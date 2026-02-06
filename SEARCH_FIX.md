@@ -35,11 +35,12 @@ srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`
 ```
 
 ## Changes Made
-1. **src/services/FileService.js** - Line 49: Updated search query format
+1. **src/services/FileService.js** - Line 47-49: Added space to underscore replacement and updated search query format
 2. **tests/unit/FileService.test.js** - Line 68: Updated test to match new format
+3. **tests/unit/FileService.test.js** - Added new test case for category names with spaces
 
 ## Testing
-- ✅ All 69 tests passing
+- ✅ All 70 tests passing (added 1 new test)
 - ✅ Build successful
 - ✅ Ready for deployment
 
@@ -55,8 +56,17 @@ The new format supports:
 ## MediaWiki Search API Documentation
 The correct syntax according to MediaWiki Search API:
 - `incategory:CategoryName` - Search within a category (no quotes, no "Category:" prefix)
+- Spaces in category names must be replaced with underscores: `Life expectancy maps` → `Life_expectancy_maps`
 - `intitle:/pattern/` - Search for pattern in title using regex format
 - Order matters: category filter first, then title filter
+
+## Examples of Space Handling
+
+| Original Category Name | Search Format |
+|------------------------|---------------|
+| `Life expectancy maps` | `incategory:Life_expectancy_maps` |
+| `Life expectancy maps of South America (no data)` | `incategory:Life_expectancy_maps_of_South_America_(no_data)` |
+| `Uploaded by OWID importer tool` | `incategory:Uploaded_by_OWID_importer_tool` |
 
 ## Version
 This fix will be included in v1.1.1

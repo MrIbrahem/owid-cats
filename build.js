@@ -43,8 +43,9 @@ function stripModuleExports(code) {
   // if (typeof module !== 'undefined' && module.exports) {
   //   module.exports = ClassName;
   // }
+  // Use [\s\S] instead of . to match across newlines
   return code.replace(
-    /if \(typeof module !== 'undefined' && module\.exports\) \{[^}]*module\.exports = [^;]+;[^}]*\}/g,
+    /if \(typeof module !== 'undefined' && module\.exports\) \{[\s\S]*?module\.exports = [^;]+;[\s\S]*?\}\n?/g,
     ''
   );
 }
@@ -55,7 +56,8 @@ function stripModuleExports(code) {
  * @returns {string} Code with global comments removed
  */
 function stripGlobalComments(code) {
-  return code.replace(/\/\* global .+? \*\/\n?/g, '');
+  // Use [\s\S] to match content across lines
+  return code.replace(/\/\* global [\s\S]+? \*\/\n?/g, '');
 }
 
 /**
@@ -151,10 +153,8 @@ function buildCSS() {
  */
 function build() {
   // Create dist directory if it doesn't exist
-  if (!fs.existsSync(DIST_DIR)) {
-    fs.mkdirSync(DIST_DIR);
-    console.log(`✓ Created ${DIST_DIR}/ directory`);
-  }
+  fs.mkdirSync(DIST_DIR, { recursive: true });
+  console.log(`✓ Created ${DIST_DIR}/ directory`);
   
   // Build JS and CSS
   buildJS();

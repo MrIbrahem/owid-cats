@@ -1,206 +1,89 @@
-# أمثلة عملية - Usage Examples
+# Usage Examples
 
-## أمثلة لاستخدام Category Batch Manager
+## Practical Examples for Category Batch Manager
 
-### مثال 1: إضافة تصنيف دولة لملفات OWID
+### Example 1: Adding Country Category to Files
 
-**الهدف:** إضافة `Category:Belarus` لجميع ملفات بيلاروسيا
+**Goal:** Add `Category:Belarus` to all Belarus-related files
 
-**الخطوات:**
-1. افتح أي صفحة تصنيف (أو أدخل التصنيف يدوياً في الحقل)
-2. في حقل "Source Category": `Category:Uploaded_by_OWID_importer_tool`
-3. في حقل "Search Pattern": `,BLR.svg`
-4. اضغط "Search"
-5. في حقل "Add Categories": `Category:Belarus, Category:Europe, Category:Eastern Europe`
-6. اضغط "GO"
+**Steps:**
+1. Navigate to category page or enter manually
+2. Source Category: `Category:Uploaded_by_OWID_importer_tool`
+3. Search Pattern: `,BLR.svg`
+4. Click "Search"
+5. Add Categories: `Category:Belarus, Category:Europe`
+6. Click "GO"
 
-**النتيجة:** جميع الملفات التي تحتوي على `,BLR.svg` ستحصل على التصنيفات الجديدة
+**Result:** All files with `,BLR.svg` will be categorized
 
 ---
 
-### مثال 2: تنظيف تصنيفات قديمة
+### Example 2: Replacing Old Category
 
-**الهدف:** إزالة تصنيف قديم وإضافة تصنيف جديد
+**Goal:** Replace deprecated category with new one
 
-**الخطوات:**
+**Steps:**
 1. Source Category: `Category:Economic_Charts`
 2. Search Pattern: `GDP`
-3. اضغط "Search"
-4. Add Categories: `Category:GDP_Indicators`
-5. Remove Categories: `Category:Old_Economic_Data`
-6. **معاينة التغييرات:** اضغط "Preview Changes" للمراجعة
-7. اضغط "GO"
+3. Add Categories: `Category:GDP_Indicators_2024`
+4. Remove Categories: `Category:Old_Economic_Data`
+5. Preview changes (optional)
+6. Click "GO"
 
 ---
 
-### مثال 3: البحث في تصنيف ضخم
+### Example 3: Large Category Search (100K+ files)
 
-**السيناريو:** تصنيف يحتوي على 150,000 ملف، وتريد فقط 200 ملف منها
+**Scenario:** Category has 150,000 files, need only 200
 
-**الخطوات:**
-1. Source Category: `Category:Charts` (تصنيف ضخم)
-2. Search Pattern: `Population_density` (نمط محدد)
-3. اضغط "Search" - **سيعثر فقط على الملفات المطابقة في ثوانٍ!**
-4. راجع النتائج (مثلاً 200 ملف)
-5. أضف التصنيفات المطلوبة
-6. اضغط "GO"
+**Steps:**
+1. Source Category: `Category:Charts`
+2. Search Pattern: `Population_density`
+3. Click "Search" - **Returns only matches in seconds!**
+4. Review ~200 results
+5. Add categories
+6. Execute
 
-**الفائدة:** بدلاً من تحميل 150,000 ملف، يتم تحميل 200 ملف فقط!
-
----
-
-### مثال 4: إزالة ملفات غير مرغوبة من النتائج
-
-**الموقف:** البحث عن `,USA.svg` أعاد بعض الملفات التي لا تريدها
-
-**الخطوات:**
-1. قم بالبحث كالمعتاد
-2. شاهد قائمة النتائج
-3. انقر على زر **×** بجانب أي ملف لا تريد تعديله
-4. أو استخدم "Deselect All" ثم اختر الملفات يدوياً
-5. تابع العملية
+**Performance:** Loads 200 files instead of 150,000!
 
 ---
 
-### مثال 5: معالجة دول متعددة
+## Common Search Patterns
 
-**الهدف:** إضافة تصنيفات جغرافية لعدة دول
-
-**للدولة الأولى (بيلاروسيا):**
-```
-Source: Category:Uploaded_by_OWID_importer_tool
-Pattern: ,BLR.svg
-Add: Category:Belarus, Category:Europe
-```
-
-**للدولة الثانية (الولايات المتحدة):**
-```
-Source: Category:Uploaded_by_OWID_importer_tool
-Pattern: ,USA.svg
-Add: Category:United States, Category:North America
-```
-
-**للدولة الثالثة (اليابان):**
-```
-Source: Category:Uploaded_by_OWID_importer_tool
-Pattern: ,JPN.svg
-Add: Category:Japan, Category:Asia
-```
-
-**نصيحة:** لا تحتاج لإغلاق الأداة بين العمليات، فقط غير النمط والتصنيفات واضغط "Search" مرة أخرى!
+| Pattern | Matches | Example |
+|---------|---------|---------|
+| `,BLR.svg` | Belarus files | `Chart_GDP,BLR.svg` |
+| `_indicator_` | Indicators | `Economic_indicator_2020.svg` |
+| `Chart_` | All charts | `Chart_Population.svg` |
+| `2023` | 2023 files | `Data_2023_Report.svg` |
 
 ---
 
-### مثال 6: البحث بأنماط مختلفة
+## Tips
 
-**أنماط شائعة للبحث:**
+### Best Practices
+- ✅ Use specific patterns: `Chart_GDP,BLR.svg`
+- ✅ Preview large operations
+- ✅ Test on 5-10 files first
+- ✅ Use full category names: `Category:Example`
 
-| النمط | يعثر على | مثال |
-|-------|---------|------|
-| `,BLR.svg` | ملفات بيلاروسيا | `Chart_GDP,BLR.svg` |
-| `_indicator_` | ملفات المؤشرات | `Economic_indicator_2020.svg` |
-| `Chart_` | جميع الرسوم البيانية | `Chart_Population.svg` |
-| `2023` | ملفات من سنة 2023 | `Data_2023_Report.svg` |
-| `GDP` | ملفات تحتوي على GDP | `GDP_Growth_Chart.svg` |
-
----
-
-### مثال 7: استخدام المعاينة قبل التنفيذ
-
-**الخطوات:**
-1. قم بإعداد البحث والتصنيفات
-2. **اضغط "Preview Changes"** بدلاً من "GO"
-3. راجع الجدول الذي يظهر:
-   - الملفات التي ستتغير
-   - التصنيفات الحالية
-   - التصنيفات الجديدة
-4. إذا كان كل شيء صحيح، أغلق المعاينة واضغط "GO"
-5. إذا وجدت خطأ، عدّل التصنيفات وعاين مرة أخرى
+### Common Mistakes
+- ❌ Generic patterns: `Chart`
+- ❌ Missing prefix: `Belarus` instead of `Category:Belarus`
+- ❌ No preview for 50+ files
 
 ---
 
-### مثال 8: التعامل مع الأخطاء
+## FAQ
 
-**إذا ظهرت أخطاء:**
+**Q: Maximum files per batch?**
+A: Up to 5000, recommended 100-500
 
-1. **لا يوجد نتائج:**
-   - تحقق من اسم التصنيف (يجب أن يبدأ بـ `Category:`)
-   - تحقق من نمط البحث (هل هو دقيق؟)
+**Q: Can I undo?**
+A: No undo, but can reverse (add→remove, remove→add)
 
-2. **فشل بعض الملفات:**
-   - راجع رسائل الخطأ في نهاية العملية
-   - الملفات الناجحة تم تعديلها بالفعل
-   - يمكنك إعادة المحاولة للملفات الفاشلة
+**Q: Why so fast?**
+A: Uses Search API instead of loading all files. See [PERFORMANCE.md](PERFORMANCE.md)
 
-3. **بطء في الاستجابة:**
-   - قد يكون التصنيف ضخم جداً
-   - حاول تحديد نمط بحث أكثر دقة
-
----
-
-## نصائح للاستخدام الفعّال
-
-### 1. استخدم أنماط بحث محددة
-❌ سيء: `Chart` (قد يعيد آلاف النتائج)
-✅ جيد: `Chart_GDP,BLR.svg` (نتائج محددة جداً)
-
-### 2. استخدم المعاينة للعمليات الكبيرة
-دائماً استخدم "Preview Changes" عندما تعدل أكثر من 50 ملف
-
-### 3. اختبر على ملفات قليلة أولاً
-إذا كنت تتعلم، جرب على 5-10 ملفات أولاً
-
-### 4. استخدم أسماء تصنيفات كاملة
-❌ سيء: `Belarus`
-✅ جيد: `Category:Belarus`
-
-### 5. راجع التصنيفات الموجودة
-قبل إضافة تصنيف، تحقق من أنه موجود فعلاً في Commons
-
----
-
-## أمثلة على عمليات متقدمة
-
-### تنظيم ملفات حسب النوع والمنطقة
-
-```
-# المرحلة 1: إضافة تصنيف النوع
-Search: Chart_GDP
-Add: Category:GDP_Charts, Category:Economic_Charts
-
-# المرحلة 2: إضافة تصنيف المنطقة
-Search: Chart_GDP,BLR
-Add: Category:Belarus_Economy
-
-# المرحلة 3: إزالة تصنيفات قديمة
-Search: Chart_GDP
-Remove: Category:Uncategorized, Category:Needs_review
-```
-
-### ترحيل من تصنيف قديم إلى جديد
-
-```
-Source: Category:Old_Charts
-Pattern: (اتركه فارغ أو استخدم نمط عام)
-Add: Category:New_Charts_2024
-Remove: Category:Old_Charts
-```
-
----
-
-## الأسئلة الشائعة
-
-**س: كم ملف يمكنني معالجته دفعة واحدة؟**
-ج: نظرياً حتى 5000 ملف، لكن يُنصح بـ 100-500 ملف في كل دفعة.
-
-**س: هل يمكنني التراجع عن التغييرات؟**
-ج: لا يوجد زر "تراجع"، لكن يمكنك تشغيل عملية عكسية (إزالة ما أضفت وإضافة ما أزلت).
-
-**س: لماذا البحث سريع جداً؟**
-ج: لأننا نستخدم Search API الذي يبحث مباشرة بدلاً من تحميل جميع الملفات. راجع [PERFORMANCE.md](PERFORMANCE.md).
-
-**س: هل يمكنني البحث في أكثر من تصنيف؟**
-ج: حالياً لا، لكن يمكنك تشغيل الأداة عدة مرات لتصنيفات مختلفة.
-
-**س: ما هو أقصى طول لنمط البحث؟**
-ج: لا يوجد حد معين، لكن يُنصح بأنماط قصيرة ومحددة للحصول على أفضل نتائج.
+**Q: Multiple categories?**
+A: Run tool separately for each category

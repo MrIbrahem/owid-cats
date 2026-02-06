@@ -1,232 +1,194 @@
-# دليل النشر - Deployment Guide
+# Deployment Guide
 
-## 📦 نشر الإصدار الجديد على Wikimedia Commons
+## Deploying to Wikimedia Commons
 
-### المتطلبات الأولية
+### Prerequisites
 
-1. حساب على Wikimedia Commons مع صلاحيات تعديل صفحات النظام
-2. الملفات المبنية في مجلد `dist/`
+1. Wikimedia Commons account with system page edit permissions
+2. Built files in `dist/` directory
 
 ---
 
-## 🚀 خطوات النشر
+## Deployment Steps
 
-### الخطوة 1: بناء المشروع
+### Step 1: Build the Project
 
 ```bash
 npm run build
 ```
 
-هذا سيُنشئ:
+This creates:
 - `dist/Gadget-CategoryBatchManager.js` (49 KB)
 - `dist/Gadget-CategoryBatchManager.css` (4 KB)
 
-### الخطوة 2: نسخ ملف JavaScript
+### Step 2: Deploy JavaScript
 
-1. افتح الملف: `dist/Gadget-CategoryBatchManager.js`
-2. انسخ محتوياته بالكامل
-3. اذهب إلى: https://commons.wikimedia.org/wiki/MediaWiki:Gadget-CategoryBatchManager.js
-4. انقر "Edit"
-5. الصق المحتوى
-6. في ملخص التعديل، اكتب:
+1. Open `dist/Gadget-CategoryBatchManager.js`
+2. Copy entire contents
+3. Go to: https://commons.wikimedia.org/wiki/MediaWiki:Gadget-CategoryBatchManager.js
+4. Click "Edit"
+5. Paste content
+6. Edit summary:
    ```
-   v1.1.0: Major performance improvement - using Search API instead of categorymembers
+   v1.1.0: Major performance improvement - Search API implementation
    ```
-7. احفظ الصفحة
+7. Save page
 
-### الخطوة 3: نسخ ملف CSS
+### Step 3: Deploy CSS
 
-1. افتح الملف: `dist/Gadget-CategoryBatchManager.css`
-2. انسخ محتوياته بالكامل
-3. اذهب إلى: https://commons.wikimedia.org/wiki/MediaWiki:Gadget-CategoryBatchManager.css
-4. انقر "Edit"
-5. الصق المحتوى
-6. في ملخص التعديل، اكتب:
+1. Open `dist/Gadget-CategoryBatchManager.css`
+2. Copy entire contents
+3. Go to: https://commons.wikimedia.org/wiki/MediaWiki:Gadget-CategoryBatchManager.css
+4. Click "Edit"
+5. Paste content
+6. Edit summary:
    ```
    v1.1.0: Updated styles for source category field
    ```
-7. احفظ الصفحة
+7. Save page
 
-### الخطوة 4: تحديث تعريف الـ Gadget
+### Step 4: Verify Gadget Definition
 
-اذهب إلى: https://commons.wikimedia.org/wiki/MediaWiki:Gadgets-definition
+Go to: https://commons.wikimedia.org/wiki/MediaWiki:Gadgets-definition
 
-تأكد من وجود السطر التالي:
+Ensure this line exists:
 ```
 * CategoryBatchManager[ResourceLoader|dependencies=mediawiki.api,mediawiki.util]|CategoryBatchManager.js|CategoryBatchManager.css
 ```
 
 ---
 
-## ✅ التحقق من النشر
+## Verification
 
-### 1. تحقق من تحميل الملفات
+### 1. Check Loading
 
-افتح Console في المتصفح وتحقق من عدم وجود أخطاء JavaScript:
-```
-F12 → Console
-```
+Open browser console (F12) and verify no JavaScript errors
 
-### 2. اختبر على صفحة تصنيف
+### 2. Test on Category Page
 
-1. اذهب إلى أي صفحة تصنيف، مثل:
-   https://commons.wikimedia.org/wiki/Category:Test
-2. تأكد من ظهور زر "Batch Manager" في القائمة
-3. انقر على الزر
-4. تحقق من:
-   - ظهور حقل "Source Category" مع اسم التصنيف الحالي
-   - إمكانية تعديل حقل التصنيف
-   - عمل البحث بشكل سريع
+1. Go to any category: https://commons.wikimedia.org/wiki/Category:Test
+2. Verify "Batch Manager" button appears
+3. Click button
+4. Verify:
+   - Source Category field shows current category
+   - Field is editable
+   - Search works quickly
 
-### 3. اختبر الأداء
+### 3. Performance Test
 
-اختبر على تصنيف كبير:
-1. افتح `Category:Uploaded_by_OWID_importer_tool`
-2. افتح Batch Manager
-3. ابحث عن نمط محدد (مثل `,BLR.svg`)
-4. تحقق من سرعة الاستجابة (يجب أن تكون ثوانٍ قليلة)
+Test on large category:
+1. Open `Category:Uploaded_by_OWID_importer_tool`
+2. Open Batch Manager
+3. Search for specific pattern (e.g., `,BLR.svg`)
+4. Verify quick response (seconds, not minutes)
 
 ---
 
-## 🔧 استكشاف الأخطاء
+## Troubleshooting
 
-### المشكلة: الزر لا يظهر
+### Button Doesn't Appear
 
-**الحل:**
-1. تحقق من تفعيل الـ Gadget في التفضيلات
-2. امسح ذاكرة التخزين المؤقت (Cache)
-3. تحقق من Console للأخطاء
+**Solutions:**
+1. Verify gadget enabled in preferences
+2. Clear browser cache
+3. Check console for errors
+4. Ensure you're on a category page
 
-### المشكلة: البحث لا يعمل
+### Search Not Working
 
-**الحل:**
-1. افتح Console
-2. ابحث عن رسائل الخطأ
-3. تحقق من أن Search API متاح
-4. تحقق من صيغة التصنيف (يجب أن يبدأ بـ `Category:`)
+**Solutions:**
+1. Open console for error messages
+2. Verify Search API is available
+3. Check category format (must start with `Category:`)
 
-### المشكلة: بطء في الأداء
+### Slow Performance
 
-**الأسباب المحتملة:**
-1. نمط البحث عام جداً (يعيد آلاف النتائج)
-2. مشكلة في الشبكة
-3. الخوادم بطيئة
+**Possible Causes:**
+1. Search pattern too generic (returns thousands)
+2. Network issues
+3. Server load
 
-**الحل:**
-- استخدم نمط بحث أكثر تحديداً
-- انتظر قليلاً وحاول مرة أخرى
-
----
-
-## 📊 مراقبة الاستخدام
-
-### إحصائيات للمراقبة:
-
-1. **عدد الاستخدامات**: راقب Console logs في UsageLogger
-2. **الأخطاء**: راقب error logs
-3. **الأداء**: راقب وقت الاستجابة
-
-### أدوات المراقبة:
-
-```javascript
-// في Console، يمكن مراقبة الاستخدام:
-localStorage.getItem('cbm-usage-log')
-```
+**Solutions:**
+- Use more specific search pattern
+- Wait and retry later
 
 ---
 
-## 🔄 التراجع عن النشر (Rollback)
+## Rollback Procedure
 
-إذا حدثت مشكلة، يمكن التراجع:
+If issues occur:
 
-1. اذهب إلى صفحة الملف على Commons
-2. اضغط "View history"
-3. اختر النسخة السابقة
-4. اضغط "restore this revision"
+1. Go to file page on Commons
+2. Click "View history"
+3. Select previous version
+4. Click "restore this revision"
 
-**أو** استخدم git للعودة للإصدار السابق:
+**Or** use git to rollback:
 ```bash
 git checkout v1.0.0
 npm run build
-# ثم انشر الملفات القديمة
+# Then deploy old files
 ```
 
 ---
 
-## 📢 الإعلان عن التحديث
+## Announcement
 
-### 1. إنشاء صفحة توثيق
+### Create Documentation Page
 
-أنشئ/حدّث صفحة التوثيق:
-https://commons.wikimedia.org/wiki/Commons:Category_Batch_Manager
+Create/update: https://commons.wikimedia.org/wiki/Commons:Category_Batch_Manager
 
-### 2. الإعلان في Village Pump
+### Announce in Village Pump
 
-انشر إعلان في:
-https://commons.wikimedia.org/wiki/Commons:Village_pump
+Post at: https://commons.wikimedia.org/wiki/Commons:Village_pump
 
-**مثال على الإعلان:**
+**Example Announcement:**
 
 ```markdown
 == Category Batch Manager - Version 1.1.0 ==
 
-I'm pleased to announce a major update to the Category Batch Manager gadget:
+Major update to Category Batch Manager gadget:
 
 === New Features ===
-* '''60x faster search''' - Now uses MediaWiki Search API instead of loading all category members
-* '''Flexible source category''' - Can now search in any category, not just the current page
-* '''Efficient for large categories''' - Can now handle categories with 100,000+ files easily
+* '''60x faster search''' - Now uses Search API
+* '''Flexible source category''' - Search any category
+* '''Large category support''' - Handles 100,000+ files efficiently
 
 === How to Use ===
 1. Go to any category page
-2. Click "Batch Manager" in the actions menu
-3. Enter a search pattern
-4. Add/remove categories as needed
+2. Click "Batch Manager"
+3. Enter search pattern
+4. Add/remove categories
 
 === Feedback ===
-Please report any issues or suggestions at [[Commons talk:Category Batch Manager]]
+Report issues at [[Commons talk:Category Batch Manager]]
 
-Thanks! ~~~~
+~~~~
 ```
 
-### 3. إشعار المستخدمين الحاليين
+---
 
-إذا كان هناك مستخدمون حاليون، أرسل لهم إشعار على صفحات نقاشهم.
+## Pre-Deployment Checklist
+
+- [ ] All tests passing (`npm test`)
+- [ ] Build successful (`npm run build`)
+- [ ] Local testing complete
+- [ ] CHANGELOG.md updated
+- [ ] Version number updated in package.json
+- [ ] Git tag created for release
+- [ ] All changes reviewed
+- [ ] No console errors
+- [ ] Rollback plan ready
 
 ---
 
-## 📝 قائمة التحقق النهائية
+## Post-Deployment
 
-قبل النشر، تأكد من:
-
-- [ ] تم تشغيل جميع الاختبارات بنجاح (`npm test`)
-- [ ] تم بناء المشروع (`npm run build`)
-- [ ] تم اختبار الكود محلياً
-- [ ] تم تحديث CHANGELOG.md
-- [ ] تم تحديث رقم الإصدار في package.json
-- [ ] تم إنشاء tag في git للإصدار الجديد
-- [ ] تم مراجعة جميع التغييرات
-- [ ] تم التحقق من عدم وجود أخطاء في Console
-- [ ] تم اختبار على بيئة test (إن وجدت)
-- [ ] تم إعداد خطة Rollback
+1. **Monitor for 1 hour** - Check for errors
+2. **Watch feedback** - Listen to user comments
+3. **Document issues** - Record any problems
+4. **Plan next release** - Use feedback for improvements
 
 ---
 
-## 🎯 بعد النشر
-
-1. **راقب لمدة ساعة:** تحقق من عدم وجود أخطاء
-2. **راقب التغذية الراجعة:** استمع لتعليقات المستخدمين
-3. **وثّق المشاكل:** سجل أي مشاكل تظهر
-4. **خطط للإصدار التالي:** استخدم التغذية الراجعة للتحسين
-
----
-
-## 📞 الدعم
-
-للمساعدة أو الأسئلة:
-- صفحة النقاش: https://commons.wikimedia.org/wiki/Commons_talk:Category_Batch_Manager
-- GitHub Issues: (إذا كان المشروع على GitHub)
-
----
-
-**تم! الأداة جاهزة للنشر 🚀**
+**Status:** Ready for production deployment 🚀

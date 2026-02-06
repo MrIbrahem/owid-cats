@@ -12,7 +12,8 @@
 
 /* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger */
 
-class CategoryBatchManagerUI {  constructor() {
+class CategoryBatchManagerUI {
+  constructor() {
     this.apiService = new APIService();
     this.fileService = new FileService(this.apiService);
     this.categoryService = new CategoryService(this.apiService);
@@ -44,7 +45,8 @@ class CategoryBatchManagerUI {  constructor() {
   buildContainer() {
     const div = document.createElement('div');
     div.id = 'category-batch-manager';
-    div.className = 'cbm-container';    div.innerHTML = `
+    div.className = 'cbm-container';
+    div.innerHTML = `
       <div class="cbm-header">
         <h2>Category Batch Manager</h2>
         <button class="cbm-close" id="cbm-close">&times;</button>
@@ -55,7 +57,7 @@ class CategoryBatchManagerUI {  constructor() {
           <label>Source Category:</label>
           <input type="text" id="cbm-source-category" value="${this.state.sourceCategory}" placeholder="Category:Example">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Search Pattern:</label>
           <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
@@ -143,12 +145,17 @@ class CategoryBatchManagerUI {  constructor() {
       this.close();
     });
   }
-
   async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
+    const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
     if (!pattern) {
       alert('Please enter a search pattern');
+      return;
+    }
+
+    if (!sourceCategory) {
+      alert('Please enter a source category');
       return;
     }
 
@@ -156,12 +163,13 @@ class CategoryBatchManagerUI {  constructor() {
 
     try {
       const files = await this.fileService.searchFiles(
-        this.state.sourceCategory,
+        sourceCategory,
         pattern
       );
 
       this.state.files = files;
       this.state.searchPattern = pattern;
+      this.state.sourceCategory = sourceCategory;
       this.renderFileList();
       this.hideLoading();
 

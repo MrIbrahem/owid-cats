@@ -348,6 +348,7 @@ class CategoryOperation {
  */
 
 
+
 class APIService {
   constructor() {
     this.baseURL = 'https://commons.wikimedia.org/w/api.php';
@@ -535,6 +536,7 @@ class APIService {
  */
 
 
+
 class FileService {
   /**
    * @param {APIService} apiService - API service instance
@@ -542,26 +544,77 @@ class FileService {
   constructor(apiService) {
     this.api = apiService;
   }
-
   /**
    * Search files by pattern within a category
+   * Uses MediaWiki search API for efficiency instead of loading all category members
    * @param {string} categoryName - Category to search in
    * @param {string} searchPattern - Pattern to match against file titles
    * @returns {Promise<Array<FileModel>>} Array of matching file models
    */
   async searchFiles(categoryName, searchPattern) {
-    // 1. Get all files from category
-    const allFiles = await this.api.getCategoryMembers(categoryName);
+    // Normalize category name
+    const cleanCategoryName = categoryName.replace(/^Category:/i, '');
 
-    // 2. Filter by pattern
-    const matchingFiles = allFiles.filter(file =>
-      file.title.includes(searchPattern)
-    );
+    // Use search API to find files matching the pattern in the category
+    const searchResults = await this.searchInCategory(cleanCategoryName, searchPattern);
 
-    // 3. Get detailed info for matching files
-    const filesWithInfo = await this.getFilesDetails(matchingFiles);
+    // Get detailed info for matching files
+    const filesWithInfo = await this.getFilesDetails(searchResults);
 
     return filesWithInfo;
+  }
+
+  /**
+   * Search for files in a category using MediaWiki search API
+   * Much more efficient than loading all category members
+   * @param {string} categoryName - Category name (without "Category:" prefix)
+   * @param {string} pattern - Search pattern
+   * @returns {Promise<Array>} Array of file objects
+   */
+  async searchInCategory(categoryName, pattern) {
+    const results = [];
+    let continueToken = null;
+
+    do {
+      const params = {
+        action: 'query',
+        list: 'search',
+        srsearch: `intitle:${pattern} incategory:"${categoryName}"`,
+        srnamespace: 6, // File namespace
+        srlimit: 500,
+        srprop: 'size|wordcount|timestamp',
+        format: 'json'
+      };
+
+      if (continueToken) {
+        params.sroffset = continueToken;
+      }
+
+      const response = await this.api.makeRequest(params);
+
+      if (response.query && response.query.search) {
+        const searchResults = response.query.search.map(file => ({
+          title: file.title,
+          pageid: file.pageid,
+          size: file.size,
+          timestamp: file.timestamp
+        }));
+
+        results.push(...searchResults);
+      }
+
+      // Check if there are more results
+      continueToken = response.continue ? response.continue.sroffset : null;
+
+      // Safety limit to prevent too many requests
+      if (results.length >= 5000) {
+        console.warn('Search result limit reached (5000 files)');
+        break;
+      }
+
+    } while (continueToken);
+
+    return results;
   }
 
   /**
@@ -636,6 +689,7 @@ class FileService {
  * Service for category operations on files
  * @class CategoryService
  */
+
 
 
 class CategoryService {
@@ -850,6 +904,7 @@ class ErrorRecovery {
  * Batch processor for handling multiple file operations
  * @class BatchProcessor
  */
+
 
 
 class BatchProcessor {
@@ -1186,6 +1241,7 @@ class ProgressBar {
  */
 
 
+
 class CategoryBatchManagerUI {
   constructor() {
     this.apiService = new APIService();
@@ -1194,7 +1250,7 @@ class CategoryBatchManagerUI {
     this.batchProcessor = new BatchProcessor(this.categoryService);
 
     this.state = {
-      sourceCategory: 'Category:Uploaded_by_OWID_importer_tool',
+      sourceCategory: mw.config.get('wgPageName'),
       searchPattern: '',
       files: [],
       selectedFiles: [],
@@ -1220,19 +1276,25 @@ class CategoryBatchManagerUI {
     const div = document.createElement('div');
     div.id = 'category-batch-manager';
     div.className = 'cbm-container';
-
     div.innerHTML = `
       <div class="cbm-header">
         <h2>Category Batch Manager</h2>
         <button class="cbm-close" id="cbm-close">&times;</button>
       </div>
-      
+
       <div class="cbm-search">
-        <label>Search Pattern:</label>
-        <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
-        <button id="cbm-search-btn">Search</button>
+        <div class="cbm-input-group">
+          <label>Source Category:</label>
+          <input type="text" id="cbm-source-category" value="${this.state.sourceCategory}" placeholder="Category:Example">
+        </div>
+
+        <div class="cbm-input-group">
+          <label>Search Pattern:</label>
+          <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
+          <button id="cbm-search-btn">Search</button>
+        </div>
       </div>
-      
+
       <div class="cbm-results">
         <div id="cbm-results-header" class="hidden">
           Found <span id="cbm-count">0</span> files
@@ -1241,41 +1303,41 @@ class CategoryBatchManagerUI {
         </div>
         <div id="cbm-file-list"></div>
       </div>
-      
+
       <div class="cbm-actions">
         <div class="cbm-input-group">
           <label>Add Categories (comma-separated):</label>
           <input type="text" id="cbm-add-cats" placeholder="Category:Example">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Remove Categories (comma-separated):</label>
           <input type="text" id="cbm-remove-cats" placeholder="Category:Old">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Edit Summary:</label>
-          <input type="text" id="cbm-summary" 
+          <input type="text" id="cbm-summary"
                  value="Batch category update via Category Batch Manager">
         </div>
-        
+
         <div class="cbm-selected-count">
           Selected: <span id="cbm-selected">0</span> files
         </div>
-        
+
         <div class="cbm-buttons">
           <button id="cbm-preview" class="cbm-btn-secondary">Preview Changes</button>
           <button id="cbm-execute" class="cbm-btn-primary">GO</button>
         </div>
       </div>
-      
+
       <div id="cbm-progress" class="cbm-progress hidden">
         <div class="cbm-progress-bar">
           <div id="cbm-progress-fill" style="width: 0%"></div>
         </div>
         <div id="cbm-progress-text">Processing...</div>
       </div>
-      
+
       <div id="cbm-preview-modal" class="cbm-modal hidden">
         <div class="cbm-modal-content">
           <h3>Preview Changes</h3>
@@ -1313,12 +1375,17 @@ class CategoryBatchManagerUI {
       this.close();
     });
   }
-
   async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
+    const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
     if (!pattern) {
       alert('Please enter a search pattern');
+      return;
+    }
+
+    if (!sourceCategory) {
+      alert('Please enter a source category');
       return;
     }
 
@@ -1326,12 +1393,13 @@ class CategoryBatchManagerUI {
 
     try {
       const files = await this.fileService.searchFiles(
-        this.state.sourceCategory,
+        sourceCategory,
         pattern
       );
 
       this.state.files = files;
       this.state.searchPattern = pattern;
+      this.state.sourceCategory = sourceCategory;
       this.renderFileList();
       this.hideLoading();
 
@@ -1365,7 +1433,7 @@ class CategoryBatchManagerUI {
       fileRow.dataset.index = index;
 
       fileRow.innerHTML = `
-        <input type="checkbox" class="cbm-file-checkbox" 
+        <input type="checkbox" class="cbm-file-checkbox"
                id="file-${index}" checked>
         <label for="file-${index}">${file.title}</label>
         <button class="cbm-remove-btn" data-index="${index}">&times;</button>
@@ -1613,6 +1681,7 @@ class CategoryBatchManagerUI {
  * Adds a "Batch Manager" button to category pages in Wikimedia Commons.
  * When clicked, opens the Category Batch Manager UI.
  */
+
 
 
 /**

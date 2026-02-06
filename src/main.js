@@ -12,15 +12,14 @@
 
 /* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger */
 
-class CategoryBatchManagerUI {
-  constructor() {
+class CategoryBatchManagerUI {  constructor() {
     this.apiService = new APIService();
     this.fileService = new FileService(this.apiService);
     this.categoryService = new CategoryService(this.apiService);
     this.batchProcessor = new BatchProcessor(this.categoryService);
 
     this.state = {
-      sourceCategory: 'Category:Uploaded_by_OWID_importer_tool',
+      sourceCategory: mw.config.get('wgPageName'),
       searchPattern: '',
       files: [],
       selectedFiles: [],
@@ -45,20 +44,25 @@ class CategoryBatchManagerUI {
   buildContainer() {
     const div = document.createElement('div');
     div.id = 'category-batch-manager';
-    div.className = 'cbm-container';
-
-    div.innerHTML = `
+    div.className = 'cbm-container';    div.innerHTML = `
       <div class="cbm-header">
         <h2>Category Batch Manager</h2>
         <button class="cbm-close" id="cbm-close">&times;</button>
       </div>
-      
+
       <div class="cbm-search">
-        <label>Search Pattern:</label>
-        <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
-        <button id="cbm-search-btn">Search</button>
+        <div class="cbm-input-group">
+          <label>Source Category:</label>
+          <input type="text" id="cbm-source-category" value="${this.state.sourceCategory}" placeholder="Category:Example">
+        </div>
+        
+        <div class="cbm-input-group">
+          <label>Search Pattern:</label>
+          <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
+          <button id="cbm-search-btn">Search</button>
+        </div>
       </div>
-      
+
       <div class="cbm-results">
         <div id="cbm-results-header" class="hidden">
           Found <span id="cbm-count">0</span> files
@@ -67,41 +71,41 @@ class CategoryBatchManagerUI {
         </div>
         <div id="cbm-file-list"></div>
       </div>
-      
+
       <div class="cbm-actions">
         <div class="cbm-input-group">
           <label>Add Categories (comma-separated):</label>
           <input type="text" id="cbm-add-cats" placeholder="Category:Example">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Remove Categories (comma-separated):</label>
           <input type="text" id="cbm-remove-cats" placeholder="Category:Old">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Edit Summary:</label>
-          <input type="text" id="cbm-summary" 
+          <input type="text" id="cbm-summary"
                  value="Batch category update via Category Batch Manager">
         </div>
-        
+
         <div class="cbm-selected-count">
           Selected: <span id="cbm-selected">0</span> files
         </div>
-        
+
         <div class="cbm-buttons">
           <button id="cbm-preview" class="cbm-btn-secondary">Preview Changes</button>
           <button id="cbm-execute" class="cbm-btn-primary">GO</button>
         </div>
       </div>
-      
+
       <div id="cbm-progress" class="cbm-progress hidden">
         <div class="cbm-progress-bar">
           <div id="cbm-progress-fill" style="width: 0%"></div>
         </div>
         <div id="cbm-progress-text">Processing...</div>
       </div>
-      
+
       <div id="cbm-preview-modal" class="cbm-modal hidden">
         <div class="cbm-modal-content">
           <h3>Preview Changes</h3>
@@ -191,7 +195,7 @@ class CategoryBatchManagerUI {
       fileRow.dataset.index = index;
 
       fileRow.innerHTML = `
-        <input type="checkbox" class="cbm-file-checkbox" 
+        <input type="checkbox" class="cbm-file-checkbox"
                id="file-${index}" checked>
         <label for="file-${index}">${file.title}</label>
         <button class="cbm-remove-btn" data-index="${index}">&times;</button>

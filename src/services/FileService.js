@@ -46,13 +46,12 @@ class FileService {
     do {
       // Replace spaces with underscores in category name for search API
       const searchCategoryName = categoryName.replace(/\s+/g, '_');
-
       const params = {
         action: 'query',
         list: 'search',
         srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`,
         srnamespace: 6, // File namespace
-        srlimit: 500,
+        srlimit: 'max',
         srprop: 'size|wordcount|timestamp',
         format: 'json'
       };

@@ -1,0 +1,268 @@
+/* Category Batch Manager - Main Stylesheet */
+
+.cbm-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  max-height: 90vh;
+  background: white;
+  border: 2px solid #a2a9b1;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cbm-header {
+  background: #f8f9fa;
+  padding: 15px;
+  border-bottom: 1px solid #a2a9b1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cbm-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.cbm-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #72777d;
+}
+
+.cbm-close:hover {
+  color: #202122;
+}
+
+.cbm-search {
+  padding: 15px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.cbm-search label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.cbm-search input {
+  width: calc(100% - 100px);
+  padding: 8px;
+  border: 1px solid #a2a9b1;
+  border-radius: 2px;
+  margin-right: 10px;
+}
+
+.cbm-search button {
+  padding: 8px 20px;
+  background: #0645AD;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.cbm-search button:hover {
+  background: #0B0080;
+}
+
+.cbm-results {
+  padding: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  border-bottom: 1px solid #eaecf0;
+}
+
+#cbm-results-header {
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 2px;
+}
+
+#cbm-results-header button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.cbm-file-row {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.cbm-file-row:hover {
+  background: #f8f9fa;
+}
+
+.cbm-file-checkbox {
+  margin-right: 10px;
+}
+
+.cbm-file-row label {
+  flex: 1;
+  cursor: pointer;
+}
+
+.cbm-remove-btn {
+  background: #d33;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.cbm-remove-btn:hover {
+  background: #b32424;
+}
+
+.cbm-actions {
+  padding: 15px;
+}
+
+.cbm-input-group {
+  margin-bottom: 15px;
+}
+
+.cbm-input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.cbm-input-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #a2a9b1;
+  border-radius: 2px;
+}
+
+.cbm-selected-count {
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.cbm-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.cbm-btn-primary {
+  flex: 1;
+  padding: 12px;
+  background: #00AF89;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cbm-btn-primary:hover {
+  background: #009270;
+}
+
+.cbm-btn-primary:disabled {
+  background: #c8ccd1;
+  cursor: not-allowed;
+}
+
+.cbm-btn-secondary {
+  flex: 1;
+  padding: 12px;
+  background: #f8f9fa;
+  color: #202122;
+  border: 1px solid #a2a9b1;
+  border-radius: 2px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cbm-btn-secondary:hover {
+  background: #eaecf0;
+}
+
+.cbm-progress {
+  padding: 15px;
+  border-top: 1px solid #eaecf0;
+}
+
+.cbm-progress-bar {
+  width: 100%;
+  height: 24px;
+  background: #eaecf0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+#cbm-progress-fill {
+  height: 100%;
+  background: #00AF89;
+  transition: width 0.3s ease;
+}
+
+#cbm-progress-text {
+  text-align: center;
+  font-size: 14px;
+}
+
+.cbm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+}
+
+.cbm-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 4px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+}
+
+.cbm-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.cbm-preview-table th,
+.cbm-preview-table td {
+  padding: 8px;
+  border: 1px solid #a2a9b1;
+  text-align: left;
+}
+
+.cbm-preview-table th {
+  background: #f8f9fa;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none !important;
+}

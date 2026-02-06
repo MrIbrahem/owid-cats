@@ -44,10 +44,13 @@ class FileService {
     let continueToken = null;
 
     do {
+      // Replace spaces with underscores in category name for search API
+      const searchCategoryName = categoryName.replace(/\s+/g, '_');
+
       const params = {
         action: 'query',
         list: 'search',
-        srsearch: `incategory:${categoryName} intitle:/${pattern}/`,
+        srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`,
         srnamespace: 6, // File namespace
         srlimit: 500,
         srprop: 'size|wordcount|timestamp',
@@ -134,7 +137,7 @@ class FileService {
       if (parseInt(pageId) < 0) continue; // Skip missing pages
 
       const categories = (page.categories || []).map(cat => cat.title);
-      const FileModelClass = typeof FileModel !== 'undefined' ? FileModel : function(d) {
+      const FileModelClass = typeof FileModel !== 'undefined' ? FileModel : function (d) {
         return d;
       };
 

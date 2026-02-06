@@ -121,6 +121,35 @@ describe('FileService', () => {
       expect(result).toHaveLength(2);
       expect(mockApi.makeRequest).toHaveBeenCalledTimes(2);
     });
+
+    test('should replace spaces with underscores in category name', async () => {
+      mockApi.makeRequest.mockResolvedValue({
+        query: {
+          search: [
+            { title: 'File:Test.svg', pageid: 1, size: 1000 }
+          ]
+        }
+      });
+
+      mockApi.getFileInfo.mockResolvedValue({
+        query: {
+          pages: {
+            '1': { title: 'File:Test.svg', pageid: 1, categories: [] }
+          }
+        }
+      });
+
+      await service.searchFiles(
+        'Category:Life expectancy maps',
+        '177'
+      );
+
+      expect(mockApi.makeRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          srsearch: 'incategory:Life_expectancy_maps intitle:/177/'
+        })
+      );
+    });
   });
 
   describe('parseFileInfo', () => {

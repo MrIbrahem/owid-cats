@@ -75,8 +75,10 @@ function processFile(filePath) {
   // For gadget-entry.js, unwrap the IIFE since we'll wrap everything in one IIFE
   if (filePath === 'src/gadget-entry.js') {
     // Remove the outer IIFE wrapper: (function () { 'use strict'; ... })();
-    content = content.replace(/^\(function \(\) \{\s*'use strict';\s*/, '');
-    content = content.replace(/\}\)\(\);?\s*$/, '');
+    // Match opening: (function () {\n  'use strict';\n\n
+    content = content.replace(/\(function \(\) \{\s+'use strict';\s+/s, '');
+    // Match closing: })();
+    content = content.replace(/\}\)\(\);?\s*$/s, '');
   }
   
   // Trim trailing whitespace and ensure proper ending

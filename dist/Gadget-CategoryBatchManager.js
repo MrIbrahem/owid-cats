@@ -1615,10 +1615,7 @@ class CategoryBatchManagerUI {
  */
 
 
-(function () {
-  'use strict';
-
-  /**
+/**
    * Add the Batch Manager tool button to the page actions menu
    */
   function addToolButton() {

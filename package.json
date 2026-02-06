@@ -1,0 +1,13 @@
+{
+  "name": "category-batch-manager",
+  "version": "1.0.0",
+  "description": "Category Batch Manager for OWID Importer - Wikimedia Commons gadget",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "license": "MIT"
+}

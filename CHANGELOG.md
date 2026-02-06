@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2026-02-07
+
+### 🐛 Bug Fixes
+- **Search Query Format**: Fixed MediaWiki search API query syntax
+  - Changed order: `incategory` now comes before `intitle`
+  - Pattern now uses regex format: `intitle:/pattern/` instead of `intitle:"pattern"`
+  - Removed quotes from category name in search query
+  - This fixes the issue where search wasn't working with certain patterns
+  - Example: `incategory:Life_expectancy_maps_of_South_America_(no_data) intitle:/177/`
+
+### 🧪 Testing
+- Updated FileService tests to match new search query format
+- All 69 tests passing ✅
+
+---
+
 ## [1.1.0] - 2026-02-07
 
 ### 🚀 Performance Improvements

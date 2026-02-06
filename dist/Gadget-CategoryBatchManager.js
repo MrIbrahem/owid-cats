@@ -579,7 +579,7 @@ class FileService {
       const params = {
         action: 'query',
         list: 'search',
-        srsearch: `intitle:${pattern} incategory:"${categoryName}"`,
+        srsearch: `incategory:${categoryName} intitle:/${pattern}/`,
         srnamespace: 6, // File namespace
         srlimit: 500,
         srprop: 'size|wordcount|timestamp',

@@ -57,7 +57,6 @@ describe('FileService', () => {
           }
         }
       });
-
       const result = await service.searchFiles(
         'Category:Test',
         ',BLR'
@@ -68,7 +67,7 @@ describe('FileService', () => {
         expect.objectContaining({
           action: 'query',
           list: 'search',
-          srsearch: 'intitle:,BLR incategory:"Test"',
+          srsearch: 'incategory:Test intitle:/,BLR/',
           srnamespace: 6
         })
       );

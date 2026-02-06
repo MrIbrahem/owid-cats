@@ -31,11 +31,21 @@ srsearch: `intitle:${pattern} incategory:"${categoryName}"`
 // Replace spaces with underscores in category name for search API
 const searchCategoryName = categoryName.replace(/\s+/g, '_');
 
-srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`
+const params = {
+  action: 'query',
+  list: 'search',
+  srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`,
+  srnamespace: 6,
+  srlimit: 'max',  // Use 'max' to respect user-specific API limits
+  format: 'json'
+};
 ```
 
 ## Changes Made
-1. **src/services/FileService.js** - Line 47-49: Added space to underscore replacement and updated search query format
+1. **src/services/FileService.js** - Line 47-56: 
+   - Added space to underscore replacement
+   - Updated search query format
+   - Changed `srlimit` from `500` to `'max'` for better API limit handling
 2. **tests/unit/FileService.test.js** - Line 68: Updated test to match new format
 3. **tests/unit/FileService.test.js** - Added new test case for category names with spaces
 
@@ -58,6 +68,7 @@ The correct syntax according to MediaWiki Search API:
 - `incategory:CategoryName` - Search within a category (no quotes, no "Category:" prefix)
 - Spaces in category names must be replaced with underscores: `Life expectancy maps` → `Life_expectancy_maps`
 - `intitle:/pattern/` - Search for pattern in title using regex format
+- `srlimit: 'max'` - Use 'max' instead of a fixed number to respect user-specific API limits (varies by user permissions)
 - Order matters: category filter first, then title filter
 
 ## Examples of Space Handling

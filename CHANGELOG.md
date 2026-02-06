@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
   - Pattern now uses regex format: `intitle:/pattern/` instead of `intitle:"pattern"`
   - Removed quotes from category name in search query
   - **Added space handling**: Spaces in category names are now automatically replaced with underscores
+  - **Set srlimit to 'max'**: Uses 'max' instead of fixed 500 to respect user-specific API limits
   - This fixes the issue where search wasn't working with certain patterns
   - Example: `incategory:Life_expectancy_maps_of_South_America_(no_data) intitle:/177/`
 

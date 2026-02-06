@@ -1,6 +1,4 @@
-# Comprehensive Plan for AI Agent to Build Wikimedia Commons Category Batch Manager Tool
-
-## Project Overview
+# Project Overview
 
 **Tool Name:** Category Batch Manager for OWID Importer  
 **Purpose:** Enable efficient batch categorization of images in Wikimedia Commons by filtering files within a category using pattern matching, allowing selective exclusion, and applying category additions/removals to the filtered set.
@@ -2343,5 +2341,6 @@ This comprehensive plan provides a complete roadmap for building the Category Ba
 5. Start development
 
 ---
+
 
 *This plan is a living document and should be updated as the project progresses and requirements evolve.*

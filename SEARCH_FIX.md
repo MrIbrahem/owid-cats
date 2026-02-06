@@ -16,6 +16,7 @@ The MediaWiki Search API requires:
 1. **Order**: `incategory` should come before `intitle`
 2. **Regex format**: Pattern should be in regex format `/pattern/` instead of quoted `"pattern"`
 3. **No quotes**: Category name should not be in quotes
+4. **Underscores**: Spaces in category names must be replaced with underscores `_`
 
 ## Solution
 Changed the search query format in `src/services/FileService.js`:
@@ -27,7 +28,10 @@ srsearch: `intitle:${pattern} incategory:"${categoryName}"`
 
 ### After:
 ```javascript
-srsearch: `incategory:${categoryName} intitle:/${pattern}/`
+// Replace spaces with underscores in category name for search API
+const searchCategoryName = categoryName.replace(/\s+/g, '_');
+
+srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`
 ```
 
 ## Changes Made

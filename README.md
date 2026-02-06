@@ -5,11 +5,13 @@ A Wikimedia Commons gadget for efficient batch categorization of images uploaded
 ## Features
 
 - **Pattern-based Search**: Search files within a category using pattern matching (e.g., `,BLR.svg` to find Belarus charts)
+- **Optimized Performance**: Uses MediaWiki Search API for lightning-fast results even in categories with 100,000+ files (see [PERFORMANCE.md](PERFORMANCE.md))
 - **Bulk Category Operations**: Add or remove categories from multiple files at once
 - **Preview Changes**: Review what will change before applying edits
 - **Progress Tracking**: Real-time progress bar with success/failure counts
 - **Error Recovery**: Failed operations are logged and can be retried
 - **Rate Limiting**: Automatic throttling to respect API limits
+- **Flexible Source**: Search in any category, not just the current page
 
 ## Installation
 

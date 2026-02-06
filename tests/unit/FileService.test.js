@@ -6,7 +6,7 @@ describe('FileService', () => {
 
   beforeEach(() => {
     mockApi = {
-      getCategoryMembers: jest.fn(),
+      makeRequest: jest.fn(),
       getFileInfo: jest.fn()
     };
     service = new FileService(mockApi);
@@ -36,15 +36,19 @@ describe('FileService', () => {
       expect(batches).toEqual([[1, 2, 3]]);
     });
   });
-
   describe('searchFiles', () => {
-    test('should filter files by pattern', async () => {
-      mockApi.getCategoryMembers.mockResolvedValue([
-        { title: 'File:Chart,BLR.svg', pageid: 1 },
-        { title: 'File:Chart,USA.svg', pageid: 2 },
-        { title: 'File:Chart,BLR_2.svg', pageid: 3 }
-      ]);
+    test('should use search API to find files by pattern', async () => {
+      // Mock search API response
+      mockApi.makeRequest.mockResolvedValue({
+        query: {
+          search: [
+            { title: 'File:Chart,BLR.svg', pageid: 1, size: 1000 },
+            { title: 'File:Chart,BLR_2.svg', pageid: 3, size: 2000 }
+          ]
+        }
+      });
 
+      // Mock file info response
       mockApi.getFileInfo.mockResolvedValue({
         query: {
           pages: {
@@ -60,12 +64,22 @@ describe('FileService', () => {
       );
 
       expect(result).toHaveLength(2);
+      expect(mockApi.makeRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'query',
+          list: 'search',
+          srsearch: 'intitle:,BLR incategory:"Test"',
+          srnamespace: 6
+        })
+      );
     });
 
     test('should return empty array when no matches', async () => {
-      mockApi.getCategoryMembers.mockResolvedValue([
-        { title: 'File:Chart,USA.svg', pageid: 1 }
-      ]);
+      mockApi.makeRequest.mockResolvedValue({
+        query: {
+          search: []
+        }
+      });
 
       const result = await service.searchFiles(
         'Category:Test',
@@ -73,6 +87,40 @@ describe('FileService', () => {
       );
 
       expect(result).toEqual([]);
+    });
+
+    test('should handle pagination in search results', async () => {
+      // First call returns results with continuation
+      mockApi.makeRequest
+        .mockResolvedValueOnce({
+          query: {
+            search: [
+              { title: 'File:Chart1.svg', pageid: 1, size: 1000 }
+            ]
+          },
+          continue: { sroffset: 1 }
+        })
+        .mockResolvedValueOnce({
+          query: {
+            search: [
+              { title: 'File:Chart2.svg', pageid: 2, size: 2000 }
+            ]
+          }
+        });
+
+      mockApi.getFileInfo.mockResolvedValue({
+        query: {
+          pages: {
+            '1': { title: 'File:Chart1.svg', pageid: 1, categories: [] },
+            '2': { title: 'File:Chart2.svg', pageid: 2, categories: [] }
+          }
+        }
+      });
+
+      const result = await service.searchFiles('Category:Test', 'Chart');
+
+      expect(result).toHaveLength(2);
+      expect(mockApi.makeRequest).toHaveBeenCalledTimes(2);
     });
   });
 

@@ -4,7 +4,8 @@
   "description": "Category Batch Manager for OWID Importer - Wikimedia Commons gadget",
   "main": "src/main.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "node build.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"

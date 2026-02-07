@@ -287,10 +287,11 @@ class CategoryBatchManagerUI {
         }
         const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
         messageContainer.innerHTML = `
-      <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
-        <span class="cdx-message__icon"></span>
-        <div class="cdx-message__content">${text}</div>
-      </div>`;
+            <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
+                <span class="cdx-message__icon"></span>
+                <div class="cdx-message__content">${text}</div>
+            </div>`;
+        messageContainer.classList.remove('hidden');
     }
 
     /**

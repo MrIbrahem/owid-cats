@@ -240,13 +240,38 @@ function handlePreview() {
 
     // Generate preview without affecting file list
     const preview = selectedFiles.map(function (file) {
+        const currentCategories = ['Belarus', 'Economic Data'];
+
+        // Check if trying to add categories that already exist
+        const duplicateCategories = toAdd.filter(cat => currentCategories.includes(cat));
+        if (duplicateCategories.length > 0) {
+            showMessage(
+                `Warning: The following categories already exist and cannot be added: <strong>${duplicateCategories.join(', ')}</strong>`,
+                'warning'
+            );
+            return null;
+        }
+
+        // Calculate new categories
+        const newCategories = [...currentCategories, ...toAdd].filter(c => !toRemove.includes(c));
+
+        // Check if there are actual changes
+        const hasChanges =
+            currentCategories.length !== newCategories.length ||
+            !currentCategories.every(cat => newCategories.includes(cat)) ||
+            !newCategories.every(cat => currentCategories.includes(cat));
+
         return {
             file: file.title,
-            currentCategories: ['Belarus', 'Economic Data'],
-            newCategories: ['Belarus', 'Economic Data', ...toAdd].filter(c => !toRemove.includes(c)),
-            willChange: true
+            currentCategories: currentCategories,
+            newCategories: newCategories,
+            willChange: hasChanges
         };
-    });
+    }).filter(item => item !== null);
+
+    if (preview.length === 0) {
+        return;
+    }
 
     showPreviewModal(preview);
 }
@@ -273,6 +298,12 @@ function showPreviewModal(preview) {
     html += '</table>';
 
     const changesCount = preview.filter(p => p.willChange).length;
+    
+    if (changesCount === 0) {
+        showMessage('No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
+        return;
+    }
+    
     html = `<p><strong>${changesCount} files</strong> will be modified</p>` + html;
 
     content.innerHTML = html;
@@ -296,6 +327,17 @@ function handleExecute() {
 
     if (toAdd.length === 0 && toRemove.length === 0) {
         showMessage('Please specify categories to add or remove.', 'warning');
+        return;
+    }
+
+    // Check for duplicate categories before execution
+    const currentCategories = ['Belarus', 'Economic Data'];
+    const duplicateCategories = toAdd.filter(cat => currentCategories.includes(cat));
+    if (duplicateCategories.length > 0) {
+        showMessage(
+            `Cannot proceed: The following categories already exist and cannot be added: <strong>${duplicateCategories.join(', ')}</strong>`,
+            'error'
+        );
         return;
     }
 

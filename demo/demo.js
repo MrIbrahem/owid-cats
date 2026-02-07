@@ -298,12 +298,12 @@ function showPreviewModal(preview) {
     html += '</table>';
 
     const changesCount = preview.filter(p => p.willChange).length;
-    
+
     if (changesCount === 0) {
         showMessage('No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
         return;
     }
-    
+
     html = `<p><strong>${changesCount} files</strong> will be modified</p>` + html;
 
     content.innerHTML = html;

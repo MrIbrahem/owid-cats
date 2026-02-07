@@ -64,14 +64,12 @@ class SearchPanel {
    */
   attachListeners() {
     document.getElementById('cbm-search-btn').addEventListener('click', () => {
-      const pattern = document.getElementById('cbm-pattern').value.trim();
-      this.onSearch(pattern);
+      this.onSearch();
     });
 
     document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        const pattern = document.getElementById('cbm-pattern').value.trim();
-        this.onSearch(pattern);
+        this.onSearch();
       }
     });
   }

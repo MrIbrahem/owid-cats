@@ -38,7 +38,16 @@ All notable changes to this project will be documented in this file.
 
 ### 🧪 Testing
 - Added test: `should count skipped files when no changes made`
-- All 129 tests passing ✅
+- **New test file:** `tests/unit/CategoryInputs.test.js` with 30+ tests:
+  - parseCategories - 9 tests
+  - getCategoriesToAdd - 2 tests
+  - getCategoriesToRemove - 2 tests
+  - getEditSummary - 3 tests
+  - clear - 3 tests
+  - createElement - 2 tests
+  - destroy - 3 tests
+  - Edge cases - 3 tests
+- **Total:** 161 tests passing ✅ (up from 129)
 
 ### 🔧 Technical Changes
 - Updated `BatchProcessor.processBatch()` to track `skipped` files separately

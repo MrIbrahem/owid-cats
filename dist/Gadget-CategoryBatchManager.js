@@ -1441,7 +1441,7 @@ class ProgressBar {
  * @description
  * Main UI class for the Category Batch Manager tool.
  * Manages the user interface, file selection, and batch operations.
- * 
+ *
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
@@ -1476,11 +1476,10 @@ class CategoryBatchManagerUI {
         // Create reopen button
         const reopenBtn = document.createElement('button');
         reopenBtn.id = 'cbm-reopen-btn';
-        reopenBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-large cdx-button--icon-only';
-        reopenBtn.setAttribute('aria-label', 'Open Category Batch Manager');
+        reopenBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-large cdx-button--icon-only'; reopenBtn.setAttribute('aria-label', 'Open Category Batch Manager');
         reopenBtn.setAttribute('title', 'Open Category Batch Manager');
         reopenBtn.textContent = '☰';
-        reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: none;';
+        reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
         // Create main container
@@ -2279,7 +2278,7 @@ class CategoryBatchManagerUI {
       'Batch Manager',
       'ca-batch-manager',
       'Open Category Batch Manager'
-    );    portletLink.addEventListener('click', function (e) {
+    ); portletLink.addEventListener('click', function (e) {
       e.preventDefault();
 
       // Ensure Codex styles, mediawiki.api, and OO.ui are loaded, then open the UI

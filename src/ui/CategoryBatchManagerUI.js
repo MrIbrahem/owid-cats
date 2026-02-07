@@ -39,11 +39,10 @@ class CategoryBatchManagerUI {
         // Create reopen button
         const reopenBtn = document.createElement('button');
         reopenBtn.id = 'cbm-reopen-btn';
-        reopenBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-large cdx-button--icon-only';
-        reopenBtn.setAttribute('aria-label', 'Open Category Batch Manager');
+        reopenBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-large cdx-button--icon-only'; reopenBtn.setAttribute('aria-label', 'Open Category Batch Manager');
         reopenBtn.setAttribute('title', 'Open Category Batch Manager');
         reopenBtn.textContent = '☰';
-        reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: none;';
+        reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
         // Create main container

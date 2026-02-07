@@ -30,7 +30,7 @@
       'Batch Manager',
       'ca-batch-manager',
       'Open Category Batch Manager'
-    );    portletLink.addEventListener('click', function (e) {
+    ); portletLink.addEventListener('click', function (e) {
       e.preventDefault();
 
       // Ensure Codex styles, mediawiki.api, and OO.ui are loaded, then open the UI

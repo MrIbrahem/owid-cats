@@ -88,9 +88,38 @@ if (confirmed) {
 
 2. **`src/ui/styles/main.css`**
    - إزالة CSS الخاص بالـ dialog المخصص (لم نعد نحتاجه)
+   - **تخفيض z-index** من 10000 إلى 100 لضمان ظهور OO.ui dialogs فوق النافذة
 
 3. **`demo/demo.html`**
    - إزالة HTML الخاص بالـ dialog (الديمو سيستخدم `confirm()` العادي)
+
+## ⚠️ مهم: Z-Index Configuration
+
+### المشكلة
+نوافذ OO.ui تستخدم z-index في نطاق **1000-2000**، بينما كانت النافذة الرئيسية تستخدم `z-index: 10000`، مما يجعل dialogs تظهر خلف النافذة.
+
+### الحل
+تم تخفيض z-index لجميع عناصر Category Batch Manager:
+
+```css
+.cbm-container {
+  z-index: 100;  /* كانت 10000 */
+}
+
+.cbm-modal {
+  z-index: 101;  /* كانت 10001 */
+}
+
+#cbm-reopen-btn {
+  z-index: 99;   /* كان 9999 */
+}
+```
+
+### ترتيب Z-Index
+1. `#cbm-reopen-btn` - 99 (الأدنى)
+2. `.cbm-container` - 100 (النافذة الرئيسية)
+3. `.cbm-modal` - 101 (نافذة المعاينة)
+4. OO.ui dialogs - ~1000-2000 (الأعلى - يظهر فوق كل شيء)
 
 ## المزايا
 

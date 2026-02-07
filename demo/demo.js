@@ -178,22 +178,17 @@ function handlePreview() {
         return;
     }
 
-    showLoading();
+    // Generate preview without affecting file list
+    const preview = selectedFiles.map(function (file) {
+        return {
+            file: file.title,
+            currentCategories: ['Belarus', 'Economic Data'],
+            newCategories: ['Belarus', 'Economic Data', ...toAdd].filter(c => !toRemove.includes(c)),
+            willChange: true
+        };
+    });
 
-    // Simulate preview generation
-    setTimeout(function () {
-        const preview = selectedFiles.map(function (file) {
-            return {
-                file: file.title,
-                currentCategories: ['Belarus', 'Economic Data'],
-                newCategories: ['Belarus', 'Economic Data', ...toAdd].filter(c => !toRemove.includes(c)),
-                willChange: true
-            };
-        });
-
-        showPreviewModal(preview);
-        hideLoading();
-    }, 300);
+    showPreviewModal(preview);
 }
 
 function showPreviewModal(preview) {

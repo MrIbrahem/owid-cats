@@ -19,6 +19,14 @@ class WikitextParser {
 
     return matches;
   }
+  /**
+   * Normalize category name by replacing underscores with spaces and trimming
+   * @param {string} categoryName - Category name to normalize
+   * @returns {string} Normalized category name
+   */
+  normalize(categoryName) {
+    return categoryName.replace(/_/g, ' ').trim();
+  }
 
   /**
    * Check if category exists in wikitext
@@ -28,13 +36,16 @@ class WikitextParser {
    */
   hasCategory(wikitext, categoryName) {
     const cleanName = categoryName.replace(/^Category:/i, '');
+    const normalizedName = this.normalize(cleanName);
+
+    // Create a pattern that matches both spaces and underscores
+    const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
     const regex = new RegExp(
-      `\\[\\[Category:${this.escapeRegex(cleanName)}(?:\\|[^\\]]*)?\\]\\]`,
+      `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]`,
       'i'
     );
     return regex.test(wikitext);
   }
-
   /**
    * Add a category to wikitext
    * @param {string} wikitext - The wikitext content
@@ -43,7 +54,14 @@ class WikitextParser {
    */
   addCategory(wikitext, categoryName) {
     const cleanName = categoryName.replace(/^Category:/i, '');
-    const categorySyntax = `[[Category:${cleanName}]]`;
+    const normalizedName = this.normalize(cleanName);
+
+    // Check if category already exists (with normalization)
+    if (this.hasCategory(wikitext, normalizedName)) {
+      return wikitext;
+    }
+
+    const categorySyntax = `[[Category:${normalizedName}]]`;
 
     // Find last category or end of file
     const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
@@ -59,7 +77,6 @@ class WikitextParser {
       return wikitext.trim() + `\n${categorySyntax}\n`;
     }
   }
-
   /**
    * Remove a category from wikitext
    * @param {string} wikitext - The wikitext content
@@ -68,8 +85,12 @@ class WikitextParser {
    */
   removeCategory(wikitext, categoryName) {
     const cleanName = categoryName.replace(/^Category:/i, '');
+    const normalizedName = this.normalize(cleanName);
+
+    // Create a pattern that matches both spaces and underscores
+    const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
     const regex = new RegExp(
-      `\\[\\[Category:${this.escapeRegex(cleanName)}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
+      `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
       'gi'
     );
     return wikitext.replace(regex, '');

@@ -103,4 +103,54 @@ describe('CategoryService', () => {
       expect(summary).toContain('-Category:B');
     });
   });
+
+  describe('getCurrentCategories', () => {
+    test('should get categories for a file', async () => {
+      mockApi.getCategories = jest.fn().mockResolvedValue(['Belarus', 'Europe', 'Maps']);
+
+      const categories = await service.getCurrentCategories('File:Test.svg');
+
+      expect(categories).toEqual(['Belarus', 'Europe', 'Maps']);
+      expect(mockApi.getCategories).toHaveBeenCalledWith('File:Test.svg');
+    });
+
+    test('should return empty array if file not found', async () => {
+      mockApi.getCategories = jest.fn().mockResolvedValue(false);
+
+      const categories = await service.getCurrentCategories('File:NotFound.svg');
+
+      expect(categories).toEqual([]);
+    });
+  });
+
+  describe('updateCategoriesOptimized', () => {
+    test('should add and remove categories using mw.Api.edit', async () => {
+      const mockEdit = jest.fn().mockResolvedValue({ edit: { result: 'Success' } });
+      mockApi._getMwApi = jest.fn().mockReturnValue({ edit: mockEdit });
+
+      const result = await service.updateCategoriesOptimized(
+        'File:Test.svg',
+        ['Category:New1', 'Category:New2'],
+        ['Category:Old1']
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.modified).toBe(true);
+      expect(mockEdit).toHaveBeenCalledWith('File:Test.svg', expect.any(Function));
+    });
+
+    test('should handle no changes scenario', async () => {
+      const mockEdit = jest.fn().mockRejectedValue(new Error('no changes'));
+      mockApi._getMwApi = jest.fn().mockReturnValue({ edit: mockEdit });
+
+      const result = await service.updateCategoriesOptimized(
+        'File:Test.svg',
+        [],
+        []
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.modified).toBe(false);
+    });
+  });
 });

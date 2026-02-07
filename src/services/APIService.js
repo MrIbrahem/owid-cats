@@ -93,7 +93,6 @@ class APIService {
 
     return this.makeRequest(params);
   }
-
   /**
    * Get page content (wikitext).
    * @param {string} title - Page title
@@ -116,24 +115,49 @@ class APIService {
   }
 
   /**
-   * Edit a page.
-   *
-   * Delegates to `mw.Api.postWithToken('csrf', …)` which handles
-   * token fetching, caching, and automatic retry on `badtoken` errors.
+   * Get categories that a page belongs to.
+   * @param {string} title - Page title
+   * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
+   */
+  async getCategories(title) {
+    const api = this._getMwApi();
+    try {
+      const categories = await api.getCategories(title);
+      if (categories === false) {
+        return false;
+      }
+      // Convert mw.Title objects to strings and remove "Category:" prefix
+      return categories.map(cat => {
+        const catStr = cat.toString();
+        return catStr.replace(/^Category:/, '');
+      });
+    } catch (error) {
+      if (typeof Logger !== 'undefined') {
+        Logger.error('Failed to get categories', error);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
    *
    * @param {string} title   - Page title
    * @param {string} content - New page content (wikitext)
    * @param {string} summary - Edit summary
+   * @param {Object} [options={}] - Additional edit options (minor, bot, etc.)
    * @returns {Promise<Object>} API response
    */
-  async editPage(title, content, summary) {
+  async editPage(title, content, summary, options = {}) {
     const api = this._getMwApi();
-    return api.postWithToken('csrf', {
-      action: 'edit',
-      title: title,
-      text: content,
-      summary: summary,
-      format: 'json'
+
+    // Use mw.Api.edit() with a transform function
+    return api.edit(title, function() {
+      return {
+        text: content,
+        summary: summary,
+        ...options
+      };
     });
   }
 

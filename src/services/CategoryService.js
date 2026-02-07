@@ -98,6 +98,71 @@ class CategoryService {
   }
 
   /**
+   * Combined add and remove operation using mw.Api.edit() for better conflict handling
+   * @param {string} fileTitle - File page title
+   * @param {Array<string>} toAdd - Categories to add
+   * @param {Array<string>} toRemove - Categories to remove
+   * @returns {Promise<{success: boolean, modified: boolean}>}
+   */
+  async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
+    const api = this.api._getMwApi();
+    const parser = this.parser;
+
+    try {
+      await api.edit(fileTitle, function(revision) {
+        let newWikitext = revision.content;
+
+        // Remove categories first
+        for (const category of toRemove) {
+          newWikitext = parser.removeCategory(newWikitext, category);
+        }
+
+        // Then add new categories
+        for (const category of toAdd) {
+          if (!parser.hasCategory(newWikitext, category)) {
+            newWikitext = parser.addCategory(newWikitext, category);
+          }
+        }
+
+        // Only save if changed
+        if (newWikitext === revision.content) {
+          return false; // No changes needed
+        }
+
+        const parts = [];
+        if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
+        if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
+
+        return {
+          text: newWikitext,
+          summary: `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`,
+          minor: false
+        };
+      });
+
+      return { success: true, modified: true };
+    } catch (error) {
+      if (error.message && error.message.includes('no changes')) {
+        return { success: true, modified: false };
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Get current categories for a file using the optimized API method
+   * @param {string} fileTitle - File page title
+   * @returns {Promise<Array<string>>} Array of category names
+   */
+  async getCurrentCategories(fileTitle) {
+    const categories = await this.api.getCategories(fileTitle);
+    if (categories === false) {
+      return [];
+    }
+    return categories;
+  }
+
+  /**
    * Build an edit summary from add/remove lists
    * @param {Array<string>} toAdd - Categories added
    * @param {Array<string>} toRemove - Categories removed

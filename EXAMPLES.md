@@ -87,3 +87,61 @@ A: Uses Search API instead of loading all files. See [PERFORMANCE.md](PERFORMANC
 
 **Q: Multiple categories?**
 A: Run tool separately for each category
+
+---
+
+## API Methods Documentation
+
+### Using MediaWiki API Methods
+
+The tool uses optimized MediaWiki API methods for better performance and conflict handling:
+
+#### Get Categories for a File
+
+```javascript
+const categoryService = new CategoryService(apiService);
+
+// Get current categories using mw.Api.getCategories()
+const categories = await categoryService.getCurrentCategories('File:Example.svg');
+// Returns: ['Belarus', 'Europe', 'Maps']
+```
+
+#### Update Categories with Conflict Detection
+
+```javascript
+// Using the optimized method with automatic conflict resolution
+await categoryService.updateCategoriesOptimized(
+  'File:GDP-per-capita,BLR.svg',
+  ['Category:Belarus', 'Category:GDP_2024'],  // Categories to add
+  ['Category:Old_Data']                        // Categories to remove
+);
+```
+
+**Benefits:**
+- Automatic edit conflict detection and retry
+- Only fetches latest revision when editing
+- Handles concurrent edits gracefully
+- No need to manually fetch content first
+
+#### Direct API Usage
+
+```javascript
+// Get categories using mw.Api
+const api = new mw.Api();
+const categories = await api.getCategories('File:Example.svg');
+// Returns: Array of mw.Title objects or false if not found
+
+// Edit with transform function
+await api.edit('File:Example.svg', function(revision) {
+  const newContent = revision.content.replace('foo', 'bar');
+  return {
+    text: newContent,
+    summary: 'Updated content',
+    minor: true
+  };
+});
+```
+
+---
+
+## Common Search Patterns

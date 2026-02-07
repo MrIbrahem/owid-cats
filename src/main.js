@@ -10,7 +10,7 @@
  * to multiple files at once.
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger */
+/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator */
 
 class CategoryBatchManagerUI {
   constructor() {
@@ -451,8 +451,7 @@ class CategoryBatchManagerUI {
   hidePreviewModal() {
     const modal = document.getElementById('cbm-preview-modal');
     modal.classList.add('hidden');
-  }
-  async handleExecute() {
+  }  async handleExecute() {
     const selectedFiles = this.getSelectedFiles();
 
     if (selectedFiles.length === 0) {
@@ -470,6 +469,18 @@ class CategoryBatchManagerUI {
     if (toAdd.length === 0 && toRemove.length === 0) {
       this.showMessage('Please specify categories to add or remove.', 'warning');
       return;
+    }
+
+    // Check for circular category reference
+    const sourceCategory = this.state.sourceCategory;
+    for (const category of toAdd) {
+      if (Validator.isCircularCategory(sourceCategory, category)) {
+        this.showMessage(
+          `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
+          'error'
+        );
+        return;
+      }
     }
 
     // Show a confirmation message and require a second click on GO

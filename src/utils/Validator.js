@@ -58,10 +58,10 @@ class Validator {
    */
   static isCircularCategory(currentCategory, categoryToAdd) {
     if (!currentCategory || !categoryToAdd) return false;
-    
+
     const normalizedCurrent = this.normalizeCategoryName(currentCategory);
     const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
-    
+
     return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
   }
 }

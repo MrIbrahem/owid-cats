@@ -19,7 +19,7 @@ class CategoryBatchManagerUI {
 
         // Initialize UI components
         this.searchPanel = new SearchPanel(() => this.searchHandler.handleSearch());
-        this.categoryInputs = new CategoryInputs();
+        this.categoryInputs = new CategoryInputs(this.apiService);
         this.fileList = new FileList(
             () => this.updateSelectedCount(),
             (index) => this.removeFile(index)

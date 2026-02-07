@@ -37,15 +37,9 @@ class ProgressBar {
    * @param {Object} results - Current results
    */
   update(percentage, results) {
-    const fill = document.getElementById('cbm-progress-fill');
-    const text = document.getElementById('cbm-progress-text');
-
-    if (fill) fill.style.width = `${percentage}%`;
-    if (text) {
-      text.textContent =
-        `Processing: ${results.processed}/${results.total} ` +
-        `(${results.successful} successful, ${results.failed} failed)`;
-    }
+    document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
+    document.getElementById('cbm-progress-text').textContent =
+      `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
   }
 }
 

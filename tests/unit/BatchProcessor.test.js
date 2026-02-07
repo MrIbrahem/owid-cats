@@ -101,9 +101,62 @@ describe('BatchProcessor', () => {
       expect(result[0].willChange).toBe(true);
       expect(result[0].newCategories).toEqual(['Category:A']);
     });
+
+    test('should throw error when trying to add duplicate categories', async () => {
+      const files = [
+        { title: 'File:Test.svg', currentCategories: ['Category:A', 'Category:B'] }
+      ];
+
+      await expect(
+        processor.previewChanges(files, ['Category:A'], [])
+      ).rejects.toThrow('The following categories already exist and cannot be added: Category:A');
+    });
+
+    test('should throw error for multiple duplicate categories', async () => {
+      const files = [
+        { title: 'File:Test.svg', currentCategories: ['Category:A', 'Category:B', 'Category:C'] }
+      ];
+
+      await expect(
+        processor.previewChanges(files, ['Category:A', 'Category:B'], [])
+      ).rejects.toThrow('The following categories already exist and cannot be added: Category:A, Category:B');
+    });
+
+    test('should allow removing duplicate categories', async () => {
+      const files = [
+        { title: 'File:Test.svg', currentCategories: ['Category:A', 'Category:B'] }
+      ];
+
+      const result = await processor.previewChanges(
+        files,
+        [],
+        ['Category:A']
+      );
+
+      expect(result).toHaveLength(1);
+      expect(result[0].willChange).toBe(true);
+      expect(result[0].newCategories).toEqual(['Category:B']);
+    });
+
+    test('should allow adding and removing different categories', async () => {
+      const files = [
+        { title: 'File:Test.svg', currentCategories: ['Category:A'] }
+      ];
+
+      const result = await processor.previewChanges(
+        files,
+        ['Category:B'],
+        ['Category:A']
+      );
+
+      expect(result).toHaveLength(1);
+      expect(result[0].willChange).toBe(true);
+      expect(result[0].newCategories).toEqual(['Category:B']);
+    });
   });
 
-  describe('processBatch', () => {    test('should process all files successfully', async () => {
+  describe('processBatch', () => {
+    test('should process all files successfully', async () => {
       const files = [
         { title: 'File:A.svg' },
         { title: 'File:B.svg' }
@@ -121,7 +174,7 @@ describe('BatchProcessor', () => {
       expect(results.skipped).toBe(0);
       expect(results.failed).toBe(0);
       expect(results.errors).toHaveLength(0);
-    });    test('should handle errors in individual files', async () => {
+    }); test('should handle errors in individual files', async () => {
       mockCategoryService.updateCategories
         .mockResolvedValueOnce({ success: true, modified: true })
         .mockRejectedValueOnce(new Error('Edit conflict'));

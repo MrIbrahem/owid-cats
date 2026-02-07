@@ -82,7 +82,6 @@ class BatchProcessor {
 
     return results;
   }
-
   /**
    * Preview changes without actually editing
    * @param {Array} files - Files to preview
@@ -95,6 +94,13 @@ class BatchProcessor {
 
     for (const file of files) {
       const current = file.currentCategories || [];
+
+      // Check if trying to add categories that already exist
+      const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
+      if (duplicateCategories.length > 0) {
+        throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+      }
+
       const after = [...current];
 
       // Simulate removal

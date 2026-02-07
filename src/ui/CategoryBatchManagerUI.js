@@ -105,6 +105,20 @@ class CategoryBatchManagerUI {
                         <div class="cbm-actions">
                             ${categoryInputsElement.outerHTML}
 
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-summary">
+                                        <span class="cdx-label__label__text">Edit Summary</span>
+                                    </label>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                                            value="Batch category update via Category Batch Manager">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="cbm-selected-count">
                                 Selected: <strong id="cbm-selected">0</strong> files
                             </div>                            <div class="cbm-buttons">
@@ -273,6 +287,24 @@ class CategoryBatchManagerUI {
             }
         });
         return selected;
+    }
+
+    /**
+     * Get the edit summary text
+     * @returns {string} Edit summary
+     */
+    getEditSummary() {
+        const input = document.getElementById('cbm-summary');
+        return input ? input.value : 'Batch category update via Category Batch Manager';
+    }
+
+    /**
+     * Set the edit summary text
+     * @param {string} summary - New edit summary
+     */
+    setEditSummary(summary) {
+        const input = document.getElementById('cbm-summary');
+        if (input) input.value = summary;
     }
 
     showLoading() {

@@ -43,19 +43,6 @@ class CategoryInputs {
                 </div>
             </div>
 
-            <div class="cdx-field">
-                <div class="cdx-label">
-                    <label class="cdx-label__label" for="cbm-summary">
-                        <span class="cdx-label__label__text">Edit Summary</span>
-                    </label>
-                </div>
-                <div class="cdx-field__control">
-                    <div class="cdx-text-input">
-                        <input id="cbm-summary" class="cdx-text-input__input" type="text"
-                            value="Batch category update via Category Batch Manager">
-                    </div>
-                </div>
-            </div>
         `;
         return div;
     }
@@ -113,15 +100,6 @@ class CategoryInputs {
     }
 
     /**
-     * Get the edit summary text
-     * @returns {string} Edit summary
-     */
-    getEditSummary() {
-        const input = document.getElementById('cbm-summary');
-        return input ? input.value : 'Batch category update via Category Batch Manager';
-    }
-
-    /**
      * Clear all category input fields
      */
     clearInputs() {
@@ -129,15 +107,6 @@ class CategoryInputs {
         const removeInput = document.getElementById('cbm-remove-cats');
         if (addInput) addInput.value = '';
         if (removeInput) removeInput.value = '';
-    }
-
-    /**
-     * Set the edit summary text
-     * @param {string} summary - New edit summary
-     */
-    setEditSummary(summary) {
-        const input = document.getElementById('cbm-summary');
-        if (input) input.value = summary;
     }
 
     /**

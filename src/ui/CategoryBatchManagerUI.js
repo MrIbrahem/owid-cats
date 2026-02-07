@@ -203,9 +203,7 @@ class CategoryBatchManagerUI {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div id="cbm-preview-modal" class="cbm-modal hidden">
+            </div>            <div id="cbm-preview-modal" class="cbm-modal hidden">
                 <div class="cbm-modal-content">
                     <h3>Preview Changes</h3>
                     <div id="cbm-preview-content"></div>
@@ -213,6 +211,28 @@ class CategoryBatchManagerUI {
                         class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
                         Close
                     </button>
+                </div>
+            </div>
+
+            <!-- Confirmation Dialog -->
+            <div id="cbm-confirm-dialog" class="cbm-dialog-backdrop hidden">
+                <div class="cbm-dialog">
+                    <div class="cbm-dialog-header">
+                        <h3 id="cbm-dialog-title">Confirm Action</h3>
+                    </div>
+                    <div class="cbm-dialog-body">
+                        <p id="cbm-dialog-message"></p>
+                    </div>
+                    <div class="cbm-dialog-footer">
+                        <button id="cbm-dialog-cancel"
+                            class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+                            Cancel
+                        </button>
+                        <button id="cbm-dialog-confirm"
+                            class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+                            Confirm
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -590,9 +610,7 @@ class CategoryBatchManagerUI {
                 );
                 return;
             }
-        }
-
-        // Check for duplicate categories before execution
+        }        // Check for duplicate categories before execution
         try {
             await this.batchProcessor.previewChanges(
                 selectedFiles,
@@ -608,19 +626,18 @@ class CategoryBatchManagerUI {
             return;
         }
 
-        // Show a confirmation message and require a second click on GO
+        // Show confirmation dialog
         const confirmMsg =
-            `About to update ${selectedFiles.length} file(s). ` +
-            `Add: ${toAdd.join(', ') || 'none'}. ` +
-            `Remove: ${toRemove.join(', ') || 'none'}. ` +
-            'Click GO again to confirm.';
+            `You are about to update ${selectedFiles.length} file(s).\n\n` +
+            `Categories to add: ${toAdd.length > 0 ? toAdd.join(', ') : 'none'}\n` +
+            `Categories to remove: ${toRemove.length > 0 ? toRemove.join(', ') : 'none'}\n\n` +
+            'Do you want to proceed?';
 
-        if (!this._executeConfirmed) {
-            this.showMessage(confirmMsg, 'notice');
-            this._executeConfirmed = true;
+        const confirmed = await this.showConfirmDialog('Confirm Batch Update', confirmMsg);
+
+        if (!confirmed) {
             return;
         }
-        this._executeConfirmed = false;
 
         this.state.isProcessing = true;
         this.state.processAbortController = new AbortController();
@@ -739,6 +756,58 @@ class CategoryBatchManagerUI {
         // Content will be replaced by renderFileList or showMessage
     }
 
+    /**
+     * Show a confirmation dialog
+     * @param {string} title - Dialog title
+     * @param {string} message - Dialog message
+     * @returns {Promise<boolean>} True if confirmed, false if cancelled
+     */
+    showConfirmDialog(title, message) {
+        return new Promise((resolve) => {
+            const dialog = document.getElementById('cbm-confirm-dialog');
+            const titleEl = document.getElementById('cbm-dialog-title');
+            const messageEl = document.getElementById('cbm-dialog-message');
+            const confirmBtn = document.getElementById('cbm-dialog-confirm');
+            const cancelBtn = document.getElementById('cbm-dialog-cancel');
+
+            if (!dialog || !titleEl || !messageEl || !confirmBtn || !cancelBtn) {
+                // Fallback to native confirm if dialog elements not found
+                resolve(confirm(message));
+                return;
+            }
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            dialog.classList.remove('hidden');
+
+            const handleConfirm = () => {
+                cleanup();
+                resolve(true);
+            };
+
+            const handleCancel = () => {
+                cleanup();
+                resolve(false);
+            };
+
+            const cleanup = () => {
+                dialog.classList.add('hidden');
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+
+            // Close on backdrop click
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    handleCancel();
+                }
+            });
+        });
+    }
+
     minimizeModal() {
         const modal = document.getElementById('category-batch-manager');
         const reopenBtn = document.getElementById('cbm-reopen-btn');
@@ -758,10 +827,13 @@ class CategoryBatchManagerUI {
         const reopenBtn = document.getElementById('cbm-reopen-btn');
         if (modal) modal.style.display = 'flex';
         if (reopenBtn) reopenBtn.style.display = 'none';
-    }
+    } async close() {
+        const confirmed = await this.showConfirmDialog(
+            'Close Category Batch Manager',
+            'Are you sure you want to close? Any unsaved changes will be lost.'
+        );
 
-    close() {
-        if (confirm('Are you sure you want to close? Unsaved changes will be lost.')) {
+        if (confirmed) {
             const el = document.getElementById('category-batch-manager');
             const reopenBtn = document.getElementById('cbm-reopen-btn');
             if (el) el.remove();

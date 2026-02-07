@@ -14,7 +14,7 @@ class WikitextParser {
     let match;
 
     while ((match = categoryRegex.exec(wikitext)) !== null) {
-      matches.push(`Category:${match[1].trim()}`);
+      matches.push(`Category:${this.normalize(match[1].trim())}`);
     }
 
     return matches;

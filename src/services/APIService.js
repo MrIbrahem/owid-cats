@@ -1,10 +1,11 @@
 /**
- * Service for interacting with MediaWiki API
+ * Service for interacting with the MediaWiki API
  *
- * When running inside MediaWiki (mw.Api available), all requests go through
- * mw.Api which handles CSRF-token management, automatic bad-token retry,
- * and correct origin headers.  A plain fetch() fallback is kept for the
- * Node / test environment where mw is not available.
+ * All requests go through mw.Api which handles CSRF-token management,
+ * automatic bad-token retry, and correct origin headers.
+ *
+ * For local development without MediaWiki, set `window.mw` to a shim
+ * that wraps fetch() — see README or DEPLOYMENT.md for details.
  *
  * @class APIService
  */
@@ -13,17 +14,11 @@
 
 class APIService {
   constructor() {
-    /** @type {string} Fallback endpoint used when mw.Api is unavailable */
-    this.baseURL = 'https://commons.wikimedia.org/w/api.php';
-
     /**
-     * Native MediaWiki API helper – instantiated lazily on first use.
+     * Native MediaWiki API helper — instantiated lazily on first use.
      * @type {mw.Api|null}
      */
     this.mwApi = null;
-
-    /** @type {string|null} CSRF token cache (fetch-fallback only) */
-    this.csrfToken = null;
   }
 
   /* ------------------------------------------------------------------ */
@@ -32,15 +27,16 @@ class APIService {
 
   /**
    * Return (and lazily create) an mw.Api instance.
-   * Returns null when mw.Api is not available (e.g. in tests).
-   * @returns {mw.Api|null}
+   * @returns {mw.Api}
+   * @throws {Error} If mw.Api is not available
    */
   _getMwApi() {
     if (this.mwApi) return this.mwApi;
     if (typeof mw !== 'undefined' && mw.Api) {
       this.mwApi = new mw.Api();
+      return this.mwApi;
     }
-    return this.mwApi;
+    throw new Error('mw.Api is not available — are you running inside MediaWiki?');
   }
 
   /* ------------------------------------------------------------------ */
@@ -48,7 +44,7 @@ class APIService {
   /* ------------------------------------------------------------------ */
 
   /**
-   * Fetch files from a category with pagination support
+   * Fetch files from a category with pagination support.
    * @param {string} categoryName - Full category name including "Category:" prefix
    * @param {Object} [options={}] - Query options
    * @param {number} [options.limit=500] - Maximum files to retrieve per request
@@ -82,7 +78,7 @@ class APIService {
   }
 
   /**
-   * Get file details including categories
+   * Get file details including categories.
    * @param {Array<string>} titles - Array of file titles
    * @returns {Promise<Object>} API response with file info
    */
@@ -99,7 +95,7 @@ class APIService {
   }
 
   /**
-   * Get page content (wikitext)
+   * Get page content (wikitext).
    * @param {string} title - Page title
    * @returns {Promise<string>} Page wikitext content
    */
@@ -122,9 +118,8 @@ class APIService {
   /**
    * Edit a page.
    *
-   * When mw.Api is available the call is delegated to
-   * `api.postWithToken('csrf', …)` which handles token fetching,
-   * caching **and** automatic retry on `badtoken` errors.
+   * Delegates to `mw.Api.postWithToken('csrf', …)` which handles
+   * token fetching, caching, and automatic retry on `badtoken` errors.
    *
    * @param {string} title   - Page title
    * @param {string} content - New page content (wikitext)
@@ -133,126 +128,31 @@ class APIService {
    */
   async editPage(title, content, summary) {
     const api = this._getMwApi();
-
-    if (api) {
-      // ── mw.Api path (production) ──────────────────────────────
-      return api.postWithToken('csrf', {
-        action: 'edit',
-        title: title,
-        text: content,
-        summary: summary,
-        format: 'json'
-      });
-    }
-
-    // ── fetch fallback (tests / non-MW environments) ───────────
-    if (!this.csrfToken) {
-      await this.getCSRFToken();
-    }
-
-    const params = {
+    return api.postWithToken('csrf', {
       action: 'edit',
       title: title,
       text: content,
       summary: summary,
-      token: this.csrfToken,
       format: 'json'
-    };
-
-    return this.makePostRequest(params);
+    });
   }
 
   /* ------------------------------------------------------------------ */
-  /*  Low-level request methods                                          */
+  /*  Low-level request method                                           */
   /* ------------------------------------------------------------------ */
 
   /**
-   * Get CSRF token for editing (fetch-fallback only).
-   * @returns {Promise<string>} CSRF token
-   */
-  async getCSRFToken() {
-    const params = {
-      action: 'query',
-      meta: 'tokens',
-      type: 'csrf',
-      format: 'json'
-    };
-
-    const data = await this.makeRequest(params);
-
-    if (!data.query || !data.query.tokens || !data.query.tokens.csrftoken) {
-      throw new Error('Failed to obtain CSRF token – are you logged in?');
-    }
-
-    this.csrfToken = data.query.tokens.csrftoken;
-    return this.csrfToken;
-  }
-
-  /**
-   * Make a GET request to the MediaWiki API.
-   *
-   * Uses mw.Api.get() when available, otherwise falls back to fetch().
-   *
+   * Make a GET request to the MediaWiki API via mw.Api.get().
    * @param {Object} params - Query parameters
    * @returns {Promise<Object>} Parsed JSON response
    */
   async makeRequest(params) {
     const api = this._getMwApi();
-
-    if (api) {
-      return api.get(params);
-    }
-
-    // ── fetch fallback ─────────────────────────────────────────
-    params.origin = '*';
-
-    const url = new URL(this.baseURL);
-    Object.keys(params).forEach(key =>
-      url.searchParams.append(key, params[key])
-    );
-
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error.info);
-      }
-
-      return data;
+      return await api.get(params);
     } catch (error) {
       if (typeof Logger !== 'undefined') {
         Logger.error('API request failed', error);
-      }
-      throw error;
-    }
-  }
-
-  /**
-   * Make a POST request to the MediaWiki API (fetch-fallback only).
-   * @param {Object} params - POST parameters
-   * @returns {Promise<Object>} Parsed JSON response
-   */
-  async makePostRequest(params) {
-    const formData = new FormData();
-    Object.keys(params).forEach(key => formData.append(key, params[key]));
-
-    try {
-      const response = await fetch(this.baseURL, {
-        method: 'POST',
-        body: formData,
-        credentials: 'same-origin'
-      });
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error.info);
-      }
-
-      return data;
-    } catch (error) {
-      if (typeof Logger !== 'undefined') {
-        Logger.error('API POST request failed', error);
       }
       throw error;
     }

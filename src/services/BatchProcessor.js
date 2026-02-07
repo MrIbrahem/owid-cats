@@ -88,17 +88,18 @@ class BatchProcessor {
    * @param {Array<string>} categoriesToAdd - Categories to add
    * @param {Array<string>} categoriesToRemove - Categories to remove
    * @returns {Promise<Array>} Preview of changes
-   */
-  async previewChanges(files, categoriesToAdd, categoriesToRemove) {
+   */  async previewChanges(files, categoriesToAdd, categoriesToRemove) {
     const previews = [];
 
     for (const file of files) {
       const current = file.currentCategories || [];
 
-      // Check if trying to add categories that already exist
-      const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
-      if (duplicateCategories.length > 0) {
-        throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+      // Check if trying to add categories that already exist (only if we're adding categories)
+      if (categoriesToAdd.length > 0) {
+        const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
+        if (duplicateCategories.length > 0) {
+          throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+        }
       }
 
       const after = [...current];

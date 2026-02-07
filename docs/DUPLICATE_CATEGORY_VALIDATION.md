@@ -3,19 +3,23 @@
 ## Overview
 تم تحديث نظام Category Batch Manager لمنع إضافة تصنيفات موجودة بالفعل في الملفات، مع السماح بإزالتها بشكل طبيعي.
 
+**تحديث (2026-02-07):** تم إصلاح مشكلة كانت تمنع عمل زر المعاينة عند محاولة إزالة تصنيفات فقط دون إضافة. الآن يتم فحص التصنيفات المكررة فقط عندما `categoriesToAdd.length > 0`.
+
 ## التغييرات المُنفذة
 
 ### 1. BatchProcessor.js
 - تم تحديث دالة `previewChanges()` للتحقق من التصنيفات المكررة
-- يتم فحص التصنيفات المطلوب إضافتها مقابل التصنيفات الحالية
+- يتم فحص التصنيفات المطلوب إضافتها مقابل التصنيفات الحالية **فقط عند وجود تصنيفات للإضافة**
 - إذا وُجدت تصنيفات مكررة، يتم رفع استثناء (exception) يحتوي على أسماء التصنيفات المكررة
 
-#### الكود المُضاف:
+#### الكود المُحدّث:
 ```javascript
-// Check if trying to add categories that already exist
-const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
-if (duplicateCategories.length > 0) {
-  throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+// Check if trying to add categories that already exist (only if we're adding categories)
+if (categoriesToAdd.length > 0) {
+  const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
+  if (duplicateCategories.length > 0) {
+    throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+  }
 }
 ```
 
@@ -149,5 +153,7 @@ test('should allow adding and removing different categories', async () => {
 
 ## الإصدار
 
-تم التنفيذ في: 7 فبراير 2026
-الإصدار: 1.1.1+
+
+
+
+الإصدار: 1.1.1+تم التنفيذ في: 7 فبراير 2026

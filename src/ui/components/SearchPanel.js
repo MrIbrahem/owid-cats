@@ -16,7 +16,7 @@ class SearchPanel {
    * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
    * @returns {HTMLElement} The search panel element
    */
-  createElement() {
+  createElement(sourceCategory) {
     const div = document.createElement('div');
     div.className = 'cbm-search';
     div.innerHTML = `
@@ -29,6 +29,7 @@ class SearchPanel {
         <div class="cdx-field__control">
           <div class="cdx-text-input">
             <input id="cbm-source-category" class="cdx-text-input__input" type="text"
+            value="${sourceCategory}"
                    placeholder="Category:Example">
           </div>
         </div>

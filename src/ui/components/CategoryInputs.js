@@ -546,6 +546,7 @@ class CategoryInputs {
             this.summaryWidget = null;
         }
     }
+
 }
 
 if (typeof module !== 'undefined' && module.exports) {

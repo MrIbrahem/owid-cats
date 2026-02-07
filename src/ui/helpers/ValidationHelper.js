@@ -38,12 +38,8 @@ class ValidationHelper {
      * @returns {Object|null} Object with toAdd and toRemove arrays, or null if validation fails
      */
     parseCategoryInputs() {
-        const toAdd = this.ui.parseCategories(
-            document.getElementById('cbm-add-cats').value
-        );
-        const toRemove = this.ui.parseCategories(
-            document.getElementById('cbm-remove-cats').value
-        );
+        const toAdd = this.ui.categoryInputs.getCategoriesToAdd();
+        const toRemove = this.ui.categoryInputs.getCategoriesToRemove();
         console.log('[CBM-V] Categories to add:', toAdd);
         console.log('[CBM-V] Categories to remove:', toRemove);
 

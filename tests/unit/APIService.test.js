@@ -49,7 +49,7 @@ describe('APIService', () => {
     test('should throw error if mw.Api is not available', () => {
       delete global.mw;
       service = new APIService();
-      
+
       expect(() => service._getMwApi()).toThrow('mw.Api is not available');
     });
   });
@@ -256,7 +256,7 @@ describe('APIService', () => {
       // Test the transform function
       const transformFn = mockMwApi.edit.mock.calls[0][1];
       const result = transformFn();
-      
+
       expect(result).toEqual({
         text: 'New content',
         summary: 'Test edit'
@@ -277,7 +277,7 @@ describe('APIService', () => {
 
       const transformFn = mockMwApi.edit.mock.calls[0][1];
       const result = transformFn();
-      
+
       expect(result).toEqual({
         text: 'New content',
         summary: 'Test edit',

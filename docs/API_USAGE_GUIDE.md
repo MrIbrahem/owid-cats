@@ -15,7 +15,7 @@ const categoryService = new CategoryService(apiService);
 
 // Get categories for a specific file
 const categories = await categoryService.getCurrentCategories('File:GDP-per-capita,BLR.svg');
-console.log(categories); 
+console.log(categories);
 // Output: ['Belarus', 'GDP_Indicators', 'Economic_Data']
 ```
 
@@ -71,10 +71,10 @@ const api = new mw.Api();
 await api.edit('File:Example.svg', function(revision) {
   // revision.content contains the current wikitext
   let content = revision.content;
-  
+
   // Make modifications
   content = content.replace('old_text', 'new_text');
-  
+
   // Return the edit parameters
   return {
     text: content,
@@ -91,7 +91,7 @@ await api.edit('File:Example.svg', function(revision) {
 await api.edit('File:Example.svg', async function(revision) {
   // You can use async operations in the transform
   const analysisResult = await externalAPI.analyze(revision.content);
-  
+
   return {
     text: analysisResult.improvedContent,
     summary: analysisResult.changelog,
@@ -105,7 +105,7 @@ await api.edit('File:Example.svg', async function(revision) {
 ```javascript
 await api.edit('File:Example.svg', function(revision) {
   const content = revision.content;
-  
+
   // Only edit if certain conditions are met
   if (!content.includes('[[Category:Belarus]]')) {
     return {
@@ -113,7 +113,7 @@ await api.edit('File:Example.svg', function(revision) {
       summary: 'Added Belarus category'
     };
   }
-  
+
   // Return false to skip the edit
   return false;
 });
@@ -280,7 +280,7 @@ for (const file of files) {
 if (failedFiles.length > 0) {
   console.log(`Retrying ${failedFiles.length} failed files...`);
   for (const { file } of failedFiles) {
-    await retryWithBackoff(() => 
+    await retryWithBackoff(() =>
       categoryService.updateCategoriesOptimized(file, toAdd, toRemove)
     );
   }
@@ -331,7 +331,7 @@ const files = await fileService.searchInCategory(category, pattern);
 
 for (const file of files) {
   const currentCats = await categoryService.getCurrentCategories(file.title);
-  
+
   // Only add if not already present
   if (!currentCats.includes('Belarus')) {
     await categoryService.updateCategoriesOptimized(

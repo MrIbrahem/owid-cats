@@ -25,6 +25,7 @@ class CategoryBatchManagerUI {
         this.searchHandler = new SearchHandler(this);
         this.previewHandler = new PreviewHandler(this);
         this.executeHandler = new ExecuteHandler(this);
+        this.progressBarHandler = new ProgressBar();
 
         this.state = {
             sourceCategory: mw.config.get('wgPageName'),
@@ -57,10 +58,8 @@ class CategoryBatchManagerUI {
         reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
-        // Append SearchPanel element
-        const searchContainer = document.getElementById('cbm-search-container');
+        // SearchPanel element
         const searchPanelElement = this.searchPanel.createElement(this.state.sourceCategory);
-
         // Create main container
         const container = this.buildContainer(searchPanelElement);
         document.body.appendChild(container);
@@ -72,6 +71,8 @@ class CategoryBatchManagerUI {
     }
 
     buildContainer(searchPanelElement) {
+        const ProgressBarElement = this.progressBarHandler.createElement();
+
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
         div.className = 'cbm-container';
@@ -157,13 +158,7 @@ class CategoryBatchManagerUI {
                                 </button>
                             </div>
                         </div>
-
-                        <div id="cbm-progress" class="cbm-progress hidden">
-                            <div class="cdx-progress-bar cdx-progress-bar--block" role="progressbar" aria-label="Batch processing progress">
-                                <div id="cbm-progress-fill" class="cdx-progress-bar__bar cbm-progress-fill"></div>
-                            </div>
-                            <div id="cbm-progress-text" class="cbm-progress-text">Processing...</div>
-                        </div>
+                        ${ProgressBarElement}
                     </div>
 
                     <!-- Right Panel: File List -->

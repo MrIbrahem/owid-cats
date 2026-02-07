@@ -7,6 +7,15 @@ class ProgressBar {
   /**
    * Show the progress bar
    */
+  createElement() {
+    return `
+      <div id="cbm-progress" class="cbm-progress hidden">
+          <div class="cdx-progress-bar cdx-progress-bar--block" role="progressbar" aria-label="Batch processing progress">
+              <div id="cbm-progress-fill" class="cdx-progress-bar__bar cbm-progress-fill"></div>
+          </div>
+          <div id="cbm-progress-text" class="cbm-progress-text">Processing...</div>
+      </div>`;
+  }
   show() {
     const el = document.getElementById('cbm-progress');
     if (el) el.classList.remove('hidden');

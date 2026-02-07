@@ -6,6 +6,24 @@ All notable changes to this project will be documented in this file.
 
 ### ✨ Enhancements
 
+#### Category Autocomplete
+- **Added autocomplete support for category input fields**
+  - "Add Categories" and "Remove Categories" fields now suggest matching categories as you type
+  - Uses OOUI `ComboBoxInputWidget` for dropdown suggestions
+  - Searches MediaWiki API (opensearch) for category matches
+  - 300ms debounce delay to avoid excessive API calls
+  - Automatically adds "Category:" prefix to suggestions
+  - Falls back to plain text inputs if OOUI is not available
+  - **New methods in CategoryInputs:**
+    - `_createAutocompleteWidget()` - Creates OOUI combobox with search
+    - `_setupAutocompleteSearch()` - Configures debounced search handler
+    - `_searchCategories()` - Queries MediaWiki API for category suggestions
+    - `getEditSummary()` - Returns the edit summary text
+    - `clear()` - Clears all input fields
+    - `destroy()` - Cleanup method for widget disposal
+  - **Enhanced `parseCategories()`** - Now handles null/undefined input safely
+  - **New test file:** `tests/unit/CategoryInputs.test.js` - 30+ tests
+
 #### Skipped Files Tracking
 - **Added separate tracking for files with no changes**
   - Files that don't need modification are now counted as **"skipped"** instead of "successful"

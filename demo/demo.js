@@ -51,8 +51,9 @@ function attachEventListeners() {
     document.getElementById('cbm-preview').addEventListener('click', handlePreview);
     document.getElementById('cbm-execute').addEventListener('click', handleExecute);
 
-    // Close buttons
-    document.getElementById('cbm-close').addEventListener('click', closeModal);
+    // Minimize and Close buttons
+    document.getElementById('cbm-minimize').addEventListener('click', minimizeModal);
+    document.getElementById('cbm-close').addEventListener('click', close);
     document.getElementById('cbm-preview-close').addEventListener('click', hidePreviewModal);
 
     // Reopen button
@@ -359,10 +360,13 @@ function parseCategories(input) {
 function close() {
     if (confirm('Are you sure you want to close? Unsaved changes will be lost.')) {
         document.getElementById('category-batch-manager').style.display = 'none';
+        // في الاستخدام الفعلي، سيتم إعادة فتح القائمة من زر الويكي
+        // في الديمو، نظهر زر إعادة الفتح
+        document.getElementById('cbm-reopen-btn').style.display = 'block';
     }
 }
 
-function closeModal() {
+function minimizeModal() {
     document.getElementById('category-batch-manager').style.display = 'none';
     document.getElementById('cbm-reopen-btn').style.display = 'block';
 }

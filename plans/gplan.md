@@ -1,9 +1,9 @@
 # Project Overview
 
-**Tool Name:** Category Batch Manager for OWID Importer  
+**Tool Name:** Category Batch Manager for OWID Importer
 **Purpose:** Enable efficient batch categorization of images in Wikimedia Commons by filtering files within a category using pattern matching, allowing selective exclusion, and applying category additions/removals to the filtered set.
 
-**Target Category:** `Category:Uploaded_by_OWID_importer_tool`  
+**Target Category:** `Category:Uploaded_by_OWID_importer_tool`
 **Primary Use Case:** Organize country-specific SVG files (e.g., files containing ",BLR.svg", ",USA.svg") by adding appropriate geographic categories.
 
 ---
@@ -418,7 +418,7 @@ class APIService {
     if (!this.csrfToken) {
       await this.getCSRFToken();
     }
-    
+
     const params = {
       action: 'edit',
       title: title,
@@ -434,20 +434,20 @@ class APIService {
   async makeRequest(params) {
     // Add origin parameter for CORS
     params.origin = '*';
-    
+
     const url = new URL(this.baseURL);
-    Object.keys(params).forEach(key => 
+    Object.keys(params).forEach(key =>
       url.searchParams.append(key, params[key])
     );
 
     try {
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (data.error) {
         throw new Error(data.error.info);
       }
-      
+
       return data;
     } catch (error) {
       Logger.error('API request failed', error);
@@ -481,15 +481,15 @@ class FileService {
   async searchFiles(categoryName, searchPattern) {
     // 1. Get all files from category
     const allFiles = await this.api.getCategoryMembers(categoryName);
-    
+
     // 2. Filter by pattern
-    const matchingFiles = allFiles.filter(file => 
+    const matchingFiles = allFiles.filter(file =>
       file.title.includes(searchPattern)
     );
-    
+
     // 3. Get detailed info for matching files
     const filesWithInfo = await this.getFilesDetails(matchingFiles);
-    
+
     return filesWithInfo;
   }
 
@@ -497,14 +497,14 @@ class FileService {
     // Batch process to get categories for each file
     const batchSize = 50; // API limit
     const batches = this.createBatches(files, batchSize);
-    
+
     const results = [];
     for (const batch of batches) {
       const titles = batch.map(f => f.title);
       const info = await this.api.getFileInfo(titles);
       results.push(...this.parseFileInfo(info));
     }
-    
+
     return results;
   }
 
@@ -541,7 +541,7 @@ class CategoryService {
   async addCategories(fileTitle, categoriesToAdd) {
     // 1. Get current page content
     const wikitext = await this.api.getPageContent(fileTitle);
-    
+
     // 2. Parse and modify
     let newWikitext = wikitext;
     for (const category of categoriesToAdd) {
@@ -549,7 +549,7 @@ class CategoryService {
         newWikitext = this.parser.addCategory(newWikitext, category);
       }
     }
-    
+
     // 3. Save if changed
     if (newWikitext !== wikitext) {
       await this.api.editPage(
@@ -558,19 +558,19 @@ class CategoryService {
         `Adding categories: ${categoriesToAdd.join(', ')}`
       );
     }
-    
+
     return { success: true, modified: newWikitext !== wikitext };
   }
 
   // Remove categories from a file
   async removeCategories(fileTitle, categoriesToRemove) {
     const wikitext = await this.api.getPageContent(fileTitle);
-    
+
     let newWikitext = wikitext;
     for (const category of categoriesToRemove) {
       newWikitext = this.parser.removeCategory(newWikitext, category);
     }
-    
+
     if (newWikitext !== wikitext) {
       await this.api.editPage(
         fileTitle,
@@ -578,7 +578,7 @@ class CategoryService {
         `Removing categories: ${categoriesToRemove.join(', ')}`
       );
     }
-    
+
     return { success: true, modified: newWikitext !== wikitext };
   }
 
@@ -586,24 +586,24 @@ class CategoryService {
   async updateCategories(fileTitle, toAdd, toRemove) {
     const wikitext = await this.api.getPageContent(fileTitle);
     let newWikitext = wikitext;
-    
+
     // Remove first
     for (const category of toRemove) {
       newWikitext = this.parser.removeCategory(newWikitext, category);
     }
-    
+
     // Then add
     for (const category of toAdd) {
       if (!this.parser.hasCategory(newWikitext, category)) {
         newWikitext = this.parser.addCategory(newWikitext, category);
       }
     }
-    
+
     if (newWikitext !== wikitext) {
       const summary = this.buildEditSummary(toAdd, toRemove);
       await this.api.editPage(fileTitle, newWikitext, summary);
     }
-    
+
     return { success: true, modified: newWikitext !== wikitext };
   }
 
@@ -651,24 +651,24 @@ class BatchProcessor {
       try {
         // Wait to respect rate limits (1 edit per 2 seconds)
         await this.rateLimiter.wait(2000);
-        
+
         // Update categories
         const result = await this.categoryService.updateCategories(
           file.title,
           categoriesToAdd,
           categoriesToRemove
         );
-        
+
         results.processed++;
         if (result.success) {
           results.successful++;
           onFileComplete(file, true);
         }
-        
+
         // Update progress
         const progress = (results.processed / results.total) * 100;
         onProgress(progress, results);
-        
+
       } catch (error) {
         results.processed++;
         results.failed++;
@@ -676,7 +676,7 @@ class BatchProcessor {
           file: file.title,
           error: error.message
         });
-        
+
         onError(file, error);
         onProgress((results.processed / results.total) * 100, results);
       }
@@ -688,22 +688,22 @@ class BatchProcessor {
   async previewChanges(files, categoriesToAdd, categoriesToRemove) {
     // Return what would change without actually editing
     const previews = [];
-    
+
     for (const file of files) {
       const current = file.currentCategories;
       const after = [...current];
-      
+
       // Simulate removal
       categoriesToRemove.forEach(cat => {
         const index = after.indexOf(cat);
         if (index > -1) after.splice(index, 1);
       });
-      
+
       // Simulate addition
       categoriesToAdd.forEach(cat => {
         if (!after.includes(cat)) after.push(cat);
       });
-      
+
       previews.push({
         file: file.title,
         currentCategories: current,
@@ -711,7 +711,7 @@ class BatchProcessor {
         willChange: JSON.stringify(current) !== JSON.stringify(after)
       });
     }
-    
+
     return previews;
   }
 }
@@ -732,11 +732,11 @@ class WikitextParser {
     const categoryRegex = /\[\[Category:([^\]|]+)(?:\|[^\]]*)?\]\]/gi;
     const matches = [];
     let match;
-    
+
     while ((match = categoryRegex.exec(wikitext)) !== null) {
       matches.push(`Category:${match[1].trim()}`);
     }
-    
+
     return matches;
   }
 
@@ -751,10 +751,10 @@ class WikitextParser {
   addCategory(wikitext, categoryName) {
     const cleanName = categoryName.replace(/^Category:/i, '');
     const categorySyntax = `[[Category:${cleanName}]]`;
-    
+
     // Find last category or end of file
     const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
-    
+
     if (lastCategoryMatch) {
       // Add after last category
       return wikitext.replace(
@@ -810,7 +810,7 @@ class CategoryBatchManagerUI {
     this.fileService = new FileService(this.apiService);
     this.categoryService = new CategoryService(this.apiService);
     this.batchProcessor = new BatchProcessor(this.categoryService);
-    
+
     this.state = {
       sourceCategory: 'Category:Uploaded_by_OWID_importer_tool',
       searchPattern: '',
@@ -820,7 +820,7 @@ class CategoryBatchManagerUI {
       categoriesToRemove: [],
       isProcessing: false
     };
-    
+
     this.init();
   }
 
@@ -839,19 +839,19 @@ class CategoryBatchManagerUI {
     const div = document.createElement('div');
     div.id = 'category-batch-manager';
     div.className = 'cbm-container';
-    
+
     div.innerHTML = `
       <div class="cbm-header">
         <h2>Category Batch Manager</h2>
         <button class="cbm-close" id="cbm-close">×</button>
       </div>
-      
+
       <div class="cbm-search">
         <label>Search Pattern:</label>
         <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
         <button id="cbm-search-btn">Search</button>
       </div>
-      
+
       <div class="cbm-results">
         <div id="cbm-results-header" class="hidden">
           Found <span id="cbm-count">0</span> files
@@ -860,41 +860,41 @@ class CategoryBatchManagerUI {
         </div>
         <div id="cbm-file-list"></div>
       </div>
-      
+
       <div class="cbm-actions">
         <div class="cbm-input-group">
           <label>Add Categories (comma-separated):</label>
           <input type="text" id="cbm-add-cats" placeholder="Category:Example">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Remove Categories (comma-separated):</label>
           <input type="text" id="cbm-remove-cats" placeholder="Category:Old">
         </div>
-        
+
         <div class="cbm-input-group">
           <label>Edit Summary:</label>
-          <input type="text" id="cbm-summary" 
+          <input type="text" id="cbm-summary"
                  value="Batch category update via Category Batch Manager">
         </div>
-        
+
         <div class="cbm-selected-count">
           Selected: <span id="cbm-selected">0</span> files
         </div>
-        
+
         <div class="cbm-buttons">
           <button id="cbm-preview" class="cbm-btn-secondary">Preview Changes</button>
           <button id="cbm-execute" class="cbm-btn-primary">GO</button>
         </div>
       </div>
-      
+
       <div id="cbm-progress" class="cbm-progress hidden">
         <div class="cbm-progress-bar">
           <div id="cbm-progress-fill" style="width: 0%"></div>
         </div>
         <div id="cbm-progress-text">Processing...</div>
       </div>
-      
+
       <div id="cbm-preview-modal" class="cbm-modal hidden">
         <div class="cbm-modal-content">
           <h3>Preview Changes</h3>
@@ -903,7 +903,7 @@ class CategoryBatchManagerUI {
         </div>
       </div>
     `;
-    
+
     return div;
   }
 
@@ -912,26 +912,26 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-search-btn').addEventListener('click', () => {
       this.handleSearch();
     });
-    
+
     // Select/Deselect all
     document.getElementById('cbm-select-all').addEventListener('click', () => {
       this.selectAll();
     });
-    
+
     document.getElementById('cbm-deselect-all').addEventListener('click', () => {
       this.deselectAll();
     });
-    
+
     // Preview button
     document.getElementById('cbm-preview').addEventListener('click', () => {
       this.handlePreview();
     });
-    
+
     // Execute button
     document.getElementById('cbm-execute').addEventListener('click', () => {
       this.handleExecute();
     });
-    
+
     // Close button
     document.getElementById('cbm-close').addEventListener('click', () => {
       this.close();
@@ -940,25 +940,25 @@ class CategoryBatchManagerUI {
 
   async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
-    
+
     if (!pattern) {
       alert('Please enter a search pattern');
       return;
     }
-    
+
     this.showLoading();
-    
+
     try {
       const files = await this.fileService.searchFiles(
         this.state.sourceCategory,
         pattern
       );
-      
+
       this.state.files = files;
       this.state.searchPattern = pattern;
       this.renderFileList();
       this.hideLoading();
-      
+
     } catch (error) {
       this.hideLoading();
       alert(`Error searching files: ${error.message}`);
@@ -969,33 +969,33 @@ class CategoryBatchManagerUI {
     const listContainer = document.getElementById('cbm-file-list');
     const countElement = document.getElementById('cbm-count');
     const headerElement = document.getElementById('cbm-results-header');
-    
+
     if (this.state.files.length === 0) {
       listContainer.innerHTML = '<p>No files found matching the pattern.</p>';
       headerElement.classList.add('hidden');
       return;
     }
-    
+
     countElement.textContent = this.state.files.length;
     headerElement.classList.remove('hidden');
-    
+
     listContainer.innerHTML = '';
-    
+
     this.state.files.forEach((file, index) => {
       const fileRow = document.createElement('div');
       fileRow.className = 'cbm-file-row';
       fileRow.dataset.index = index;
-      
+
       fileRow.innerHTML = `
-        <input type="checkbox" class="cbm-file-checkbox" 
+        <input type="checkbox" class="cbm-file-checkbox"
                id="file-${index}" checked>
         <label for="file-${index}">${file.title}</label>
         <button class="cbm-remove-btn" data-index="${index}">×</button>
       `;
-      
+
       listContainer.appendChild(fileRow);
     });
-    
+
     // Attach remove button listeners
     document.querySelectorAll('.cbm-remove-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1003,14 +1003,14 @@ class CategoryBatchManagerUI {
         this.removeFile(index);
       });
     });
-    
+
     // Attach checkbox listeners
     document.querySelectorAll('.cbm-file-checkbox').forEach(checkbox => {
       checkbox.addEventListener('change', () => {
         this.updateSelectedCount();
       });
     });
-    
+
     this.updateSelectedCount();
   }
 
@@ -1057,31 +1057,31 @@ class CategoryBatchManagerUI {
 
   async handlePreview() {
     const selectedFiles = this.getSelectedFiles();
-    
+
     if (selectedFiles.length === 0) {
       alert('No files selected');
       return;
     }
-    
+
     const toAdd = this.parseCategories(
       document.getElementById('cbm-add-cats').value
     );
     const toRemove = this.parseCategories(
       document.getElementById('cbm-remove-cats').value
     );
-    
+
     this.showLoading();
-    
+
     try {
       const preview = await this.batchProcessor.previewChanges(
         selectedFiles,
         toAdd,
         toRemove
       );
-      
+
       this.showPreviewModal(preview);
       this.hideLoading();
-      
+
     } catch (error) {
       this.hideLoading();
       alert(`Error generating preview: ${error.message}`);
@@ -1091,10 +1091,10 @@ class CategoryBatchManagerUI {
   showPreviewModal(preview) {
     const modal = document.getElementById('cbm-preview-modal');
     const content = document.getElementById('cbm-preview-content');
-    
+
     let html = '<table class="cbm-preview-table">';
     html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
-    
+
     preview.forEach(item => {
       if (item.willChange) {
         html += `
@@ -1106,15 +1106,15 @@ class CategoryBatchManagerUI {
         `;
       }
     });
-    
+
     html += '</table>';
-    
+
     const changesCount = preview.filter(p => p.willChange).length;
     html = `<p>${changesCount} files will be modified</p>` + html;
-    
+
     content.innerHTML = html;
     modal.classList.remove('hidden');
-    
+
     document.getElementById('cbm-preview-close').addEventListener('click', () => {
       modal.classList.add('hidden');
     });
@@ -1122,35 +1122,35 @@ class CategoryBatchManagerUI {
 
   async handleExecute() {
     const selectedFiles = this.getSelectedFiles();
-    
+
     if (selectedFiles.length === 0) {
       alert('No files selected');
       return;
     }
-    
+
     const toAdd = this.parseCategories(
       document.getElementById('cbm-add-cats').value
     );
     const toRemove = this.parseCategories(
       document.getElementById('cbm-remove-cats').value
     );
-    
+
     if (toAdd.length === 0 && toRemove.length === 0) {
       alert('Please specify categories to add or remove');
       return;
     }
-    
+
     const confirmed = confirm(
       `Are you sure you want to update ${selectedFiles.length} files?\n` +
       `Add: ${toAdd.join(', ') || 'none'}\n` +
       `Remove: ${toRemove.join(', ') || 'none'}`
     );
-    
+
     if (!confirmed) return;
-    
+
     this.state.isProcessing = true;
     this.showProgress();
-    
+
     try {
       const results = await this.batchProcessor.processBatch(
         selectedFiles,
@@ -1168,9 +1168,9 @@ class CategoryBatchManagerUI {
           }
         }
       );
-      
+
       this.showResults(results);
-      
+
     } catch (error) {
       alert(`Batch process failed: ${error.message}`);
     } finally {
@@ -1191,7 +1191,7 @@ class CategoryBatchManagerUI {
 
   updateProgress(percentage, results) {
     document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
-    document.getElementById('cbm-progress-text').textContent = 
+    document.getElementById('cbm-progress-text').textContent =
       `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.failed} failed)`;
   }
 
@@ -1200,14 +1200,14 @@ class CategoryBatchManagerUI {
     message += `Total: ${results.total}\n`;
     message += `Successful: ${results.successful}\n`;
     message += `Failed: ${results.failed}\n`;
-    
+
     if (results.errors.length > 0) {
       message += `\nErrors:\n`;
       results.errors.forEach(err => {
         message += `- ${err.file}: ${err.error}\n`;
       });
     }
-    
+
     alert(message);
   }
 
@@ -1516,9 +1516,9 @@ class CategoryBatchManagerUI {
 function addToolButton() {
   // Check if we're on a category page
   const isCategoryPage = mw.config.get('wgCanonicalNamespace') === 'Category';
-  
+
   if (!isCategoryPage) return;
-  
+
   // Add button to page
   const portletLink = mw.util.addPortletLink(
     'p-cactions',
@@ -1527,10 +1527,10 @@ function addToolButton() {
     'ca-batch-manager',
     'Open Category Batch Manager'
   );
-  
+
   portletLink.addEventListener('click', (e) => {
     e.preventDefault();
-    
+
     // Initialize and show UI
     if (!window.categoryBatchManager) {
       window.categoryBatchManager = new CategoryBatchManagerUI();
@@ -1566,7 +1566,7 @@ class ErrorRecovery {
       timestamp: new Date(),
       attemptCount: (operation.attemptCount || 0) + 1
     });
-    
+
     // Save to localStorage
     this.saveToStorage();
   }
@@ -1575,7 +1575,7 @@ class ErrorRecovery {
     const toRetry = this.failedOperations.filter(
       op => op.attemptCount < 3
     );
-    
+
     for (const operation of toRetry) {
       try {
         await this.executeOperation(operation);
@@ -1820,11 +1820,11 @@ describe('CategoryService', () => {
 ```javascript
 /**
  * Category Batch Manager for Wikimedia Commons
- * 
+ *
  * @author [Your Name]
  * @version 1.0.0
  * @license MIT
- * 
+ *
  * @description
  * A tool for batch categorization of files in Wikimedia Commons.
  * Allows filtering files by pattern and applying category changes
@@ -1898,19 +1898,19 @@ To add "Category:United States" to all USA charts:
 # Frequently Asked Questions
 
 ## Q: Why can't I see the Batch Manager button?
-A: Make sure you're on a category page and have enabled 
+A: Make sure you're on a category page and have enabled
    the gadget in your preferences.
 
 ## Q: How many files can I process at once?
-A: The tool can handle hundreds of files, but processes 
+A: The tool can handle hundreds of files, but processes
    them sequentially to respect rate limits.
 
 ## Q: What if the process fails halfway?
-A: The tool logs all operations. Failed files can be 
+A: The tool logs all operations. Failed files can be
    retried individually.
 
 ## Q: Can I undo changes?
-A: Each edit has a clear edit summary. You can revert 
+A: Each edit has a clear edit summary. You can revert
    individual edits through the file history.
 ```
 
@@ -2054,7 +2054,7 @@ const LAST_UPDATED = '2026-02-06';
 ```markdown
 == New Tool: Category Batch Manager for OWID Importer ==
 
-I'm pleased to announce a new gadget for efficiently 
+I'm pleased to announce a new gadget for efficiently
 categorizing files uploaded by the OWID importer tool.
 
 === Features ===
@@ -2065,14 +2065,14 @@ categorizing files uploaded by the OWID importer tool.
 * Error handling and retry
 
 === How to Enable ===
-Go to [[Special:Preferences#mw-prefsection-gadgets]] and 
+Go to [[Special:Preferences#mw-prefsection-gadgets]] and
 enable "Category Batch Manager"
 
 === Documentation ===
 Full guide: [[Commons:Category Batch Manager]]
 
 === Feedback ===
-Please report bugs or suggest improvements at 
+Please report bugs or suggest improvements at
 [[Commons talk:Category Batch Manager]]
 
 Happy editing! ~~~~

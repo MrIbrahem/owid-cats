@@ -281,7 +281,10 @@ class CategoryBatchManagerUI {
      */
     showMessage(text, type) {
         const messageContainer = document.getElementById('cbm-results-message');
-        if (!messageContainer) return;
+        if (!messageContainer) {
+            console.error('[CBM] Message container not found');
+            return;
+        }
         const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
         messageContainer.innerHTML = `
       <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
@@ -409,10 +412,6 @@ class CategoryBatchManagerUI {
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
         }
-    }
-
-    hideLoading() {
-        // Content will be replaced by renderFileList or showMessage
     }
 
     /**

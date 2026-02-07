@@ -469,10 +469,6 @@ function showLoading() {
             `;
 }
 
-function hideLoading() {
-    // Loading will be replaced by renderFileList()
-}
-
 function parseCategories(input) {
     if (!input || !input.trim()) {
         return [];

@@ -54,7 +54,6 @@ async handlePreview() {
     this.showLoading();  // يؤثر على قائمة الملفات
     const preview = await this.batchProcessor.previewChanges(...);
     this.showPreviewModal(preview);
-    this.hideLoading();
 }
 ```
 

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Batch Manager - Interactive Demo</title>
+    <link rel="stylesheet" href="css.css">
+    <link rel="stylesheet" href="css.css">
+    <!-- load codex style -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codex/2.3.2/codex.min.js"
+        integrity="sha512-5hdqakHInVQsHvGk+D4cLQza/uTpBPj+lqlFG37aEm6d3/z0Sd8K8nXAun7zrgisxfEwGdS2OX764It8P4n5jQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codex/2.3.2/codex.style.min.css"
+        integrity="sha512-29UfiqUEWV5YjfmDDgRVrkBv19xQ+1wlgLlZfrcE5z2VfV1EXnyRqv3hpQB08V0dKRaQ1drnVpRcFx45m6oORA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .demo-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10002;
+            max-width: 300px;
+        }
+
+        .demo-controls h3 {
+            margin-top: 0;
+            color: #202122;
+            border-bottom: 2px solid #36c;
+            padding-bottom: 10px;
+        }
+
+        .demo-button {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 10px;
+            background: #36c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .demo-button:hover {
+            background: #2a4b8d;
+        }
+
+        .demo-button.secondary {
+            background: #72777d;
+        }
+
+        .demo-button.secondary:hover {
+            background: #54595d;
+        }
+
+        .demo-button.success {
+            background: #00af89;
+        }
+
+        .demo-button.success:hover {
+            background: #008c6d;
+        }
+
+        .demo-button.danger {
+            background: #d73333;
+        }
+
+        .demo-button.danger:hover {
+            background: #b32424;
+        }
+
+        .demo-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .demo-section h4 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #54595d;
+        }
+
+        .demo-info {
+            background: #eaf3ff;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-demo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #36c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10003;
+            transition: all 0.3s;
+        }
+
+        .toggle-demo:hover {
+            transform: scale(1.1);
+            background: #2a4b8d;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Demo Controls Panel -->
+    <div class="demo-controls" id="demo-controls">
+        <h3>🎮 Demo Controls</h3>
+
+        <div class="demo-info">
+            Use these buttons to quickly test different scenarios
+        </div>
+
+        <div class="demo-section">
+            <h4>Quick Actions</h4>
+            <button class="demo-button success" onclick="quickSearch()">🔍 Quick Search (BLR)</button>
+            <button class="demo-button success" onclick="selectAndAdd()">✅ Select All + Add Categories</button>
+            <button class="demo-button success" onclick="previewDemo()">👁️ Preview Changes</button>
+            <button class="demo-button success" onclick="executeDemo()">▶️ Execute Batch</button>
+        </div>
+
+        <div class="demo-section">
+            <h4>Test Scenarios</h4>
+            <button class="demo-button" onclick="testEmptySearch()">Test: Empty Search</button>
+            <button class="demo-button" onclick="testNoSelection()">Test: No Selection</button>
+            <button class="demo-button" onclick="testNoCategories()">Test: No Categories</button>
+            <button class="demo-button" onclick="testLargeDataset()">Test: Large Dataset</button>
+        </div>
+
+        <div class="demo-section">
+            <h4>UI Controls</h4>
+            <button class="demo-button secondary" onclick="clearAll()">🗑️ Clear All</button>
+            <button class="demo-button secondary" onclick="resetForm()">🔄 Reset Form</button>
+            <button class="demo-button danger" onclick="closeApp()">❌ Close App</button>
+        </div>
+
+        <div class="demo-section">
+            <h4>Console</h4>
+            <button class="demo-button secondary" onclick="showStats()">📊 Show Stats</button>
+            <button class="demo-button secondary" onclick="exportData()">💾 Export Data</button>
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-demo" onclick="toggleDemo()" title="Toggle Demo Controls">🎮</button>
+
+    <!-- Main Application (from modal.html) -->
+    <div id="category-batch-manager" class="cbm-container">
+        <div class="cbm-header">
+            <h2>Category Batch Manager - Interactive Demo</h2>
+            <button
+                class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
+                id="cbm-close" aria-label="Close">&#215;</button>
+        </div>
+
+        <div class="cbm-body">
+            <div class="cbm-search">
+                <div class="cdx-field">
+                    <div class="cdx-label">
+                        <label class="cdx-label__label" for="cbm-source-category">
+                            <span class="cdx-label__label__text">Source Category</span>
+                        </label>
+                    </div>
+                    <div class="cdx-field__control">
+                        <div class="cdx-text-input">
+                            <input id="cbm-source-category" class="cdx-text-input__input" type="text"
+                                value="Category:Sample_Files" placeholder="Category:Example">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cdx-field">
+                    <div class="cdx-label">
+                        <label class="cdx-label__label" for="cbm-pattern">
+                            <span class="cdx-label__label__text">Search Pattern</span>
+                        </label>
+                        <span class="cdx-label__description">
+                            Enter a pattern to filter files (e.g., ,BLR.svg)
+                        </span>
+                    </div>
+                    <div class="cdx-field__control cbm-search-row">
+                        <div class="cdx-text-input" style="flex: 1;">
+                            <input id="cbm-pattern" class="cdx-text-input__input" type="text"
+                                placeholder="e.g., ,BLR.svg">
+                        </div>
+                        <button id="cbm-search-btn"
+                            class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="cbm-results">
+                <div id="cbm-results-header" class="cbm-results-header hidden">
+                    <div class="cdx-info-chip cdx-info-chip--notice">
+                        <span class="cdx-info-chip__text">
+                            Found <strong id="cbm-count">0</strong> files
+                        </span>
+                    </div>
+                    <button id="cbm-select-all"
+                        class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
+                        Select All
+                    </button>
+                    <button id="cbm-deselect-all"
+                        class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
+                        Deselect All
+                    </button>
+                </div>
+                <div id="cbm-results-message" class="hidden"></div>
+                <br>
+                <div id="cbm-file-list"></div>
+            </div>
+
+            <div class="cbm-actions">
+                <div class="cdx-field">
+                    <div class="cdx-label">
+                        <label class="cdx-label__label" for="cbm-add-cats">
+                            <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
+                        </label>
+                        <span class="cdx-label__description">
+                            e.g., Category:Belarus, Category:Europe
+                        </span>
+                    </div>
+                    <div class="cdx-field__control">
+                        <div class="cdx-text-input">
+                            <input id="cbm-add-cats" class="cdx-text-input__input" type="text"
+                                placeholder="Category:Example">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cdx-field">
+                    <div class="cdx-label">
+                        <label class="cdx-label__label" for="cbm-remove-cats">
+                            <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
+                        </label>
+                    </div>
+                    <div class="cdx-field__control">
+                        <div class="cdx-text-input">
+                            <input id="cbm-remove-cats" class="cdx-text-input__input" type="text"
+                                placeholder="Category:Old">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cdx-field">
+                    <div class="cdx-label">
+                        <label class="cdx-label__label" for="cbm-summary">
+                            <span class="cdx-label__label__text">Edit Summary</span>
+                        </label>
+                    </div>
+                    <div class="cdx-field__control">
+                        <div class="cdx-text-input">
+                            <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                                value="Batch category update via Category Batch Manager">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cbm-selected-count">
+                    Selected: <strong id="cbm-selected">0</strong> files
+                </div>
+
+                <div class="cbm-buttons">
+                    <button id="cbm-preview"
+                        class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+                        Preview Changes
+                    </button>
+                    <button id="cbm-execute"
+                        class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+                        GO
+                    </button>
+                </div>
+            </div>
+
+            <div id="cbm-progress" class="cbm-progress hidden">
+                <div class="cdx-progress-bar cdx-progress-bar--block" role="progressbar"
+                    aria-label="Batch processing progress">
+                    <div id="cbm-progress-fill" class="cdx-progress-bar__bar cbm-progress-fill"></div>
+                </div>
+                <div id="cbm-progress-text" class="cbm-progress-text">Processing...</div>
+            </div>
+        </div>
+
+        <div id="cbm-preview-modal" class="cbm-modal hidden">
+            <div class="cbm-modal-content">
+                <h3>Preview Changes</h3>
+                <div id="cbm-preview-content"></div>
+                <button id="cbm-preview-close"
+                    class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the main application script from modal.html -->
+    <script src="js.js"></script>
+
+    <!-- Demo-specific functions -->
+    <script>
+        // Extended mock files for demo
+        const extendedMockFiles = [
+            { title: 'File:GDP-per-capita,BLR.svg', selected: false },
+            { title: 'File:Life-expectancy,BLR.svg', selected: false },
+            { title: 'File:Population,BLR.svg', selected: false },
+            { title: 'File:Unemployment-rate,BLR.svg', selected: false },
+            { title: 'File:Literacy-rate,BLR.svg', selected: false },
+            { title: 'File:Infant-mortality,BLR.svg', selected: false },
+            { title: 'File:CO2-emissions,BLR.svg', selected: false },
+            { title: 'File:Energy-consumption,BLR.svg', selected: false },
+            { title: 'File:GDP-per-capita,POL.svg', selected: false },
+            { title: 'File:Life-expectancy,POL.svg', selected: false },
+            { title: 'File:GDP-per-capita,UKR.svg', selected: false },
+            { title: 'File:Population,UKR.svg', selected: false },
+        ];
+
+        // Replace mockFiles with extended version
+        if (typeof mockFiles !== 'undefined') {
+            mockFiles.length = 0;
+            mockFiles.push(...extendedMockFiles);
+        }
+
+        // Demo control functions
+        function toggleDemo() {
+            const controls = document.getElementById('demo-controls');
+            controls.classList.toggle('hidden');
+        }
+
+        function quickSearch() {
+            document.getElementById('cbm-pattern').value = 'BLR';
+            document.getElementById('cbm-search-btn').click();
+            console.log('✅ Quick search executed: BLR');
+        }
+
+        function selectAndAdd() {
+            setTimeout(() => {
+                document.getElementById('cbm-select-all').click();
+                document.getElementById('cbm-add-cats').value = 'Category:Belarus, Category:Europe';
+                console.log('✅ Selected all and added categories');
+            }, 500);
+        }
+
+        function previewDemo() {
+            if (!document.getElementById('cbm-add-cats').value) {
+                document.getElementById('cbm-add-cats').value = 'Category:Demo';
+            }
+            setTimeout(() => {
+                document.getElementById('cbm-preview').click();
+                console.log('✅ Preview opened');
+            }, 500);
+        }
+
+        function executeDemo() {
+            if (!document.getElementById('cbm-add-cats').value) {
+                document.getElementById('cbm-add-cats').value = 'Category:Demo';
+            }
+            setTimeout(() => {
+                document.getElementById('cbm-execute').click();
+                console.log('✅ Execution started');
+            }, 500);
+        }
+
+        function testEmptySearch() {
+            document.getElementById('cbm-pattern').value = 'XXXNONEXISTENT';
+            document.getElementById('cbm-search-btn').click();
+            console.log('🧪 Test: Empty search');
+        }
+
+        function testNoSelection() {
+            document.getElementById('cbm-deselect-all').click();
+            document.getElementById('cbm-preview').click();
+            console.log('🧪 Test: No selection');
+        }
+
+        function testNoCategories() {
+            document.getElementById('cbm-add-cats').value = '';
+            document.getElementById('cbm-remove-cats').value = '';
+            document.getElementById('cbm-preview').click();
+            console.log('🧪 Test: No categories');
+        }
+
+        function testLargeDataset() {
+            // Add more mock files
+            for (let i = 0; i < 50; i++) {
+                currentFiles.push({
+                    title: `File:Test-file-${i}.svg`,
+                    selected: false
+                });
+            }
+            renderFileList();
+            console.log('🧪 Test: Large dataset (50+ files)');
+        }
+
+        function clearAll() {
+            document.getElementById('cbm-pattern').value = '';
+            document.getElementById('cbm-add-cats').value = '';
+            document.getElementById('cbm-remove-cats').value = '';
+            currentFiles = [];
+            renderFileList();
+            clearMessage();
+            document.getElementById('cbm-results-header').classList.add('hidden');
+            console.log('🗑️ All cleared');
+        }
+
+        function resetForm() {
+            document.getElementById('cbm-source-category').value = 'Category:Sample_Files';
+            document.getElementById('cbm-pattern').value = '';
+            document.getElementById('cbm-add-cats').value = '';
+            document.getElementById('cbm-remove-cats').value = '';
+            document.getElementById('cbm-summary').value = 'Batch category update via Category Batch Manager';
+            clearAll();
+            console.log('🔄 Form reset');
+        }
+
+        function closeApp() {
+            if (confirm('Close the application?')) {
+                document.getElementById('cbm-close').click();
+                console.log('❌ Application closed');
+            }
+        }
+
+        function showStats() {
+            const stats = {
+                totalFiles: currentFiles.length,
+                selectedFiles: currentFiles.filter(f => f.selected).length,
+                pattern: document.getElementById('cbm-pattern').value,
+                categoriesToAdd: document.getElementById('cbm-add-cats').value,
+                categoriesToRemove: document.getElementById('cbm-remove-cats').value
+            };
+            console.table(stats);
+            console.log('📊 Current Statistics:', stats);
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                files: currentFiles,
+                settings: {
+                    sourceCategory: document.getElementById('cbm-source-category').value,
+                    pattern: document.getElementById('cbm-pattern').value,
+                    addCategories: document.getElementById('cbm-add-cats').value,
+                    removeCategories: document.getElementById('cbm-remove-cats').value,
+                    summary: document.getElementById('cbm-summary').value
+                }
+            };
+            console.log('💾 Exported Data:', JSON.stringify(data, null, 2));
+            alert('Data exported to console!');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🎮 Interactive Demo Mode Activated');
+            console.log('📌 Use the demo controls panel on the right to quickly test features');
+            console.log('💡 Tip: Press the 🎮 button to toggle the controls panel');
+        });
+    </script>
+</body>
+
+</html>

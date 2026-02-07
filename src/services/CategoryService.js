@@ -109,7 +109,7 @@ class CategoryService {
     const parser = this.parser;
 
     try {
-      await api.edit(fileTitle, function(revision) {
+      await api.edit(fileTitle, function (revision) {
         let newWikitext = revision.content;
 
         // Remove categories first

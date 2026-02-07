@@ -152,7 +152,7 @@ class APIService {
     const api = this._getMwApi();
 
     // Use mw.Api.edit() with a transform function
-    return api.edit(title, function() {
+    return api.edit(title, function () {
       return {
         text: content,
         summary: summary,

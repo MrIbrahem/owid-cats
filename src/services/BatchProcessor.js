@@ -27,10 +27,10 @@ class BatchProcessor {
    */
   async processBatch(files, categoriesToAdd, categoriesToRemove, callbacks = {}) {
     const {
-      onProgress = () => {},
-      onFileComplete = () => {},
-      onError = () => {}
-    } = callbacks;    const results = {
+      onProgress = () => { },
+      onFileComplete = () => { },
+      onError = () => { }
+    } = callbacks; const results = {
       total: files.length,
       processed: 0,
       successful: 0,

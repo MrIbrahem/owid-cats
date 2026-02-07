@@ -9,39 +9,39 @@
 /* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator */
 
 class CategoryBatchManagerUI {
-  constructor() {
-    this.apiService = new APIService();
-    this.fileService = new FileService(this.apiService);
-    this.categoryService = new CategoryService(this.apiService);
-    this.batchProcessor = new BatchProcessor(this.categoryService);
+    constructor() {
+        this.apiService = new APIService();
+        this.fileService = new FileService(this.apiService);
+        this.categoryService = new CategoryService(this.apiService);
+        this.batchProcessor = new BatchProcessor(this.categoryService);
 
-    this.state = {
-      sourceCategory: mw.config.get('wgPageName'),
-      searchPattern: '',
-      files: [],
-      selectedFiles: [],
-      categoriesToAdd: [],
-      categoriesToRemove: [],
-      isProcessing: false
-    };
+        this.state = {
+            sourceCategory: mw.config.get('wgPageName'),
+            searchPattern: '',
+            files: [],
+            selectedFiles: [],
+            categoriesToAdd: [],
+            categoriesToRemove: [],
+            isProcessing: false
+        };
 
-    this.init();
-  }
+        this.init();
+    }
 
-  init() {
-    this.createUI();
-    this.attachEventListeners();
-  }
+    init() {
+        this.createUI();
+        this.attachEventListeners();
+    }
 
-  createUI() {
-    const container = this.buildContainer();
-    document.body.appendChild(container);
-  }
-  buildContainer() {
-    const div = document.createElement('div');
-    div.id = 'category-batch-manager';
-    div.className = 'cbm-container';
-    div.innerHTML = `
+    createUI() {
+        const container = this.buildContainer();
+        document.body.appendChild(container);
+    }
+    buildContainer() {
+        const div = document.createElement('div');
+        div.id = 'category-batch-manager';
+        div.className = 'cbm-container';
+        div.innerHTML = `
       <div class="cbm-header">
         <h2>Category Batch Manager</h2>
         <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
@@ -187,125 +187,125 @@ class CategoryBatchManagerUI {
       </div>
     `;
 
-    return div;
-  }
-  attachEventListeners() {
-    document.getElementById('cbm-search-btn').addEventListener('click', () => {
-      this.handleSearch();
-    });
-
-    document.getElementById('cbm-select-all').addEventListener('click', () => {
-      this.selectAll();
-    });
-
-    document.getElementById('cbm-deselect-all').addEventListener('click', () => {
-      this.deselectAll();
-    });
-
-    document.getElementById('cbm-preview').addEventListener('click', () => {
-      this.handlePreview();
-    });
-
-    document.getElementById('cbm-execute').addEventListener('click', () => {
-      this.handleExecute();
-    });
-
-    document.getElementById('cbm-close').addEventListener('click', () => {
-      this.close();
-    });
-
-    // Preview modal close button
-    document.getElementById('cbm-preview-close').addEventListener('click', () => {
-      this.hidePreviewModal();
-    });
-
-    // Close modal when clicking outside
-    document.getElementById('cbm-preview-modal').addEventListener('click', (e) => {
-      if (e.target.id === 'cbm-preview-modal') {
-        this.hidePreviewModal();
-      }
-    });
-  } async handleSearch() {
-    const pattern = document.getElementById('cbm-pattern').value.trim();
-    const sourceCategory = document.getElementById('cbm-source-category').value.trim();
-
-    if (!pattern) {
-      this.showMessage('Please enter a search pattern.', 'warning');
-      return;
+        return div;
     }
+    attachEventListeners() {
+        document.getElementById('cbm-search-btn').addEventListener('click', () => {
+            this.handleSearch();
+        });
 
-    if (!sourceCategory) {
-      this.showMessage('Please enter a source category.', 'warning');
-      return;
+        document.getElementById('cbm-select-all').addEventListener('click', () => {
+            this.selectAll();
+        });
+
+        document.getElementById('cbm-deselect-all').addEventListener('click', () => {
+            this.deselectAll();
+        });
+
+        document.getElementById('cbm-preview').addEventListener('click', () => {
+            this.handlePreview();
+        });
+
+        document.getElementById('cbm-execute').addEventListener('click', () => {
+            this.handleExecute();
+        });
+
+        document.getElementById('cbm-close').addEventListener('click', () => {
+            this.close();
+        });
+
+        // Preview modal close button
+        document.getElementById('cbm-preview-close').addEventListener('click', () => {
+            this.hidePreviewModal();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('cbm-preview-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'cbm-preview-modal') {
+                this.hidePreviewModal();
+            }
+        });
+    } async handleSearch() {
+        const pattern = document.getElementById('cbm-pattern').value.trim();
+        const sourceCategory = document.getElementById('cbm-source-category').value.trim();
+
+        if (!pattern) {
+            this.showMessage('Please enter a search pattern.', 'warning');
+            return;
+        }
+
+        if (!sourceCategory) {
+            this.showMessage('Please enter a source category.', 'warning');
+            return;
+        }
+
+        this.clearMessage();
+        this.showLoading();
+
+        try {
+            const files = await this.fileService.searchFiles(
+                sourceCategory,
+                pattern
+            );
+
+            this.state.files = files;
+            this.state.searchPattern = pattern;
+            this.state.sourceCategory = sourceCategory;
+            this.renderFileList();
+            this.hideLoading();
+
+            UsageLogger.logSearch(pattern, files.length);
+        } catch (error) {
+            this.hideLoading();
+            this.showMessage(`Error searching files: ${error.message}`, 'error');
+        }
     }
-
-    this.clearMessage();
-    this.showLoading();
-
-    try {
-      const files = await this.fileService.searchFiles(
-        sourceCategory,
-        pattern
-      );
-
-      this.state.files = files;
-      this.state.searchPattern = pattern;
-      this.state.sourceCategory = sourceCategory;
-      this.renderFileList();
-      this.hideLoading();
-
-      UsageLogger.logSearch(pattern, files.length);
-    } catch (error) {
-      this.hideLoading();
-      this.showMessage(`Error searching files: ${error.message}`, 'error');
-    }
-  }
-  /**
-   * Display a Codex CSS-only message banner above the file list.
-   * @param {string} text - Message text
-   * @param {string} type - One of 'notice', 'warning', 'error', 'success'
-   */
-  showMessage(text, type) {
-    const messageContainer = document.getElementById('cbm-results-message');
-    if (!messageContainer) return;
-    const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
-    messageContainer.innerHTML = `
+    /**
+     * Display a Codex CSS-only message banner above the file list.
+     * @param {string} text - Message text
+     * @param {string} type - One of 'notice', 'warning', 'error', 'success'
+     */
+    showMessage(text, type) {
+        const messageContainer = document.getElementById('cbm-results-message');
+        if (!messageContainer) return;
+        const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
+        messageContainer.innerHTML = `
       <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
         <span class="cdx-message__icon"></span>
         <div class="cdx-message__content">${text}</div>
       </div>`;
-  }
-
-  /**
-   * Clear any displayed messages
-   */
-  clearMessage() {
-    const messageContainer = document.getElementById('cbm-results-message');
-    if (messageContainer) {
-      messageContainer.innerHTML = '';
-    }
-  }
-
-  renderFileList() {
-    const listContainer = document.getElementById('cbm-file-list');
-    const countElement = document.getElementById('cbm-count');
-    const headerElement = document.getElementById('cbm-results-header');
-
-    if (this.state.files.length === 0) {
-      listContainer.innerHTML = '<p>No files found matching the pattern.</p>';
-      headerElement.classList.add('hidden');
-      return;
     }
 
-    countElement.textContent = this.state.files.length;
-    headerElement.classList.remove('hidden');
+    /**
+     * Clear any displayed messages
+     */
+    clearMessage() {
+        const messageContainer = document.getElementById('cbm-results-message');
+        if (messageContainer) {
+            messageContainer.innerHTML = '';
+        }
+    }
 
-    listContainer.innerHTML = ''; this.state.files.forEach((file, index) => {
-      const fileRow = document.createElement('div');
-      fileRow.className = 'cbm-file-row';
-      fileRow.dataset.index = index;
+    renderFileList() {
+        const listContainer = document.getElementById('cbm-file-list');
+        const countElement = document.getElementById('cbm-count');
+        const headerElement = document.getElementById('cbm-results-header');
 
-      fileRow.innerHTML = `
+        if (this.state.files.length === 0) {
+            listContainer.innerHTML = '<p>No files found matching the pattern.</p>';
+            headerElement.classList.add('hidden');
+            return;
+        }
+
+        countElement.textContent = this.state.files.length;
+        headerElement.classList.remove('hidden');
+
+        listContainer.innerHTML = ''; this.state.files.forEach((file, index) => {
+            const fileRow = document.createElement('div');
+            fileRow.className = 'cbm-file-row';
+            fileRow.dataset.index = index;
+
+            fileRow.innerHTML = `
         <div class="cdx-checkbox cbm-file-checkbox-wrapper">
           <div class="cdx-checkbox__wrapper">
             <input id="file-${index}" class="cdx-checkbox__input cbm-file-checkbox"
@@ -322,247 +322,247 @@ class CategoryBatchManagerUI {
                 data-index="${index}" aria-label="Remove file">&#215;</button>
       `;
 
-      listContainer.appendChild(fileRow);
-    });
+            listContainer.appendChild(fileRow);
+        });
 
-    // Attach remove button listeners
-    document.querySelectorAll('.cbm-remove-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const index = parseInt(e.target.dataset.index);
-        this.removeFile(index);
-      });
-    });
+        // Attach remove button listeners
+        document.querySelectorAll('.cbm-remove-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                this.removeFile(index);
+            });
+        });
 
-    // Attach checkbox listeners
-    document.querySelectorAll('.cbm-file-checkbox').forEach(checkbox => {
-      checkbox.addEventListener('change', () => {
+        // Attach checkbox listeners
+        document.querySelectorAll('.cbm-file-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                this.updateSelectedCount();
+            });
+        });
+
         this.updateSelectedCount();
-      });
-    });
-
-    this.updateSelectedCount();
-  }
-
-  removeFile(index) {
-    this.state.files.splice(index, 1);
-    this.renderFileList();
-  }
-
-  selectAll() {
-    document.querySelectorAll('.cbm-file-checkbox').forEach(cb => {
-      cb.checked = true;
-    });
-    this.updateSelectedCount();
-  }
-
-  deselectAll() {
-    document.querySelectorAll('.cbm-file-checkbox').forEach(cb => {
-      cb.checked = false;
-    });
-    this.updateSelectedCount();
-  }
-
-  updateSelectedCount() {
-    const selected = document.querySelectorAll('.cbm-file-checkbox:checked').length;
-    document.getElementById('cbm-selected').textContent = selected;
-  }
-
-  getSelectedFiles() {
-    const selected = [];
-    document.querySelectorAll('.cbm-file-checkbox:checked').forEach(cb => {
-      const index = parseInt(cb.id.replace('file-', ''));
-      if (this.state.files[index]) {
-        selected.push(this.state.files[index]);
-      }
-    });
-    return selected;
-  }
-
-  parseCategories(input) {
-    return input
-      .split(',')
-      .map(cat => cat.trim())
-      .filter(cat => cat.length > 0)
-      .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-  }
-  async handlePreview() {
-    const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
-      this.showMessage('No files selected.', 'warning');
-      return;
     }
 
-    const toAdd = this.parseCategories(
-      document.getElementById('cbm-add-cats').value
-    );
-    const toRemove = this.parseCategories(
-      document.getElementById('cbm-remove-cats').value
-    );
+    removeFile(index) {
+        this.state.files.splice(index, 1);
+        this.renderFileList();
+    }
 
-    // Check for circular category reference
-    const sourceCategory = this.state.sourceCategory;
-    for (const category of toAdd) {
-      if (Validator.isCircularCategory(sourceCategory, category)) {
-        this.showMessage(
-          `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
-          'error'
+    selectAll() {
+        document.querySelectorAll('.cbm-file-checkbox').forEach(cb => {
+            cb.checked = true;
+        });
+        this.updateSelectedCount();
+    }
+
+    deselectAll() {
+        document.querySelectorAll('.cbm-file-checkbox').forEach(cb => {
+            cb.checked = false;
+        });
+        this.updateSelectedCount();
+    }
+
+    updateSelectedCount() {
+        const selected = document.querySelectorAll('.cbm-file-checkbox:checked').length;
+        document.getElementById('cbm-selected').textContent = selected;
+    }
+
+    getSelectedFiles() {
+        const selected = [];
+        document.querySelectorAll('.cbm-file-checkbox:checked').forEach(cb => {
+            const index = parseInt(cb.id.replace('file-', ''));
+            if (this.state.files[index]) {
+                selected.push(this.state.files[index]);
+            }
+        });
+        return selected;
+    }
+
+    parseCategories(input) {
+        return input
+            .split(',')
+            .map(cat => cat.trim())
+            .filter(cat => cat.length > 0)
+            .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
+    }
+    async handlePreview() {
+        const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
+            this.showMessage('No files selected.', 'warning');
+            return;
+        }
+
+        const toAdd = this.parseCategories(
+            document.getElementById('cbm-add-cats').value
         );
-        return;
-      }
+        const toRemove = this.parseCategories(
+            document.getElementById('cbm-remove-cats').value
+        );
+
+        // Check for circular category reference
+        const sourceCategory = this.state.sourceCategory;
+        for (const category of toAdd) {
+            if (Validator.isCircularCategory(sourceCategory, category)) {
+                this.showMessage(
+                    `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
+                    'error'
+                );
+                return;
+            }
+        }
+
+        this.showLoading();
+
+        try {
+            const preview = await this.batchProcessor.previewChanges(
+                selectedFiles,
+                toAdd,
+                toRemove
+            );
+
+            this.showPreviewModal(preview);
+            this.hideLoading();
+
+        } catch (error) {
+            this.hideLoading();
+            this.showMessage(`Error generating preview: ${error.message}`, 'error');
+        }
     }
+    showPreviewModal(preview) {
+        const modal = document.getElementById('cbm-preview-modal');
+        const content = document.getElementById('cbm-preview-content');
 
-    this.showLoading();
+        let html = '<table class="cbm-preview-table">';
+        html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
 
-    try {
-      const preview = await this.batchProcessor.previewChanges(
-        selectedFiles,
-        toAdd,
-        toRemove
-      );
-
-      this.showPreviewModal(preview);
-      this.hideLoading();
-
-    } catch (error) {
-      this.hideLoading();
-      this.showMessage(`Error generating preview: ${error.message}`, 'error');
-    }
-  }
-  showPreviewModal(preview) {
-    const modal = document.getElementById('cbm-preview-modal');
-    const content = document.getElementById('cbm-preview-content');
-
-    let html = '<table class="cbm-preview-table">';
-    html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
-
-    preview.forEach(item => {
-      if (item.willChange) {
-        html += `
+        preview.forEach(item => {
+            if (item.willChange) {
+                html += `
           <tr>
             <td>${item.file}</td>
             <td>${item.currentCategories.join('<br>')}</td>
             <td>${item.newCategories.join('<br>')}</td>
           </tr>
         `;
-      }
-    });
+            }
+        });
 
-    html += '</table>';
+        html += '</table>';
 
-    const changesCount = preview.filter(p => p.willChange).length;
-    html = `<p>${changesCount} files will be modified</p>` + html;
+        const changesCount = preview.filter(p => p.willChange).length;
+        html = `<p>${changesCount} files will be modified</p>` + html;
 
-    content.innerHTML = html;
-    modal.classList.remove('hidden');
-  }
-
-  hidePreviewModal() {
-    const modal = document.getElementById('cbm-preview-modal');
-    modal.classList.add('hidden');
-  }  async handleExecute() {
-    const selectedFiles = this.getSelectedFiles();
-
-    if (selectedFiles.length === 0) {
-      this.showMessage('No files selected.', 'warning');
-      return;
+        content.innerHTML = html;
+        modal.classList.remove('hidden');
     }
 
-    const toAdd = this.parseCategories(
-      document.getElementById('cbm-add-cats').value
-    );
-    const toRemove = this.parseCategories(
-      document.getElementById('cbm-remove-cats').value
-    );
+    hidePreviewModal() {
+        const modal = document.getElementById('cbm-preview-modal');
+        modal.classList.add('hidden');
+    } async handleExecute() {
+        const selectedFiles = this.getSelectedFiles();
 
-    if (toAdd.length === 0 && toRemove.length === 0) {
-      this.showMessage('Please specify categories to add or remove.', 'warning');
-      return;
-    }
-
-    // Check for circular category reference
-    const sourceCategory = this.state.sourceCategory;
-    for (const category of toAdd) {
-      if (Validator.isCircularCategory(sourceCategory, category)) {
-        this.showMessage(
-          `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
-          'error'
-        );
-        return;
-      }
-    }
-
-    // Show a confirmation message and require a second click on GO
-    const confirmMsg =
-      `About to update ${selectedFiles.length} file(s). ` +
-      `Add: ${toAdd.join(', ') || 'none'}. ` +
-      `Remove: ${toRemove.join(', ') || 'none'}. ` +
-      'Click GO again to confirm.';
-
-    if (!this._executeConfirmed) {
-      this.showMessage(confirmMsg, 'notice');
-      this._executeConfirmed = true;
-      return;
-    }
-    this._executeConfirmed = false;
-
-    this.state.isProcessing = true;
-    this.showProgress();
-
-    try {
-      const results = await this.batchProcessor.processBatch(
-        selectedFiles,
-        toAdd,
-        toRemove,
-        {
-          onProgress: (progress, results) => {
-            this.updateProgress(progress, results);
-          },
-          onFileComplete: (file, success) => {
-            console.log(`${file.title}: ${success ? 'success' : 'failed'}`);
-          },
-          onError: (file, error) => {
-            console.error(`Error processing ${file.title}:`, error);
-          }
+        if (selectedFiles.length === 0) {
+            this.showMessage('No files selected.', 'warning');
+            return;
         }
-      );
 
-      UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
-      this.showResults(results);
+        const toAdd = this.parseCategories(
+            document.getElementById('cbm-add-cats').value
+        );
+        const toRemove = this.parseCategories(
+            document.getElementById('cbm-remove-cats').value
+        );
 
-    } catch (error) {
-      this.showMessage(`Batch process failed: ${error.message}`, 'error');
-    } finally {
-      this.state.isProcessing = false;
-      this.hideProgress();
+        if (toAdd.length === 0 && toRemove.length === 0) {
+            this.showMessage('Please specify categories to add or remove.', 'warning');
+            return;
+        }
+
+        // Check for circular category reference
+        const sourceCategory = this.state.sourceCategory;
+        for (const category of toAdd) {
+            if (Validator.isCircularCategory(sourceCategory, category)) {
+                this.showMessage(
+                    `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
+                    'error'
+                );
+                return;
+            }
+        }
+
+        // Show a confirmation message and require a second click on GO
+        const confirmMsg =
+            `About to update ${selectedFiles.length} file(s). ` +
+            `Add: ${toAdd.join(', ') || 'none'}. ` +
+            `Remove: ${toRemove.join(', ') || 'none'}. ` +
+            'Click GO again to confirm.';
+
+        if (!this._executeConfirmed) {
+            this.showMessage(confirmMsg, 'notice');
+            this._executeConfirmed = true;
+            return;
+        }
+        this._executeConfirmed = false;
+
+        this.state.isProcessing = true;
+        this.showProgress();
+
+        try {
+            const results = await this.batchProcessor.processBatch(
+                selectedFiles,
+                toAdd,
+                toRemove,
+                {
+                    onProgress: (progress, results) => {
+                        this.updateProgress(progress, results);
+                    },
+                    onFileComplete: (file, success) => {
+                        console.log(`${file.title}: ${success ? 'success' : 'failed'}`);
+                    },
+                    onError: (file, error) => {
+                        console.error(`Error processing ${file.title}:`, error);
+                    }
+                }
+            );
+
+            UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
+            this.showResults(results);
+
+        } catch (error) {
+            this.showMessage(`Batch process failed: ${error.message}`, 'error');
+        } finally {
+            this.state.isProcessing = false;
+            this.hideProgress();
+        }
     }
-  }
 
-  showProgress() {
-    document.getElementById('cbm-progress').classList.remove('hidden');
-    document.getElementById('cbm-execute').disabled = true;
-  }
-
-  hideProgress() {
-    document.getElementById('cbm-progress').classList.add('hidden');
-    document.getElementById('cbm-execute').disabled = false;
-  }
-  updateProgress(percentage, results) {
-    document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
-    document.getElementById('cbm-progress-text').textContent =
-      `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
-  } showResults(results) {
-    const messageContainer = document.getElementById('cbm-results-message');
-    if (!messageContainer) return;
-
-    const type = results.failed > 0 ? 'warning' : 'success';
-    let errorsHtml = '';
-    if (results.errors && results.errors.length > 0) {
-      errorsHtml = '<ul style="margin: 8px 0 0; padding-left: 20px;">' +
-        results.errors.map(err => `<li>${err.file}: ${err.error}</li>`).join('') +
-        '</ul>';
+    showProgress() {
+        document.getElementById('cbm-progress').classList.remove('hidden');
+        document.getElementById('cbm-execute').disabled = true;
     }
 
-    const ariaAttr = type === 'warning' ? 'aria-live="polite"' : 'aria-live="polite"';
-    messageContainer.innerHTML = `
+    hideProgress() {
+        document.getElementById('cbm-progress').classList.add('hidden');
+        document.getElementById('cbm-execute').disabled = false;
+    }
+    updateProgress(percentage, results) {
+        document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
+        document.getElementById('cbm-progress-text').textContent =
+            `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
+    } showResults(results) {
+        const messageContainer = document.getElementById('cbm-results-message');
+        if (!messageContainer) return;
+
+        const type = results.failed > 0 ? 'warning' : 'success';
+        let errorsHtml = '';
+        if (results.errors && results.errors.length > 0) {
+            errorsHtml = '<ul style="margin: 8px 0 0; padding-left: 20px;">' +
+                results.errors.map(err => `<li>${err.file}: ${err.error}</li>`).join('') +
+                '</ul>';
+        }
+
+        const ariaAttr = type === 'warning' ? 'aria-live="polite"' : 'aria-live="polite"';
+        messageContainer.innerHTML = `
       <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
         <span class="cdx-message__icon"></span>
         <div class="cdx-message__content">
@@ -574,28 +574,28 @@ class CategoryBatchManagerUI {
           ${errorsHtml}
         </div>
       </div>`;
-  }
-  showLoading() {
-    const listContainer = document.getElementById('cbm-file-list');
-    if (listContainer) {
-      listContainer.innerHTML = `
+    }
+    showLoading() {
+        const listContainer = document.getElementById('cbm-file-list');
+        if (listContainer) {
+            listContainer.innerHTML = `
         <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar"
              aria-label="Loading">
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
+        }
     }
-  }
 
-  hideLoading() {
-    // Content will be replaced by renderFileList or showMessage
-  }
+    hideLoading() {
+        // Content will be replaced by renderFileList or showMessage
+    }
 
-  close() {
-    const el = document.getElementById('category-batch-manager');
-    if (el) el.remove();
-  }
+    close() {
+        const el = document.getElementById('category-batch-manager');
+        if (el) el.remove();
+    }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = CategoryBatchManagerUI;
+    module.exports = CategoryBatchManagerUI;
 }

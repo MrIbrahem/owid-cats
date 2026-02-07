@@ -479,7 +479,7 @@ class CategoryBatchManagerUI {
             .map(cat => cat.trim())
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-    }    async handlePreview() {
+    } async handlePreview() {
         const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
             this.showMessage('No files selected.', 'warning');
             return;
@@ -527,7 +527,7 @@ class CategoryBatchManagerUI {
                 this.showMessage(`Error generating preview: ${error.message}`, 'error');
             }
         }
-    }showPreviewModal(preview) {
+    } showPreviewModal(preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
 

@@ -1022,7 +1022,8 @@ class BatchProcessor {
 
 // === src/ui/components/SearchPanel.js ===
 /**
- * Search panel UI component
+ * Search panel UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class SearchPanel
  */
 class SearchPanel {
@@ -1034,16 +1035,48 @@ class SearchPanel {
   }
 
   /**
-   * Create the search panel HTML element
+   * Create the search panel HTML element with Codex components.
+   * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
    * @returns {HTMLElement} The search panel element
    */
   createElement() {
     const div = document.createElement('div');
     div.className = 'cbm-search';
     div.innerHTML = `
-      <label>Search Pattern:</label>
-      <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
-      <button id="cbm-search-btn">Search</button>
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-source-category">
+            <span class="cdx-label__label__text">Source Category</span>
+          </label>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-source-category" class="cdx-text-input__input" type="text"
+                   placeholder="Category:Example">
+          </div>
+        </div>
+      </div>
+
+      <div class="cdx-field" style="margin-top: 12px;">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-pattern">
+            <span class="cdx-label__label__text">Search Pattern</span>
+          </label>
+          <span class="cdx-label__description">
+            Enter a pattern to filter files (e.g., ,BLR.svg)
+          </span>
+        </div>
+        <div class="cdx-field__control cbm-search-row">
+          <div class="cdx-text-input" style="flex: 1;">
+            <input id="cbm-pattern" class="cdx-text-input__input" type="text"
+                   placeholder="e.g., ,BLR.svg">
+          </div>
+          <button id="cbm-search-btn"
+                  class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+            Search
+          </button>
+        </div>
+      </div>
     `;
     return div;
   }
@@ -1068,7 +1101,8 @@ class SearchPanel {
 
 // === src/ui/components/FileList.js ===
 /**
- * File list UI component
+ * File list UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class FileList
  */
 class FileList {
@@ -1080,7 +1114,7 @@ class FileList {
   }
 
   /**
-   * Render the file list
+   * Render the file list using Codex CdxCheckbox CSS-only pattern.
    * @param {Array} files - Files to display
    */
   render(files) {
@@ -1089,7 +1123,11 @@ class FileList {
     const headerElement = document.getElementById('cbm-results-header');
 
     if (files.length === 0) {
-      listContainer.innerHTML = '<p>No files found matching the pattern.</p>';
+      listContainer.innerHTML = `
+        <div class="cdx-message cdx-message--block cdx-message--notice" aria-live="polite">
+          <span class="cdx-message__icon"></span>
+          <div class="cdx-message__content">No files found matching the pattern.</div>
+        </div>`;
       headerElement.classList.add('hidden');
       return;
     }
@@ -1105,10 +1143,22 @@ class FileList {
       fileRow.dataset.index = index;
 
       fileRow.innerHTML = `
-        <input type="checkbox" class="cbm-file-checkbox" 
-               id="file-${index}" checked>
-        <label for="file-${index}">${file.title}</label>
-        <button class="cbm-remove-btn" data-index="${index}">&#215;</button>
+        <div class="cdx-checkbox cbm-file-checkbox-wrapper">
+          <div class="cdx-checkbox__wrapper">
+            <input id="file-${index}" class="cdx-checkbox__input cbm-file-checkbox"
+                   type="checkbox" checked>
+            <span class="cdx-checkbox__icon"></span>
+            <div class="cdx-checkbox__label cdx-label">
+              <label for="file-${index}" class="cdx-label__label">
+                <span class="cdx-label__label__text">${file.title}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button class="cdx-button cdx-button--action-destructive cdx-button--weight-quiet cdx-button--size-medium cbm-remove-btn"
+                data-index="${index}" aria-label="Remove file">
+          &#215;
+        </button>
       `;
 
       listContainer.appendChild(fileRow);
@@ -1126,32 +1176,63 @@ class FileList {
 
 // === src/ui/components/CategoryInputs.js ===
 /**
- * Category inputs UI component
+ * Category inputs UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class CategoryInputs
  */
 class CategoryInputs {
   /**
-   * Create the category inputs HTML element
+   * Create the category inputs HTML element with Codex components.
+   * Uses CdxField, CdxTextInput CSS-only patterns.
    * @returns {HTMLElement} The inputs element
    */
   createElement() {
     const div = document.createElement('div');
     div.className = 'cbm-actions';
     div.innerHTML = `
-      <div class="cbm-input-group">
-        <label>Add Categories (comma-separated):</label>
-        <input type="text" id="cbm-add-cats" placeholder="Category:Example">
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-add-cats">
+            <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
+          </label>
+          <span class="cdx-label__description">
+            e.g., Category:Belarus, Category:Europe
+          </span>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-add-cats" class="cdx-text-input__input" type="text"
+                   placeholder="Category:Example">
+          </div>
+        </div>
       </div>
-      
-      <div class="cbm-input-group">
-        <label>Remove Categories (comma-separated):</label>
-        <input type="text" id="cbm-remove-cats" placeholder="Category:Old">
+
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-remove-cats">
+            <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
+          </label>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-remove-cats" class="cdx-text-input__input" type="text"
+                   placeholder="Category:Old">
+          </div>
+        </div>
       </div>
-      
-      <div class="cbm-input-group">
-        <label>Edit Summary:</label>
-        <input type="text" id="cbm-summary" 
-               value="Batch category update via Category Batch Manager">
+
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-summary">
+            <span class="cdx-label__label__text">Edit Summary</span>
+          </label>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                   value="Batch category update via Category Batch Manager">
+          </div>
+        </div>
       </div>
     `;
     return div;
@@ -1191,7 +1272,8 @@ class CategoryInputs {
 
 // === src/ui/components/ProgressBar.js ===
 /**
- * Progress bar UI component
+ * Progress bar UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class ProgressBar
  */
 class ProgressBar {
@@ -1212,7 +1294,9 @@ class ProgressBar {
   }
 
   /**
-   * Update the progress bar
+   * Update the progress bar.
+   * Note: Codex CdxProgressBar is indeterminate only (CSS-only).
+   * We keep the custom fill bar for determinate progress alongside Codex styling.
    * @param {number} percentage - Progress percentage (0-100)
    * @param {Object} results - Current results
    */
@@ -1273,7 +1357,6 @@ class CategoryBatchManagerUI {
     const container = this.buildContainer();
     document.body.appendChild(container);
   }
-
   buildContainer() {
     const div = document.createElement('div');
     div.id = 'category-batch-manager';
@@ -1281,70 +1364,146 @@ class CategoryBatchManagerUI {
     div.innerHTML = `
       <div class="cbm-header">
         <h2>Category Batch Manager</h2>
-        <button class="cbm-close" id="cbm-close">&times;</button>
+        <button class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
+                id="cbm-close" aria-label="Close">&#215;</button>
       </div>
 
-      <div class="cbm-search">
-        <div class="cbm-input-group">
-          <label>Source Category:</label>
-          <input type="text" id="cbm-source-category" value="${this.state.sourceCategory}" placeholder="Category:Example">
+      <div class="cbm-body">
+        <div class="cbm-search">
+          <div class="cdx-field">
+            <div class="cdx-label">
+              <label class="cdx-label__label" for="cbm-source-category">
+                <span class="cdx-label__label__text">Source Category</span>
+              </label>
+            </div>
+            <div class="cdx-field__control">
+              <div class="cdx-text-input">
+                <input id="cbm-source-category" class="cdx-text-input__input" type="text"
+                       value="${this.state.sourceCategory}" placeholder="Category:Example">
+              </div>
+            </div>
+          </div>
+
+          <div class="cdx-field">
+            <div class="cdx-label">
+              <label class="cdx-label__label" for="cbm-pattern">
+                <span class="cdx-label__label__text">Search Pattern</span>
+              </label>
+              <span class="cdx-label__description">
+                Enter a pattern to filter files (e.g., ,BLR.svg)
+              </span>
+            </div>
+            <div class="cdx-field__control cbm-search-row">
+              <div class="cdx-text-input" style="flex: 1;">
+                <input id="cbm-pattern" class="cdx-text-input__input" type="text"
+                       placeholder="e.g., ,BLR.svg">
+              </div>
+              <button id="cbm-search-btn"
+                      class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+                Search
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="cbm-input-group">
-          <label>Search Pattern:</label>
-          <input type="text" id="cbm-pattern" placeholder="e.g., ,BLR.svg">
-          <button id="cbm-search-btn">Search</button>
-        </div>
-      </div>
-
-      <div class="cbm-results">
-        <div id="cbm-results-header" class="hidden">
-          Found <span id="cbm-count">0</span> files
-          <button id="cbm-select-all">Select All</button>
-          <button id="cbm-deselect-all">Deselect All</button>
-        </div>
-        <div id="cbm-file-list"></div>
-      </div>
-
-      <div class="cbm-actions">
-        <div class="cbm-input-group">
-          <label>Add Categories (comma-separated):</label>
-          <input type="text" id="cbm-add-cats" placeholder="Category:Example">
+        <div class="cbm-results">
+          <div id="cbm-results-header" class="cbm-results-header hidden">
+            <div class="cdx-info-chip cdx-info-chip--notice">
+              <span class="cdx-info-chip__text">
+                Found <strong id="cbm-count">0</strong> files
+              </span>
+            </div>
+            <button id="cbm-select-all"
+                    class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
+              Select All
+            </button>
+            <button id="cbm-deselect-all"
+                    class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
+              Deselect All
+            </button>
+          </div>
+          <div id="cbm-file-list"></div>
         </div>
 
-        <div class="cbm-input-group">
-          <label>Remove Categories (comma-separated):</label>
-          <input type="text" id="cbm-remove-cats" placeholder="Category:Old">
+        <div class="cbm-actions">
+          <div class="cdx-field">
+            <div class="cdx-label">
+              <label class="cdx-label__label" for="cbm-add-cats">
+                <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
+              </label>
+              <span class="cdx-label__description">
+                e.g., Category:Belarus, Category:Europe
+              </span>
+            </div>
+            <div class="cdx-field__control">
+              <div class="cdx-text-input">
+                <input id="cbm-add-cats" class="cdx-text-input__input" type="text"
+                       placeholder="Category:Example">
+              </div>
+            </div>
+          </div>
+
+          <div class="cdx-field">
+            <div class="cdx-label">
+              <label class="cdx-label__label" for="cbm-remove-cats">
+                <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
+              </label>
+            </div>
+            <div class="cdx-field__control">
+              <div class="cdx-text-input">
+                <input id="cbm-remove-cats" class="cdx-text-input__input" type="text"
+                       placeholder="Category:Old">
+              </div>
+            </div>
+          </div>
+
+          <div class="cdx-field">
+            <div class="cdx-label">
+              <label class="cdx-label__label" for="cbm-summary">
+                <span class="cdx-label__label__text">Edit Summary</span>
+              </label>
+            </div>
+            <div class="cdx-field__control">
+              <div class="cdx-text-input">
+                <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                       value="Batch category update via Category Batch Manager">
+              </div>
+            </div>
+          </div>
+
+          <div class="cbm-selected-count">
+            Selected: <strong id="cbm-selected">0</strong> files
+          </div>
+
+          <div class="cbm-buttons">
+            <button id="cbm-preview"
+                    class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+              Preview Changes
+            </button>
+            <button id="cbm-execute"
+                    class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+              GO
+            </button>
+          </div>
         </div>
 
-        <div class="cbm-input-group">
-          <label>Edit Summary:</label>
-          <input type="text" id="cbm-summary"
-                 value="Batch category update via Category Batch Manager">
+        <div id="cbm-progress" class="cbm-progress hidden">
+          <div class="cdx-progress-bar cdx-progress-bar--block" role="progressbar"
+               aria-label="Batch processing progress">
+            <div id="cbm-progress-fill" class="cdx-progress-bar__bar cbm-progress-fill"></div>
+          </div>
+          <div id="cbm-progress-text" class="cbm-progress-text">Processing...</div>
         </div>
-
-        <div class="cbm-selected-count">
-          Selected: <span id="cbm-selected">0</span> files
-        </div>
-
-        <div class="cbm-buttons">
-          <button id="cbm-preview" class="cbm-btn-secondary">Preview Changes</button>
-          <button id="cbm-execute" class="cbm-btn-primary">GO</button>
-        </div>
-      </div>
-
-      <div id="cbm-progress" class="cbm-progress hidden">
-        <div class="cbm-progress-bar">
-          <div id="cbm-progress-fill" style="width: 0%"></div>
-        </div>
-        <div id="cbm-progress-text">Processing...</div>
       </div>
 
       <div id="cbm-preview-modal" class="cbm-modal hidden">
         <div class="cbm-modal-content">
           <h3>Preview Changes</h3>
           <div id="cbm-preview-content"></div>
-          <button id="cbm-preview-close">Close</button>
+          <button id="cbm-preview-close"
+                  class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+            Close
+          </button>
         </div>
       </div>
     `;
@@ -1376,18 +1535,17 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-close').addEventListener('click', () => {
       this.close();
     });
-  }
-  async handleSearch() {
+  }  async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
     const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
     if (!pattern) {
-      alert('Please enter a search pattern');
+      this.showMessage('Please enter a search pattern.', 'warning');
       return;
     }
 
     if (!sourceCategory) {
-      alert('Please enter a source category');
+      this.showMessage('Please enter a source category.', 'warning');
       return;
     }
 
@@ -1405,12 +1563,26 @@ class CategoryBatchManagerUI {
       this.renderFileList();
       this.hideLoading();
 
-      UsageLogger.logSearch(pattern, files.length);
-
-    } catch (error) {
+      UsageLogger.logSearch(pattern, files.length);    } catch (error) {
       this.hideLoading();
-      alert(`Error searching files: ${error.message}`);
+      this.showMessage(`Error searching files: ${error.message}`, 'error');
     }
+  }
+
+  /**
+   * Display a Codex CSS-only message banner above the file list.
+   * @param {string} text - Message text
+   * @param {string} type - One of 'notice', 'warning', 'error', 'success'
+   */
+  showMessage(text, type) {
+    const listContainer = document.getElementById('cbm-file-list');
+    if (!listContainer) return;
+    const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
+    listContainer.innerHTML = `
+      <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
+        <span class="cdx-message__icon"></span>
+        <div class="cdx-message__content">${text}</div>
+      </div>`;
   }
 
   renderFileList() {
@@ -1427,18 +1599,26 @@ class CategoryBatchManagerUI {
     countElement.textContent = this.state.files.length;
     headerElement.classList.remove('hidden');
 
-    listContainer.innerHTML = '';
-
-    this.state.files.forEach((file, index) => {
+    listContainer.innerHTML = '';    this.state.files.forEach((file, index) => {
       const fileRow = document.createElement('div');
       fileRow.className = 'cbm-file-row';
       fileRow.dataset.index = index;
 
       fileRow.innerHTML = `
-        <input type="checkbox" class="cbm-file-checkbox"
-               id="file-${index}" checked>
-        <label for="file-${index}">${file.title}</label>
-        <button class="cbm-remove-btn" data-index="${index}">&times;</button>
+        <div class="cdx-checkbox cbm-file-checkbox-wrapper">
+          <div class="cdx-checkbox__wrapper">
+            <input id="file-${index}" class="cdx-checkbox__input cbm-file-checkbox"
+                   type="checkbox" checked>
+            <span class="cdx-checkbox__icon"></span>
+            <div class="cdx-checkbox__label cdx-label">
+              <label for="file-${index}" class="cdx-label__label">
+                <span class="cdx-label__label__text">${file.title}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button class="cdx-button cdx-button--action-destructive cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-remove-btn"
+                data-index="${index}" aria-label="Remove file">&#215;</button>
       `;
 
       listContainer.appendChild(fileRow);
@@ -1506,10 +1686,8 @@ class CategoryBatchManagerUI {
   }
 
   async handlePreview() {
-    const selectedFiles = this.getSelectedFiles();
-
-    if (selectedFiles.length === 0) {
-      alert('No files selected');
+    const selectedFiles = this.getSelectedFiles();    if (selectedFiles.length === 0) {
+      this.showMessage('No files selected.', 'warning');
       return;
     }
 
@@ -1534,7 +1712,7 @@ class CategoryBatchManagerUI {
 
     } catch (error) {
       this.hideLoading();
-      alert(`Error generating preview: ${error.message}`);
+      this.showMessage(`Error generating preview: ${error.message}`, 'error');
     }
   }
 
@@ -1569,12 +1747,11 @@ class CategoryBatchManagerUI {
       modal.classList.add('hidden');
     });
   }
-
   async handleExecute() {
     const selectedFiles = this.getSelectedFiles();
 
     if (selectedFiles.length === 0) {
-      alert('No files selected');
+      this.showMessage('No files selected.', 'warning');
       return;
     }
 
@@ -1586,17 +1763,23 @@ class CategoryBatchManagerUI {
     );
 
     if (toAdd.length === 0 && toRemove.length === 0) {
-      alert('Please specify categories to add or remove');
+      this.showMessage('Please specify categories to add or remove.', 'warning');
       return;
     }
 
-    const confirmed = confirm(
-      `Are you sure you want to update ${selectedFiles.length} files?\n` +
-      `Add: ${toAdd.join(', ') || 'none'}\n` +
-      `Remove: ${toRemove.join(', ') || 'none'}`
-    );
+    // Show a confirmation message and require a second click on GO
+    const confirmMsg =
+      `About to update ${selectedFiles.length} file(s). ` +
+      `Add: ${toAdd.join(', ') || 'none'}. ` +
+      `Remove: ${toRemove.join(', ') || 'none'}. ` +
+      'Click GO again to confirm.';
 
-    if (!confirmed) return;
+    if (!this._executeConfirmed) {
+      this.showMessage(confirmMsg, 'notice');
+      this._executeConfirmed = true;
+      return;
+    }
+    this._executeConfirmed = false;
 
     this.state.isProcessing = true;
     this.showProgress();
@@ -1623,7 +1806,7 @@ class CategoryBatchManagerUI {
       this.showResults(results);
 
     } catch (error) {
-      alert(`Batch process failed: ${error.message}`);
+      this.showMessage(`Batch process failed: ${error.message}`, 'error');
     } finally {
       this.state.isProcessing = false;
       this.hideProgress();
@@ -1645,29 +1828,44 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-progress-text').textContent =
       `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.failed} failed)`;
   }
-
   showResults(results) {
-    let message = `Batch process complete!\n\n`;
-    message += `Total: ${results.total}\n`;
-    message += `Successful: ${results.successful}\n`;
-    message += `Failed: ${results.failed}\n`;
+    const listContainer = document.getElementById('cbm-file-list');
+    if (!listContainer) return;
 
-    if (results.errors.length > 0) {
-      message += `\nErrors:\n`;
-      results.errors.forEach(err => {
-        message += `- ${err.file}: ${err.error}\n`;
-      });
+    const type = results.failed > 0 ? 'warning' : 'success';
+    let errorsHtml = '';
+    if (results.errors && results.errors.length > 0) {
+      errorsHtml = '<ul style="margin: 8px 0 0; padding-left: 20px;">' +
+        results.errors.map(err => `<li>${err.file}: ${err.error}</li>`).join('') +
+        '</ul>';
     }
 
-    alert(message);
+    const ariaAttr = type === 'warning' ? 'aria-live="polite"' : 'aria-live="polite"';
+    listContainer.innerHTML = `
+      <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
+        <span class="cdx-message__icon"></span>
+        <div class="cdx-message__content">
+          <p><strong>Batch process complete!</strong></p>
+          <p>Total: ${results.total} &mdash;
+             Successful: ${results.successful} &mdash;
+             Failed: ${results.failed}</p>
+          ${errorsHtml}
+        </div>
+      </div>`;
   }
-
   showLoading() {
-    // Could add a loading spinner overlay
+    const listContainer = document.getElementById('cbm-file-list');
+    if (listContainer) {
+      listContainer.innerHTML = `
+        <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar"
+             aria-label="Loading">
+          <div class="cdx-progress-bar__bar"></div>
+        </div>`;
+    }
   }
 
   hideLoading() {
-    // Remove loading spinner
+    // Content will be replaced by renderFileList or showMessage
   }
 
   close() {
@@ -1682,6 +1880,10 @@ class CategoryBatchManagerUI {
  *
  * Adds a "Batch Manager" button to category pages in Wikimedia Commons.
  * When clicked, opens the Category Batch Manager UI.
+ *
+ * Codex CSS is loaded at runtime via mw.loader.using() so that all
+ * Codex CSS-only classes (cdx-button, cdx-text-input, cdx-checkbox, etc.)
+ * are available before the UI is rendered.
  */
 
 
@@ -1707,10 +1909,12 @@ class CategoryBatchManagerUI {
     portletLink.addEventListener('click', function (e) {
       e.preventDefault();
 
-      // Initialize and show UI
-      if (!window.categoryBatchManager) {
-        window.categoryBatchManager = new CategoryBatchManagerUI();
-      }
+      // Ensure Codex design-system styles are loaded, then open the UI
+      mw.loader.using(['@wikimedia/codex']).then(function () {
+        if (!window.categoryBatchManager) {
+          window.categoryBatchManager = new CategoryBatchManagerUI();
+        }
+      });
     });
   }
 

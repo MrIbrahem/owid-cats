@@ -1326,6 +1326,9 @@ class FileList {
         document.querySelectorAll('.cbm-file-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', () => {
                 this.updateSelectedCount();
+                if (this.onSelectionChange) {
+                    this.onSelectionChange();
+                }
             });
         });
 
@@ -2128,7 +2131,7 @@ class SearchHandler {
             this.ui.state.files = files;
             this.ui.state.searchPattern = pattern;
             this.ui.state.sourceCategory = sourceCategory;
-            this.ui.renderFileList();
+            this.ui.fileList.renderFileList(this.ui.state.files);
             this.hideSearchProgress();
             this.updateSearchButton(false);
             this.ui.state.isSearching = false;
@@ -2193,10 +2196,10 @@ class SearchHandler {
 
     /**
      * Hide search progress indicator
-     * Content will be replaced by renderFileList
+     * Content will be replaced by FileList.renderFileList
      */
     hideSearchProgress() {
-        // Content will be replaced by renderFileList
+        // Content will be replaced by FileList.renderFileList
     }
 }
 
@@ -2782,63 +2785,6 @@ class CategoryBatchManagerUI {
         if (messageContainer) {
             messageContainer.innerHTML = '';
         }
-    }
-
-    renderFileList() {
-        const listContainer = document.getElementById('cbm-file-list');
-        const countElement = document.getElementById('cbm-count');
-        const headerElement = document.getElementById('cbm-results-header');
-
-        if (this.state.files.length === 0) {
-            listContainer.innerHTML = '<p>No files found matching the pattern.</p>';
-            headerElement.classList.add('hidden');
-            return;
-        }
-
-        countElement.textContent = this.state.files.length;
-        headerElement.classList.remove('hidden');
-
-        listContainer.innerHTML = ''; this.state.files.forEach((file, index) => {
-            const fileRow = document.createElement('div');
-            fileRow.className = 'cbm-file-row';
-            fileRow.dataset.index = index;
-
-            fileRow.innerHTML = `
-        <div class="cdx-checkbox cbm-file-checkbox-wrapper">
-          <div class="cdx-checkbox__wrapper">
-            <input id="file-${index}" class="cdx-checkbox__input cbm-file-checkbox"
-                   type="checkbox" checked>
-            <span class="cdx-checkbox__icon"></span>
-            <div class="cdx-checkbox__label cdx-label">
-              <label for="file-${index}" class="cdx-label__label">
-                <span class="cdx-label__label__text">${file.title}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <button class="cdx-button cdx-button--action-destructive cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-remove-btn"
-                data-index="${index}" aria-label="Remove file">&#215;</button>
-      `;
-
-            listContainer.appendChild(fileRow);
-        });
-
-        // Attach remove button listeners
-        document.querySelectorAll('.cbm-remove-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const index = parseInt(e.target.dataset.index);
-                this.removeFile(index);
-            });
-        });
-
-        // Attach checkbox listeners
-        document.querySelectorAll('.cbm-file-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updateSelectedCount();
-            });
-        });
-
-        this.updateSelectedCount();
     }
 
     removeFile(index) {

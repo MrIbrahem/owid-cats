@@ -61,7 +61,7 @@ class SearchHandler {
             this.ui.state.files = files;
             this.ui.state.searchPattern = pattern;
             this.ui.state.sourceCategory = sourceCategory;
-            this.ui.renderFileList();
+            this.ui.fileList.renderFileList(this.ui.state.files);
             this.hideSearchProgress();
             this.updateSearchButton(false);
             this.ui.state.isSearching = false;
@@ -126,10 +126,10 @@ class SearchHandler {
 
     /**
      * Hide search progress indicator
-     * Content will be replaced by renderFileList
+     * Content will be replaced by FileList.renderFileList
      */
     hideSearchProgress() {
-        // Content will be replaced by renderFileList
+        // Content will be replaced by FileList.renderFileList
     }
 }
 

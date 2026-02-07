@@ -32,10 +32,25 @@ class CategoryBatchManagerUI {
         this.createUI();
         this.attachEventListeners();
     }
-
     createUI() {
+        // Create reopen button
+        const reopenBtn = document.createElement('button');
+        reopenBtn.id = 'cbm-reopen-btn';
+        reopenBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-large cdx-button--icon-only';
+        reopenBtn.setAttribute('aria-label', 'Open Category Batch Manager');
+        reopenBtn.setAttribute('title', 'Open Category Batch Manager');
+        reopenBtn.textContent = '☰';
+        reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: none;';
+        document.body.appendChild(reopenBtn);
+
+        // Create main container
         const container = this.buildContainer();
         document.body.appendChild(container);
+
+        // Add reopen button listener
+        reopenBtn.addEventListener('click', () => {
+            this.reopenModal();
+        });
     }
     buildContainer() {
         const div = document.createElement('div');
@@ -217,10 +232,8 @@ class CategoryBatchManagerUI {
 
         document.getElementById('cbm-execute').addEventListener('click', () => {
             this.handleExecute();
-        });
-
-        document.getElementById('cbm-close').addEventListener('click', () => {
-            this.close();
+        }); document.getElementById('cbm-close').addEventListener('click', () => {
+            this.closeModal();
         });
 
         // Preview modal close button
@@ -393,7 +406,8 @@ class CategoryBatchManagerUI {
             .map(cat => cat.trim())
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-    }    async handlePreview() {
+    }
+    async handlePreview() {
         const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
             this.showMessage('No files selected.', 'warning');
             return;
@@ -589,10 +603,22 @@ class CategoryBatchManagerUI {
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
         }
+    } hideLoading() {
+        // Content will be replaced by renderFileList or showMessage
     }
 
-    hideLoading() {
-        // Content will be replaced by renderFileList or showMessage
+    closeModal() {
+        const modal = document.getElementById('category-batch-manager');
+        const reopenBtn = document.getElementById('cbm-reopen-btn');
+        if (modal) modal.style.display = 'none';
+        if (reopenBtn) reopenBtn.style.display = 'block';
+    }
+
+    reopenModal() {
+        const modal = document.getElementById('category-batch-manager');
+        const reopenBtn = document.getElementById('cbm-reopen-btn');
+        if (modal) modal.style.display = 'flex';
+        if (reopenBtn) reopenBtn.style.display = 'none';
     }
 
     close() {

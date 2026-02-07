@@ -50,126 +50,136 @@ class CategoryBatchManagerUI {
             </div>
 
             <div class="cbm-body">
-                <div class="cbm-search">
-                    <div class="cdx-field">
-                        <div class="cdx-label">
-                            <label class="cdx-label__label" for="cbm-source-category">
-                                <span class="cdx-label__label__text">Source Category</span>
-                            </label>
-                        </div>
-                        <div class="cdx-field__control">
-                            <div class="cdx-text-input">
-                                <input id="cbm-source-category" class="cdx-text-input__input" type="text"
-                                    value="${this.state.sourceCategory}" placeholder="Category:Example">
+                <div class="cbm-main-layout">
+                    <!-- Left Panel: Search and Actions -->
+                    <div class="cbm-left-panel">
+                        <div class="cbm-search">
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-source-category">
+                                        <span class="cdx-label__label__text">Source Category</span>
+                                    </label>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-source-category" class="cdx-text-input__input" type="text"
+                                            value="${this.state.sourceCategory}" placeholder="Category:Example">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-pattern">
+                                        <span class="cdx-label__label__text">Search Pattern</span>
+                                    </label>
+                                    <span class="cdx-label__description">
+                                        Enter a pattern to filter files (e.g., ,BLR.svg)
+                                    </span>
+                                </div>
+                                <div class="cdx-field__control cbm-search-row">
+                                    <div class="cdx-text-input" style="flex: 1;">
+                                        <input id="cbm-pattern" class="cdx-text-input__input" type="text" placeholder="e.g., ,BLR.svg">
+                                    </div>
+                                    <button id="cbm-search-btn"
+                                        class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+                                        Search
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="cdx-field">
-                        <div class="cdx-label">
-                            <label class="cdx-label__label" for="cbm-pattern">
-                                <span class="cdx-label__label__text">Search Pattern</span>
-                            </label>
-                            <span class="cdx-label__description">
-                                Enter a pattern to filter files (e.g., ,BLR.svg)
-                            </span>
-                        </div>
-                        <div class="cdx-field__control cbm-search-row">
-                            <div class="cdx-text-input" style="flex: 1;">
-                                <input id="cbm-pattern" class="cdx-text-input__input" type="text" placeholder="e.g., ,BLR.svg">
+                        <div id="cbm-results-message" class="hidden"></div>
+
+                        <div class="cbm-actions">
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-add-cats">
+                                        <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
+                                    </label>
+                                    <span class="cdx-label__description">
+                                        e.g., Category:Belarus, Category:Europe
+                                    </span>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-add-cats" class="cdx-text-input__input" type="text" placeholder="Category:Example">
+                                    </div>
+                                </div>
                             </div>
-                            <button id="cbm-search-btn"
-                                class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
-                                Search
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="cbm-results">
-                    <div id="cbm-results-header" class="cbm-results-header hidden">
-                        <div class="cdx-info-chip cdx-info-chip--notice">
-                            <span class="cdx-info-chip__text">
-                                Found <strong id="cbm-count">0</strong> files
-                            </span>
-                        </div>
-                        <button id="cbm-select-all"
-                            class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
-                            Select All
-                        </button>
-                        <button id="cbm-deselect-all"
-                            class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
-                            Deselect All
-                        </button>
-                    </div>
-                    <div id="cbm-results-message"></div>
-                    <div id="cbm-file-list"></div>
-                </div>
 
-                <div class="cbm-actions">
-                    <div class="cdx-field">
-                        <div class="cdx-label">
-                            <label class="cdx-label__label" for="cbm-add-cats">
-                                <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
-                            </label>
-                            <span class="cdx-label__description">
-                                e.g., Category:Belarus, Category:Europe
-                            </span>
-                        </div>
-                        <div class="cdx-field__control">
-                            <div class="cdx-text-input">
-                                <input id="cbm-add-cats" class="cdx-text-input__input" type="text" placeholder="Category:Example">
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-remove-cats">
+                                        <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
+                                    </label>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-remove-cats" class="cdx-text-input__input" type="text" placeholder="Category:Old">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="cdx-field">
-                        <div class="cdx-label">
-                            <label class="cdx-label__label" for="cbm-remove-cats">
-                                <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
-                            </label>
-                        </div>
-                        <div class="cdx-field__control">
-                            <div class="cdx-text-input">
-                                <input id="cbm-remove-cats" class="cdx-text-input__input" type="text" placeholder="Category:Old">
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-summary">
+                                        <span class="cdx-label__label__text">Edit Summary</span>
+                                    </label>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                                            value="Batch category update via Category Batch Manager">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="cbm-selected-count">
+                                Selected: <strong id="cbm-selected">0</strong> files
+                            </div>
+
+                            <div class="cbm-buttons">
+                                <button id="cbm-preview"
+                                    class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+                                    Preview Changes
+                                </button>
+                                <button id="cbm-execute"
+                                    class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+                                    GO
+                                </button>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="cdx-field">
-                        <div class="cdx-label">
-                            <label class="cdx-label__label" for="cbm-summary">
-                                <span class="cdx-label__label__text">Edit Summary</span>
-                            </label>
-                        </div>
-                        <div class="cdx-field__control">
-                            <div class="cdx-text-input">
-                                <input id="cbm-summary" class="cdx-text-input__input" type="text"
-                                    value="Batch category update via Category Batch Manager">
+                        <div id="cbm-progress" class="cbm-progress hidden">
+                            <div class="cdx-progress-bar cdx-progress-bar--block" role="progressbar" aria-label="Batch processing progress">
+                                <div id="cbm-progress-fill" class="cdx-progress-bar__bar cbm-progress-fill"></div>
                             </div>
+                            <div id="cbm-progress-text" class="cbm-progress-text">Processing...</div>
                         </div>
                     </div>
 
-                    <div class="cbm-selected-count">
-                        Selected: <strong id="cbm-selected">0</strong> files
+                    <!-- Right Panel: File List -->
+                    <div class="cbm-right-panel">
+                        <div class="cbm-results">
+                            <div id="cbm-results-header" class="cbm-results-header hidden">
+                                <div class="cdx-info-chip cdx-info-chip--notice">
+                                    <span class="cdx-info-chip__text">
+                                        Found <strong id="cbm-count">0</strong> files
+                                    </span>
+                                </div>
+                                <button id="cbm-select-all"
+                                    class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
+                                    Select All
+                                </button>
+                                <button id="cbm-deselect-all"
+                                    class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div id="cbm-file-list"></div>
+                        </div>
                     </div>
-
-                    <div class="cbm-buttons">
-                        <button id="cbm-preview"
-                            class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
-                            Preview Changes
-                        </button>
-                        <button id="cbm-execute"
-                            class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
-                            GO
-                        </button>
-                    </div>
-                </div>
-
-                <div id="cbm-progress" class="cbm-progress hidden">
-                    <div class="cdx-progress-bar cdx-progress-bar--block" role="progressbar" aria-label="Batch processing progress">
-                        <div id="cbm-progress-fill" class="cdx-progress-bar__bar cbm-progress-fill"></div>
-                    </div>
-                    <div id="cbm-progress-text" class="cbm-progress-text">Processing...</div>
                 </div>
             </div>
 
@@ -383,8 +393,7 @@ class CategoryBatchManagerUI {
             .map(cat => cat.trim())
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-    }
-    async handlePreview() {
+    }    async handlePreview() {
         const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
             this.showMessage('No files selected.', 'warning');
             return;
@@ -409,8 +418,7 @@ class CategoryBatchManagerUI {
             }
         }
 
-        this.showLoading();
-
+        // Generate preview without affecting file list - no loading indicator
         try {
             const preview = await this.batchProcessor.previewChanges(
                 selectedFiles,
@@ -419,10 +427,8 @@ class CategoryBatchManagerUI {
             );
 
             this.showPreviewModal(preview);
-            this.hideLoading();
 
         } catch (error) {
-            this.hideLoading();
             this.showMessage(`Error generating preview: ${error.message}`, 'error');
         }
     }

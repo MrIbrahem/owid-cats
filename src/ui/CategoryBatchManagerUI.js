@@ -4,9 +4,11 @@
  * @description
  * Main UI class for the Category Batch Manager tool.
  * Manages the user interface, file selection, and batch operations.
+ * 
+ * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator */
+/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO */
 
 class CategoryBatchManagerUI {
     constructor() {
@@ -211,28 +213,6 @@ class CategoryBatchManagerUI {
                         class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
                         Close
                     </button>
-                </div>
-            </div>
-
-            <!-- Confirmation Dialog -->
-            <div id="cbm-confirm-dialog" class="cbm-dialog-backdrop hidden">
-                <div class="cbm-dialog">
-                    <div class="cbm-dialog-header">
-                        <h3 id="cbm-dialog-title">Confirm Action</h3>
-                    </div>
-                    <div class="cbm-dialog-body">
-                        <p id="cbm-dialog-message"></p>
-                    </div>
-                    <div class="cbm-dialog-footer">
-                        <button id="cbm-dialog-cancel"
-                            class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
-                            Cancel
-                        </button>
-                        <button id="cbm-dialog-confirm"
-                            class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
-                            Confirm
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -624,16 +604,18 @@ class CategoryBatchManagerUI {
                 this.showMessage(`Error: ${error.message}`, 'error');
             }
             return;
-        }
-
-        // Show confirmation dialog
+        }        // Show confirmation dialog
         const confirmMsg =
             `You are about to update ${selectedFiles.length} file(s).\n\n` +
             `Categories to add: ${toAdd.length > 0 ? toAdd.join(', ') : 'none'}\n` +
             `Categories to remove: ${toRemove.length > 0 ? toRemove.join(', ') : 'none'}\n\n` +
             'Do you want to proceed?';
 
-        const confirmed = await this.showConfirmDialog('Confirm Batch Update', confirmMsg);
+        const confirmed = await this.showConfirmDialog(confirmMsg, {
+            title: 'Confirm Batch Update',
+            confirmLabel: 'Proceed',
+            cancelLabel: 'Cancel'
+        });
 
         if (!confirmed) {
             return;
@@ -757,53 +739,37 @@ class CategoryBatchManagerUI {
     }
 
     /**
-     * Show a confirmation dialog
-     * @param {string} title - Dialog title
+     * Show a confirmation dialog using MediaWiki's OO.ui.confirm
      * @param {string} message - Dialog message
+     * @param {Object} options - Dialog options
      * @returns {Promise<boolean>} True if confirmed, false if cancelled
      */
-    showConfirmDialog(title, message) {
-        return new Promise((resolve) => {
-            const dialog = document.getElementById('cbm-confirm-dialog');
-            const titleEl = document.getElementById('cbm-dialog-title');
-            const messageEl = document.getElementById('cbm-dialog-message');
-            const confirmBtn = document.getElementById('cbm-dialog-confirm');
-            const cancelBtn = document.getElementById('cbm-dialog-cancel');
+    async showConfirmDialog(message, options = {}) {
+        const title = options.title || 'Confirm';
 
-            if (!dialog || !titleEl || !messageEl || !confirmBtn || !cancelBtn) {
-                // Fallback to native confirm if dialog elements not found
+        return new Promise((resolve) => {
+            if (typeof OO === 'undefined' || !OO.ui || !OO.ui.confirm) {
+                // Fallback to native confirm if OO.ui is not available
                 resolve(confirm(message));
                 return;
             }
 
-            titleEl.textContent = title;
-            messageEl.textContent = message;
-            dialog.classList.remove('hidden');
-
-            const handleConfirm = () => {
-                cleanup();
-                resolve(true);
-            };
-
-            const handleCancel = () => {
-                cleanup();
-                resolve(false);
-            };
-
-            const cleanup = () => {
-                dialog.classList.add('hidden');
-                confirmBtn.removeEventListener('click', handleConfirm);
-                cancelBtn.removeEventListener('click', handleCancel);
-            };
-
-            confirmBtn.addEventListener('click', handleConfirm);
-            cancelBtn.addEventListener('click', handleCancel);
-
-            // Close on backdrop click
-            dialog.addEventListener('click', (e) => {
-                if (e.target === dialog) {
-                    handleCancel();
-                }
+            OO.ui.confirm(message, {
+                title: title,
+                actions: [
+                    {
+                        action: 'accept',
+                        label: options.confirmLabel || 'Confirm',
+                        flags: ['primary', 'progressive']
+                    },
+                    {
+                        action: 'reject',
+                        label: options.cancelLabel || 'Cancel',
+                        flags: 'safe'
+                    }
+                ]
+            }).done((confirmed) => {
+                resolve(confirmed);
             });
         });
     }
@@ -829,8 +795,12 @@ class CategoryBatchManagerUI {
         if (reopenBtn) reopenBtn.style.display = 'none';
     } async close() {
         const confirmed = await this.showConfirmDialog(
-            'Close Category Batch Manager',
-            'Are you sure you want to close? Any unsaved changes will be lost.'
+            'Are you sure you want to close? Any unsaved changes will be lost.',
+            {
+                title: 'Close Category Batch Manager',
+                confirmLabel: 'Close',
+                cancelLabel: 'Cancel'
+            }
         );
 
         if (confirmed) {

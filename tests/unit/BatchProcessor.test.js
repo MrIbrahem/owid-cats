@@ -103,8 +103,7 @@ describe('BatchProcessor', () => {
     });
   });
 
-  describe('processBatch', () => {
-    test('should process all files successfully', async () => {
+  describe('processBatch', () => {    test('should process all files successfully', async () => {
       const files = [
         { title: 'File:A.svg' },
         { title: 'File:B.svg' }
@@ -119,11 +118,10 @@ describe('BatchProcessor', () => {
       expect(results.total).toBe(2);
       expect(results.processed).toBe(2);
       expect(results.successful).toBe(2);
+      expect(results.skipped).toBe(0);
       expect(results.failed).toBe(0);
       expect(results.errors).toHaveLength(0);
-    });
-
-    test('should handle errors in individual files', async () => {
+    });    test('should handle errors in individual files', async () => {
       mockCategoryService.updateCategories
         .mockResolvedValueOnce({ success: true, modified: true })
         .mockRejectedValueOnce(new Error('Edit conflict'));
@@ -145,6 +143,29 @@ describe('BatchProcessor', () => {
       expect(results.failed).toBe(1);
       expect(results.errors).toHaveLength(1);
       expect(results.errors[0].file).toBe('File:B.svg');
+    });
+
+    test('should count skipped files when no changes made', async () => {
+      mockCategoryService.updateCategories
+        .mockResolvedValueOnce({ success: true, modified: true })
+        .mockResolvedValueOnce({ success: true, modified: false });
+
+      const files = [
+        { title: 'File:A.svg' },
+        { title: 'File:B.svg' }
+      ];
+
+      const results = await processor.processBatch(
+        files,
+        ['Category:Test'],
+        []
+      );
+
+      expect(results.total).toBe(2);
+      expect(results.processed).toBe(2);
+      expect(results.successful).toBe(1);
+      expect(results.skipped).toBe(1);
+      expect(results.failed).toBe(0);
     });
 
     test('should call progress callback', async () => {

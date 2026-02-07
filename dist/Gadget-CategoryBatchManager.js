@@ -1045,12 +1045,11 @@ class BatchProcessor {
       onProgress = () => {},
       onFileComplete = () => {},
       onError = () => {}
-    } = callbacks;
-
-    const results = {
+    } = callbacks;    const results = {
       total: files.length,
       processed: 0,
       successful: 0,
+      skipped: 0,
       failed: 0,
       errors: []
     };
@@ -1070,8 +1069,13 @@ class BatchProcessor {
 
         results.processed++;
         if (result.success) {
-          results.successful++;
-          onFileComplete(file, true);
+          if (result.modified) {
+            results.successful++;
+            onFileComplete(file, true);
+          } else {
+            results.skipped++;
+            onFileComplete(file, false);
+          }
         }
 
         // Update progress
@@ -1976,11 +1980,10 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-progress').classList.add('hidden');
     document.getElementById('cbm-execute').disabled = false;
   }
-
   updateProgress(percentage, results) {
     document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
     document.getElementById('cbm-progress-text').textContent =
-      `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.failed} failed)`;
+      `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
   } showResults(results) {
     const messageContainer = document.getElementById('cbm-results-message');
     if (!messageContainer) return;
@@ -2001,6 +2004,7 @@ class CategoryBatchManagerUI {
           <p><strong>Batch process complete!</strong></p>
           <p>Total: ${results.total} &mdash;
              Successful: ${results.successful} &mdash;
+             Skipped: ${results.skipped || 0} &mdash;
              Failed: ${results.failed}</p>
           ${errorsHtml}
         </div>

@@ -16,6 +16,14 @@ const mockFiles = [
     { title: 'File:Infant-mortality,BLR5.svg', selected: false },
     { title: 'File:CO2-emissions,BLR.svg6', selected: false },
     { title: 'File:Energy-consumption,BLR7.svg', selected: false },
+    { title: 'File:7Life-expectancy,BLR1.svg', selected: false },
+    { title: 'File:6Population,BLR2.svg', selected: false },
+    { title: 'File:5Unemployment-rate,BLR3.svg', selected: false },
+    { title: 'File:4Literacy-rate,BLR4.svg', selected: false },
+    { title: 'File:3Infant-mortality,BLR5.svg', selected: false },
+    { title: 'File:2CO2-emissions,BLR.svg6', selected: false },
+    { title: 'File:1Energy-consumption,BLR7.svg', selected: false },
+
 ];
 
 let currentFiles = [];

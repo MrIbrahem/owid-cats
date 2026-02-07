@@ -57,9 +57,10 @@ class ValidationHelper {
     }
 
     /**
-     * Check for circular category references and filter them out
+     * Check for circular category references and filter them out silently
+     * Only shows error if ALL categories are circular
      * @param {Array<string>} categoriesToAdd - Categories to check for circular references
-     * @returns {Array<string>} Filtered categories without circular ones
+     * @returns {Array<string>|null} Filtered categories, or null if all are circular
      */
     filterCircularCategories(categoriesToAdd) {
         const sourceCategory = this.ui.state.sourceCategory;
@@ -68,21 +69,23 @@ class ValidationHelper {
 
         for (const category of categoriesToAdd) {
             if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM-V] Circular category detected:', category);
+                console.log('[CBM-V] Circular category detected (silently removed):', category);
                 circularCategories.push(category);
             } else {
                 validCategories.push(category);
             }
         }
 
-        // Show warning if circular categories were found
-        if (circularCategories.length > 0) {
+        // If all categories are circular, show error
+        if (circularCategories.length > 0 && validCategories.length === 0) {
             this.ui.showMessage(
-                `⚠️ Removed circular categorie(s) that cannot be added: ${circularCategories.join(', ')}. Continuing with ${validCategories.length} valid categorie(s).`,
-                'warning'
+                `❌ Cannot add: all categorie(s) are circular references to the current page. Cannot add "${circularCategories.join(', ')}" to itself.`,
+                'error'
             );
+            return null;
         }
 
+        // Silently filter circular categories if there are valid ones
         return validCategories;
     }
 
@@ -97,13 +100,14 @@ class ValidationHelper {
         const categoryInputs = this.parseCategoryInputs();
         if (!categoryInputs) return null;
 
-        // Filter out circular categories instead of failing
+        // Filter out circular categories (returns null if ALL are circular)
         const filteredToAdd = this.filterCircularCategories(categoryInputs.toAdd);
+        if (filteredToAdd === null) return null; // All categories were circular
 
         // Check if there are any valid operations remaining
         if (filteredToAdd.length === 0 && categoryInputs.toRemove.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
-            this.ui.showMessage('No valid categories to add or remove after filtering circular references.', 'warning');
+            this.ui.showMessage('No valid categories to add or remove.', 'warning');
             return null;
         }
 

@@ -35,9 +35,9 @@ const SOURCE_FILES = [
 const CSS_SOURCE = 'src/ui/styles/main.css';
 const DIST_DIR = 'dist';
 const OUTPUT_JS = 'dist/Gadget-CategoryBatchManager.js';
-const OUTPUT_JS2 = 'dist/js.js';
+const OUTPUT_JS2 = 'dist/jsnew.js';
 const OUTPUT_CSS = 'dist/Gadget-CategoryBatchManager.css';
-const OUTPUT_CSS2 = 'dist/css.css';
+const OUTPUT_CSS2 = 'dist/cssnew.css';
 
 /**
  * Strip module.exports blocks from JavaScript code

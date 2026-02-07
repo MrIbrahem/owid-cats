@@ -31,7 +31,9 @@ const SOURCE_FILES = [
 const CSS_SOURCE = 'src/ui/styles/main.css';
 const DIST_DIR = 'dist';
 const OUTPUT_JS = 'dist/Gadget-CategoryBatchManager.js';
+const OUTPUT_JS2 = 'dist/js.js';
 const OUTPUT_CSS = 'dist/Gadget-CategoryBatchManager.css';
+const OUTPUT_CSS2 = 'dist/css.css';
 
 /**
  * Strip module.exports blocks from JavaScript code
@@ -67,13 +69,13 @@ function stripGlobalComments(code) {
  */
 function processFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
-  
+
   // Strip module.exports blocks
   content = stripModuleExports(content);
-  
+
   // Strip global comments
   content = stripGlobalComments(content);
-  
+
   // For gadget-entry.js, unwrap the IIFE since we'll wrap everything in one IIFE
   if (filePath === 'src/gadget-entry.js') {
     // Remove the outer IIFE wrapper: (function () { 'use strict'; ... })();
@@ -82,13 +84,13 @@ function processFile(filePath) {
     // Match closing: })();
     content = content.replace(/\}\)\(\);?\s*$/s, '');
   }
-  
+
   // Trim trailing whitespace and ensure proper ending
   content = content.trim();
-  
+
   // Add file marker comment
   const marker = `// === ${filePath} ===\n`;
-  
+
   return marker + content;
 }
 
@@ -116,13 +118,13 @@ function generateHeader() {
  */
 function buildJS() {
   console.log('Building JavaScript bundle...');
-  
+
   // Process all source files
   const processedFiles = SOURCE_FILES.map(processFile);
-  
+
   // Combine all processed files
   const combinedContent = processedFiles.join('\n\n');
-  
+
   // Wrap in IIFE
   const bundle = `${generateHeader()}(function () {
 'use strict';
@@ -131,10 +133,13 @@ ${combinedContent}
 
 })();
 `;
-  
+
   // Write output file
   fs.writeFileSync(OUTPUT_JS, bundle, 'utf8');
   console.log(`✓ Created ${OUTPUT_JS}`);
+  // Write output file
+  fs.writeFileSync(OUTPUT_JS2, bundle, 'utf8');
+  console.log(`✓ Created ${OUTPUT_JS2}`);
 }
 
 /**
@@ -142,10 +147,13 @@ ${combinedContent}
  */
 function buildCSS() {
   console.log('Copying CSS file...');
-  
+
   const cssContent = fs.readFileSync(CSS_SOURCE, 'utf8');
   fs.writeFileSync(OUTPUT_CSS, cssContent, 'utf8');
   console.log(`✓ Created ${OUTPUT_CSS}`);
+
+  fs.writeFileSync(OUTPUT_CSS2, cssContent, 'utf8');
+  console.log(`✓ Created ${OUTPUT_CSS2}`);
 }
 
 /**
@@ -155,11 +163,11 @@ function build() {
   // Create dist directory if it doesn't exist
   fs.mkdirSync(DIST_DIR, { recursive: true });
   console.log(`✓ Created ${DIST_DIR}/ directory`);
-  
+
   // Build JS and CSS
   buildJS();
   buildCSS();
-  
+
   console.log('\nBuild completed successfully!');
 }
 

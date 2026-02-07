@@ -1486,7 +1486,7 @@ class CategoryBatchManagerUI {
     buildContainer() {
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
-        div.className = 'cbm-container';        div.innerHTML = `
+        div.className = 'cbm-container'; div.innerHTML = `
             <div class="cbm-header">
                 <h2>Category Batch Manager</h2>
                 <div>
@@ -1663,7 +1663,7 @@ class CategoryBatchManagerUI {
 
         document.getElementById('cbm-preview').addEventListener('click', () => {
             this.handlePreview();
-        });        document.getElementById('cbm-execute').addEventListener('click', () => {
+        }); document.getElementById('cbm-execute').addEventListener('click', () => {
             this.handleExecute();
         });
 
@@ -2042,7 +2042,7 @@ class CategoryBatchManagerUI {
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
         }
-    }    hideLoading() {
+    } hideLoading() {
         // Content will be replaced by renderFileList or showMessage
     }
 
@@ -2109,13 +2109,13 @@ class CategoryBatchManagerUI {
       'Open Category Batch Manager'
     );    portletLink.addEventListener('click', function (e) {
       e.preventDefault();
-      
+
       // Ensure Codex styles and mediawiki.api are loaded, then open the UI
       mw.loader.using(['@wikimedia/codex', 'mediawiki.api']).then(function () {
         // Check if modal exists and is hidden
         var existingModal = document.getElementById('category-batch-manager');
         var reopenBtn = document.getElementById('cbm-reopen-btn');
-        
+
         if (existingModal && existingModal.style.display === 'none') {
           // Just show the existing modal
           existingModal.style.display = 'flex';

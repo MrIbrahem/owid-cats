@@ -8,7 +8,7 @@
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FileList, CategoryInputs */
+/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FileList */
 
 class CategoryBatchManagerUI {
     constructor() {
@@ -19,7 +19,6 @@ class CategoryBatchManagerUI {
 
         // Initialize UI components
         this.searchPanel = new SearchPanel(() => this.searchHandler.handleSearch());
-        this.categoryInputs = new CategoryInputs();
         this.fileList = new FileList(
             () => this.updateSelectedCount(),
             (index) => this.removeFile(index)
@@ -77,7 +76,6 @@ class CategoryBatchManagerUI {
 
     buildContainer(searchPanelElement) {
         const ProgressBarElement = this.progressBarHandler.createElement();
-        const categoryInputsElement = this.categoryInputs.createElement();
 
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
@@ -103,7 +101,49 @@ class CategoryBatchManagerUI {
                         <div id="cbm-results-message" class="hidden"></div>
 
                         <div class="cbm-actions">
-                            ${categoryInputsElement.outerHTML}
+
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-add-cats">
+                                        <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
+                                    </label>
+                                    <span class="cdx-label__description">
+                                        e.g., Category:Belarus, Category:Europe
+                                    </span>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-add-cats" class="cdx-text-input__input" type="text" placeholder="Category:Example">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-remove-cats">
+                                        <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
+                                    </label>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-remove-cats" class="cdx-text-input__input" type="text" placeholder="Category:Old">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="cdx-field">
+                                <div class="cdx-label">
+                                    <label class="cdx-label__label" for="cbm-summary">
+                                        <span class="cdx-label__label__text">Edit Summary</span>
+                                    </label>
+                                </div>
+                                <div class="cdx-field__control">
+                                    <div class="cdx-text-input">
+                                        <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                                            value="Batch category update via Category Batch Manager">
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="cbm-selected-count">
                                 Selected: <strong id="cbm-selected">0</strong> files

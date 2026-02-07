@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل الاستخدام - Category Batch Manager</title>
+    <link rel="stylesheet" href="https://doc.wikimedia.org/codex/latest/codex.style.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .guide-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #202122;
+            border-bottom: 2px solid #0645ad;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #202122;
+            margin-top: 30px;
+            border-right: 4px solid #00af89;
+            padding-right: 10px;
+        }
+
+        .example-box {
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .tip-box {
+            background: #eaf3ff;
+            border-right: 4px solid #36c;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: #fef6e7;
+            border-right: 4px solid #fc3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .success-box {
+            background: #d5fdf4;
+            border-right: 4px solid #00af89;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #c7254e;
+        }
+
+        .btn-demo {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #36c;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .btn-demo:hover {
+            background: #2a4b8d;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eaecf0;
+        }
+
+        .feature-list li:before {
+            content: "✓ ";
+            color: #00af89;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .screenshot {
+            border: 2px solid #a2a9b1;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 15px 0;
+            background: white;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-right: 3px solid #36c;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #36c;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="guide-container">
+        <h1>🎯 دليل الاستخدام الكامل - Category Batch Manager</h1>
+
+        <div class="success-box">
+            <strong>مرحباً!</strong> هذا الدليل سيساعدك على فهم واستخدام جميع ميزات Category Batch Manager.
+        </div>
+
+        <h2>📋 نظرة عامة</h2>
+        <p>
+            Category Batch Manager هي أداة قوية لإدارة التصنيفات (Categories) لملفات متعددة دفعة واحدة على Wikimedia Commons.
+        </p>
+
+        <ul class="feature-list">
+            <li>البحث عن ملفات باستخدام نمط معين</li>
+            <li>إضافة تصنيفات لملفات متعددة في نفس الوقت</li>
+            <li>إزالة تصنيفات من ملفات متعددة</li>
+            <li>معاينة التغييرات قبل التنفيذ</li>
+            <li>تتبع التقدم أثناء العملية</li>
+            <li>تقرير مفصل عن النتائج</li>
+        </ul>
+
+        <h2>🚀 البدء السريع</h2>
+
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>افتح الأداة</strong>
+            <div class="example-box">
+                <a href="modal.html" class="btn-demo" target="_blank">افتح المعاينة التفاعلية</a>
+            </div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>ابحث عن الملفات</strong>
+            <p>أدخل نمط البحث في حقل "Search Pattern":</p>
+            <div class="example-box">
+                مثال: BLR<br>
+                مثال: GDP<br>
+                مثال: ,BLR.svg
+            </div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>حدد الملفات</strong>
+            <p>استخدم الأزرار أو checkboxes لتحديد الملفات:</p>
+            <div class="example-box">
+                <button class="cdx-button">Select All</button>
+                <button class="cdx-button">Deselect All</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>أدخل التصنيفات</strong>
+            <div class="example-box">
+                Add: Category:Belarus, Category:Europe<br>
+                Remove: Category:Uncategorized
+            </div>
+        </div>
+
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>معاينة وتنفيذ</strong>
+            <div class="example-box">
+                <button class="cdx-button">Preview Changes</button>
+                ثم
+                <button class="cdx-button cdx-button--action-progressive">GO</button>
+            </div>
+        </div>
+
+        <h2>💡 أمثلة عملية</h2>
+
+        <h3>مثال 1: إضافة تصنيف Belarus لجميع ملفات BLR</h3>
+        <div class="example-box">
+            <strong>الخطوات:</strong><br>
+            1. Source Category: Category:Sample_Files<br>
+            2. Search Pattern: BLR<br>
+            3. انقر "Search"<br>
+            4. انقر "Select All"<br>
+            5. Add Categories: Category:Belarus<br>
+            6. انقر "Preview Changes"<br>
+            7. راجع التغييرات<br>
+            8. انقر "GO"
+        </div>
+
+        <h3>مثال 2: استبدال تصنيف قديم بجديد</h3>
+        <div class="example-box">
+            <strong>الخطوات:</strong><br>
+            1. ابحث عن الملفات<br>
+            2. Add Categories: Category:Economic_Indicators_2024<br>
+            3. Remove Categories: Category:Economic_Indicators_2023<br>
+            4. انقر "GO"
+        </div>
+
+        <h3>مثال 3: إضافة عدة تصنيفات دفعة واحدة</h3>
+        <div class="example-box">
+            <strong>Add Categories:</strong><br>
+            Category:Belarus, Category:Europe, Category:Economic Data, Category:SVG files
+        </div>
+
+        <h2>⚠️ نصائح وتحذيرات</h2>
+
+        <div class="tip-box">
+            <strong>💡 نصيحة:</strong> استخدم "Preview Changes" دائماً قبل النقر على "GO" للتأكد من التغييرات.
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ تحذير:</strong> التغييرات نهائية! تأكد من مراجعة المعاينة قبل التنفيذ.
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 نصيحة:</strong> يمكنك إضافة التصنيفات بدون كتابة "Category:" - ستُضاف تلقائياً.
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 نصيحة:</strong> استخدم الفواصل (,) لفصل التصنيفات المتعددة.
+        </div>
+
+        <h2>🎨 فهم الواجهة</h2>
+
+        <h3>أقسام الواجهة:</h3>
+
+        <div class="screenshot">
+            <h4>1️⃣ قسم البحث (Search Panel)</h4>
+            <ul>
+                <li><code>Source Category</code>: التصنيف المصدر للبحث فيه</li>
+                <li><code>Search Pattern</code>: نمط البحث لتصفية الملفات</li>
+                <li><code>Search Button</code>: زر البحث</li>
+            </ul>
+        </div>
+
+        <div class="screenshot">
+            <h4>2️⃣ قسم النتائج (Results Panel)</h4>
+            <ul>
+                <li><code>Count</code>: عدد الملفات المطابقة</li>
+                <li><code>Select All / Deselect All</code>: أزرار التحديد</li>
+                <li><code>File List</code>: قائمة الملفات مع checkboxes</li>
+            </ul>
+        </div>
+
+        <div class="screenshot">
+            <h4>3️⃣ قسم الإجراءات (Actions Panel)</h4>
+            <ul>
+                <li><code>Add Categories</code>: حقل التصنيفات المراد إضافتها</li>
+                <li><code>Remove Categories</code>: حقل التصنيفات المراد إزالتها</li>
+                <li><code>Edit Summary</code>: ملخص التعديل (مطلوب)</li>
+                <li><code>Selected Count</code>: عدد الملفات المحددة</li>
+                <li><code>Preview / GO</code>: أزرار التنفيذ</li>
+            </ul>
+        </div>
+
+        <div class="screenshot">
+            <h4>4️⃣ قسم التقدم (Progress Bar)</h4>
+            <ul>
+                <li>يظهر أثناء تنفيذ العملية</li>
+                <li>يعرض النسبة المئوية والنتائج</li>
+            </ul>
+        </div>
+
+        <h2>🔍 رسائل الحالة</h2>
+
+        <div class="screenshot">
+            <h4>أنواع الرسائل:</h4>
+            <ul>
+                <li><strong style="color: #d73333;">❌ خطأ (Error):</strong> مشكلة يجب حلها</li>
+                <li><strong style="color: #fc3;">⚠️ تحذير (Warning):</strong> تنبيه مهم</li>
+                <li><strong style="color: #00af89;">✅ نجاح (Success):</strong> عملية ناجحة</li>
+                <li><strong style="color: #36c;">ℹ️ معلومة (Notice):</strong> معلومة عامة</li>
+            </ul>
+        </div>
+
+        <h2>🛠️ استكشاف الأخطاء</h2>
+
+        <h3>المشكلة: "No files found"</h3>
+        <div class="example-box">
+            <strong>الحل:</strong><br>
+            • تحقق من نمط البحث<br>
+            • تأكد من وجود ملفات تطابق النمط<br>
+            • جرب نمط بحث أوسع
+        </div>
+
+        <h3>المشكلة: "Please select at least one file"</h3>
+        <div class="example-box">
+            <strong>الحل:</strong><br>
+            • حدد ملف واحد على الأقل باستخدام checkbox<br>
+            • أو استخدم "Select All"
+        </div>
+
+        <h3>المشكلة: "Please specify categories"</h3>
+        <div class="example-box">
+            <strong>الحل:</strong><br>
+            • أدخل تصنيف واحد على الأقل في "Add" أو "Remove"<br>
+            • تأكد من الفصل بفواصل إذا كان هناك عدة تصنيفات
+        </div>
+
+        <h2>📊 فهم نتائج المعاينة</h2>
+
+        <div class="screenshot">
+            <h4>جدول المعاينة يعرض:</h4>
+            <ul>
+                <li><strong>File:</strong> اسم الملف</li>
+                <li><strong>Current Categories:</strong> التصنيفات الحالية</li>
+                <li><strong>New Categories:</strong> التصنيفات بعد التعديل</li>
+            </ul>
+        </div>
+
+        <h2>✨ ميزات متقدمة</h2>
+
+        <h3>1. حذف ملف من القائمة</h3>
+        <div class="example-box">
+            انقر على زر × بجانب الملف لحذفه من القائمة بدون تعديله
+        </div>
+
+        <h3>2. تنسيق التصنيفات التلقائي</h3>
+        <div class="example-box">
+            يمكنك كتابة: Belarus<br>
+            سيتم تحويله إلى: Category:Belarus
+        </div>
+
+        <h3>3. إغلاق النوافذ المنبثقة</h3>
+        <div class="example-box">
+            • انقر "Close"<br>
+            • أو انقر خارج النافذة
+        </div>
+
+        <h2>📈 نتائج العملية</h2>
+
+        <div class="screenshot">
+            <h4>بعد انتهاء العملية، ستحصل على:</h4>
+            <ul>
+                <li>✅ <strong>Success:</strong> عدد الملفات المحدثة بنجاح</li>
+                <li>❌ <strong>Failed:</strong> عدد الملفات التي فشل تحديثها</li>
+                <li>⏭️ <strong>Skipped:</strong> عدد الملفات المتخطاة</li>
+            </ul>
+        </div>
+
+        <h2>🔗 روابط مفيدة</h2>
+
+        <div class="example-box">
+            <a href="modal.html" class="btn-demo">المعاينة التفاعلية</a>
+            <a href="../README.md" class="btn-demo">التوثيق الكامل</a>
+            <a href="../CHANGELOG.md" class="btn-demo">سجل التغييرات</a>
+        </div>
+
+        <h2>💬 الدعم والمساعدة</h2>
+
+        <div class="tip-box">
+            <strong>هل تحتاج مساعدة؟</strong><br>
+            • راجع التوثيق في مجلد <code>docs/</code><br>
+            • اطلع على الأمثلة في <code>docs/EXAMPLES.md</code><br>
+            • راجع دليل API في <code>docs/API_USAGE_GUIDE.md</code>
+        </div>
+
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid #eaecf0;">
+
+        <div style="text-align: center; color: #72777d;">
+            <p>تم إنشاء هذا الدليل بواسطة Category Batch Manager Team</p>
+            <p>الإصدار: 1.1.1 | التاريخ: فبراير 2026</p>
+        </div>
+    </div>
+</body>
+
+</html>

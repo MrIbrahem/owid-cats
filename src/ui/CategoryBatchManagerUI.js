@@ -8,14 +8,21 @@
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO */
+/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler */
 
 class CategoryBatchManagerUI {
     constructor() {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
         this.categoryService = new CategoryService(this.apiService);
-        this.batchProcessor = new BatchProcessor(this.categoryService); this.state = {
+        this.batchProcessor = new BatchProcessor(this.categoryService);
+
+        // Initialize handlers
+        this.searchHandler = new SearchHandler(this);
+        this.previewHandler = new PreviewHandler(this);
+        this.executeHandler = new ExecuteHandler(this);
+
+        this.state = {
             sourceCategory: mw.config.get('wgPageName'),
             searchPattern: '',
             files: [],
@@ -224,7 +231,7 @@ class CategoryBatchManagerUI {
 
     attachEventListeners() {
         document.getElementById('cbm-search-btn').addEventListener('click', () => {
-            this.handleSearch();
+            this.searchHandler.handleSearch();
         });
 
         document.getElementById('cbm-select-all').addEventListener('click', () => {
@@ -236,13 +243,14 @@ class CategoryBatchManagerUI {
         });
 
         document.getElementById('cbm-preview').addEventListener('click', () => {
-            this.handlePreview();
-        }); document.getElementById('cbm-execute').addEventListener('click', () => {
-            this.handleExecute();
+            this.previewHandler.handlePreview();
+        });
+        document.getElementById('cbm-execute').addEventListener('click', () => {
+            this.executeHandler.handleExecute();
         });
 
         document.getElementById('cbm-stop').addEventListener('click', () => {
-            this.stopProcess();
+            this.executeHandler.stopProcess();
         });
 
         document.getElementById('cbm-minimize').addEventListener('click', () => {
@@ -255,110 +263,15 @@ class CategoryBatchManagerUI {
 
         // Preview modal close button
         document.getElementById('cbm-preview-close').addEventListener('click', () => {
-            this.hidePreviewModal();
+            this.previewHandler.hidePreviewModal();
         });
 
         // Close modal when clicking outside
         document.getElementById('cbm-preview-modal').addEventListener('click', (e) => {
             if (e.target.id === 'cbm-preview-modal') {
-                this.hidePreviewModal();
+                this.previewHandler.hidePreviewModal();
             }
         });
-    }
-
-    async handleSearch() {
-        // إذا كان البحث جارياً، أوقفه
-        if (this.state.isSearching) {
-            this.stopSearch();
-            return;
-        }
-
-        const pattern = document.getElementById('cbm-pattern').value.trim();
-        const sourceCategory = document.getElementById('cbm-source-category').value.trim();
-
-        if (!pattern) {
-            this.showMessage('Please enter a search pattern.', 'warning');
-            return;
-        }
-
-        if (!sourceCategory) {
-            this.showMessage('Please enter a source category.', 'warning');
-            return;
-        }
-
-        this.clearMessage();
-        this.state.isSearching = true;
-        this.state.searchAbortController = new AbortController();
-
-        // تغيير زر البحث إلى زر إيقاف
-        this.updateSearchButton(true);
-        this.showSearchProgress();
-
-        try {
-            const files = await this.fileService.searchFiles(
-                sourceCategory,
-                pattern,
-                { signal: this.state.searchAbortController.signal }
-            );
-
-            this.state.files = files;
-            this.state.searchPattern = pattern;
-            this.state.sourceCategory = sourceCategory;
-            this.renderFileList();
-            this.hideSearchProgress();
-            this.updateSearchButton(false);
-            this.state.isSearching = false;
-
-            UsageLogger.logSearch(pattern, files.length);
-        } catch (error) {
-            this.hideSearchProgress();
-            this.updateSearchButton(false);
-            this.state.isSearching = false;
-
-            if (error.name === 'AbortError') {
-                this.showMessage('Search cancelled by user.', 'notice');
-            } else {
-                this.showMessage(`Error searching files: ${error.message}`, 'error');
-            }
-        }
-    }
-
-    stopSearch() {
-        if (this.state.searchAbortController) {
-            this.state.searchAbortController.abort();
-            this.state.searchAbortController = null;
-        }
-    }
-
-    updateSearchButton(isSearching) {
-        const searchBtn = document.getElementById('cbm-search-btn');
-        if (searchBtn) {
-            if (isSearching) {
-                searchBtn.textContent = 'Stop';
-                searchBtn.className = 'cdx-button cdx-button--action-destructive cdx-button--weight-primary cdx-button--size-medium';
-            } else {
-                searchBtn.textContent = 'Search';
-                searchBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium';
-            }
-        }
-    }
-
-    showSearchProgress() {
-        const listContainer = document.getElementById('cbm-file-list');
-        if (listContainer) {
-            listContainer.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 12px; padding: 20px; justify-content: center;">
-                    <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar" aria-label="Searching">
-                        <div class="cdx-progress-bar__bar"></div>
-                    </div>
-                    <span style="color: #54595d;">Searching for files...</span>
-                </div>
-            `;
-        }
-    }
-
-    hideSearchProgress() {
-        // Content will be replaced by renderFileList
     }
 
     /**
@@ -486,296 +399,6 @@ class CategoryBatchManagerUI {
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
     }
-
-    async handlePreview() {
-        console.log('[CBM] Preview button clicked');
-        const selectedFiles = this.getSelectedFiles();
-        console.log('[CBM] Selected files:', selectedFiles);
-        if (selectedFiles.length === 0) {
-            console.log('[CBM] No files selected');
-            this.showMessage('No files selected.', 'warning');
-            return;
-        }
-
-        const toAdd = this.parseCategories(
-            document.getElementById('cbm-add-cats').value
-        );
-        const toRemove = this.parseCategories(
-            document.getElementById('cbm-remove-cats').value
-        );
-        console.log('[CBM] Categories to add:', toAdd);
-        console.log('[CBM] Categories to remove:', toRemove);
-
-        if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM] No categories specified');
-            this.showMessage('Please specify categories to add or remove.', 'warning');
-            return;
-        }
-
-        // Check for circular category reference
-        const sourceCategory = this.state.sourceCategory;
-        for (const category of toAdd) {
-            if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM] Circular category detected:', category);
-                this.showMessage(
-                    `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
-                    'error'
-                );
-                return;
-            }
-        }
-
-        // Generate preview without affecting file list - no loading indicator
-        try {
-            console.log('[CBM] Calling batchProcessor.previewChanges');
-            const preview = await this.batchProcessor.previewChanges(
-                selectedFiles,
-                toAdd,
-                toRemove
-            );
-            console.log('[CBM] Preview result:', preview);
-            this.showPreviewModal(preview);
-
-        } catch (error) {
-            console.log('[CBM] Error in previewChanges:', error);
-            // Check if error is about duplicate categories
-            if (error.message.includes('already exist')) {
-                this.showMessage(`⚠️ ${error.message}`, 'warning');
-            } else {
-                this.showMessage(`Error generating preview: ${error.message}`, 'error');
-            }
-        }
-    }
-
-
-    showPreviewModal(preview) {
-        const modal = document.getElementById('cbm-preview-modal');
-        const content = document.getElementById('cbm-preview-content');
-
-        let html = '<table class="cbm-preview-table">';
-        html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
-
-        preview.forEach(item => {
-            if (item.willChange) {
-                html += `
-          <tr>
-            <td>${item.file}</td>
-            <td>${item.currentCategories.join('<br>')}</td>
-            <td>${item.newCategories.join('<br>')}</td>
-          </tr>
-        `;
-            }
-        });
-
-        html += '</table>';
-
-        const changesCount = preview.filter(p => p.willChange).length;
-
-        if (changesCount === 0) {
-            this.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
-            return;
-        }
-
-        html = `<p>${changesCount} files will be modified</p>` + html;
-
-        content.innerHTML = html;
-        modal.classList.remove('hidden');
-    }
-
-    hidePreviewModal() {
-        const modal = document.getElementById('cbm-preview-modal');
-        modal.classList.add('hidden');
-    }
-
-
-    async handleExecute() {
-        console.log('[CBM] GO button clicked');
-        const selectedFiles = this.getSelectedFiles();
-        console.log('[CBM] Selected files:', selectedFiles);
-        if (selectedFiles.length === 0) {
-            console.log('[CBM] No files selected');
-            this.showMessage('No files selected.', 'warning');
-            return;
-        }
-
-        const toAdd = this.parseCategories(
-            document.getElementById('cbm-add-cats').value
-        );
-        const toRemove = this.parseCategories(
-            document.getElementById('cbm-remove-cats').value
-        );
-        console.log('[CBM] Categories to add:', toAdd);
-        console.log('[CBM] Categories to remove:', toRemove);
-
-        if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM] No categories specified');
-            this.showMessage('Please specify categories to add or remove.', 'warning');
-            return;
-        }
-
-        // Check for circular category reference
-        const sourceCategory = this.state.sourceCategory;
-        for (const category of toAdd) {
-            if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM] Circular category detected:', category);
-                this.showMessage(
-                    `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
-                    'error'
-                );
-                return;
-            }
-        }
-
-        // Check for duplicate categories before execution
-        try {
-            console.log('[CBM] Calling batchProcessor.previewChanges (pre-execute validation)');
-            await this.batchProcessor.previewChanges(
-                selectedFiles,
-                toAdd,
-                toRemove
-            );
-        } catch (error) {
-            console.log('[CBM] Error in previewChanges (pre-execute):', error);
-            if (error.message.includes('already exist')) {
-                this.showMessage(`❌ Cannot proceed: ${error.message}`, 'error');
-            } else {
-                this.showMessage(`Error: ${error.message}`, 'error');
-            }
-            return;
-        }
-        // Show confirmation dialog
-        const confirmMsg =
-            `You are about to update ${selectedFiles.length} file(s).\n\n` +
-            `Categories to add: ${toAdd.length > 0 ? toAdd.join(', ') : 'none'}\n` +
-            `Categories to remove: ${toRemove.length > 0 ? toRemove.join(', ') : 'none'}\n\n` +
-            'Do you want to proceed?';
-
-        console.log('[CBM] Showing confirmation dialog');
-        const confirmed = await this.showConfirmDialog(confirmMsg, {
-            title: 'Confirm Batch Update',
-            confirmLabel: 'Proceed',
-            cancelLabel: 'Cancel'
-        });
-        console.log('[CBM] Confirmation dialog result:', confirmed);
-
-        if (!confirmed) {
-            console.log('[CBM] User cancelled batch operation');
-            return;
-        }
-
-        this.state.isProcessing = true;
-        this.state.processAbortController = new AbortController();
-
-        // إخفاء أزرار Preview و GO وإظهار زر الإيقاف
-        this.toggleProcessButtons(true);
-        this.showProgress();
-
-        try {
-            console.log('[CBM] Calling batchProcessor.processBatch');
-            const results = await this.batchProcessor.processBatch(
-                selectedFiles,
-                toAdd,
-                toRemove,
-                {
-                    signal: this.state.processAbortController.signal,
-                    onProgress: (progress, results) => {
-                        console.log('[CBM] Progress:', progress, results);
-                        this.updateProgress(progress, results);
-                    },
-                    onFileComplete: (file, success) => {
-                        console.log(`[CBM] File complete: ${file.title}: ${success ? 'success' : 'failed'}`);
-                    },
-                    onError: (file, error) => {
-                        console.error(`[CBM] Error processing ${file.title}:`, error);
-                    }
-                }
-            );
-
-            console.log('[CBM] Batch operation results:', results);
-            UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
-            this.showResults(results);
-
-        } catch (error) {
-            console.log('[CBM] Error in processBatch:', error);
-            if (error.name === 'AbortError') {
-                this.showMessage('Batch process cancelled by user.', 'warning');
-            } else {
-                this.showMessage(`Batch process failed: ${error.message}`, 'error');
-            }
-        } finally {
-            this.state.isProcessing = false;
-            this.hideProgress();
-            this.toggleProcessButtons(false);
-        }
-    }
-
-    stopProcess() {
-        if (this.state.processAbortController) {
-            this.state.processAbortController.abort();
-            this.state.processAbortController = null;
-        }
-    }
-
-    toggleProcessButtons(isProcessing) {
-        const previewBtn = document.getElementById('cbm-preview');
-        const executeBtn = document.getElementById('cbm-execute');
-        const stopBtn = document.getElementById('cbm-stop');
-
-        if (isProcessing) {
-            // إخفاء Preview و GO
-            if (previewBtn) previewBtn.style.display = 'none';
-            if (executeBtn) executeBtn.style.display = 'none';
-            // إظهار زر الإيقاف
-            if (stopBtn) stopBtn.style.display = 'block';
-        } else {
-            // إظهار Preview و GO
-            if (previewBtn) previewBtn.style.display = 'block';
-            if (executeBtn) executeBtn.style.display = 'block';
-            // إخفاء زر الإيقاف
-            if (stopBtn) stopBtn.style.display = 'none';
-        }
-    }
-
-    showProgress() {
-        document.getElementById('cbm-progress').classList.remove('hidden');
-    }
-
-    hideProgress() {
-        document.getElementById('cbm-progress').classList.add('hidden');
-    }
-    updateProgress(percentage, results) {
-        document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
-        document.getElementById('cbm-progress-text').textContent =
-            `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
-    }
-
-    showResults(results) {
-        const messageContainer = document.getElementById('cbm-results-message');
-        if (!messageContainer) return;
-
-        const type = results.failed > 0 ? 'warning' : 'success';
-        let errorsHtml = '';
-        if (results.errors && results.errors.length > 0) {
-            errorsHtml = '<ul style="margin: 8px 0 0; padding-left: 20px;">' +
-                results.errors.map(err => `<li>${err.file}: ${err.error}</li>`).join('') +
-                '</ul>';
-        }
-
-        const ariaAttr = type === 'warning' ? 'aria-live="polite"' : 'aria-live="polite"';
-        messageContainer.innerHTML = `
-      <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
-        <span class="cdx-message__icon"></span>
-        <div class="cdx-message__content">
-          <p><strong>Batch process complete!</strong></p>
-          <p>Total: ${results.total} &mdash;
-             Successful: ${results.successful} &mdash;
-             Skipped: ${results.skipped || 0} &mdash;
-             Failed: ${results.failed}</p>
-          ${errorsHtml}
-        </div>
-      </div>`;
-    }
-
 
     showLoading() {
         const listContainer = document.getElementById('cbm-file-list');

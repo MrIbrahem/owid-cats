@@ -32,17 +32,15 @@ describe('BatchProcessor', () => {
       expect(result[0].willChange).toBe(true);
       expect(result[0].newCategories).toContain('Category:B');
       expect(result[0].newCategories).toContain('Category:A');
-    });
-
-    test('should show files that will not change', async () => {
+    }); test('should show files that will not change when only removing non-existent categories', async () => {
       const files = [
         { title: 'File:Test.svg', currentCategories: ['Category:A'] }
       ];
 
       const result = await processor.previewChanges(
         files,
-        ['Category:A'],
-        []
+        [],
+        ['Category:B']
       );
 
       expect(result).toHaveLength(1);

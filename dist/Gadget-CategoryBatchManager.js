@@ -1097,7 +1097,6 @@ class BatchProcessor {
 
     return results;
   }
-
   /**
    * Preview changes without actually editing
    * @param {Array} files - Files to preview
@@ -1110,6 +1109,13 @@ class BatchProcessor {
 
     for (const file of files) {
       const current = file.currentCategories || [];
+
+      // Check if trying to add categories that already exist
+      const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
+      if (duplicateCategories.length > 0) {
+        throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+      }
+
       const after = [...current];
 
       // Simulate removal
@@ -1444,7 +1450,7 @@ class CategoryBatchManagerUI {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
         this.categoryService = new CategoryService(this.apiService);
-        this.batchProcessor = new BatchProcessor(this.categoryService);        this.state = {
+        this.batchProcessor = new BatchProcessor(this.categoryService); this.state = {
             sourceCategory: mw.config.get('wgPageName'),
             searchPattern: '',
             files: [],
@@ -1666,7 +1672,7 @@ class CategoryBatchManagerUI {
 
         document.getElementById('cbm-preview').addEventListener('click', () => {
             this.handlePreview();
-        });        document.getElementById('cbm-execute').addEventListener('click', () => {
+        }); document.getElementById('cbm-execute').addEventListener('click', () => {
             this.handleExecute();
         });
 
@@ -1693,7 +1699,7 @@ class CategoryBatchManagerUI {
                 this.hidePreviewModal();
             }
         });
-    }    async handleSearch() {
+    } async handleSearch() {
         // إذا كان البحث جارياً، أوقفه
         if (this.state.isSearching) {
             this.stopSearch();
@@ -1911,8 +1917,7 @@ class CategoryBatchManagerUI {
             .map(cat => cat.trim())
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-    }
-    async handlePreview() {
+    } async handlePreview() {
         const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
             this.showMessage('No files selected.', 'warning');
             return;
@@ -1948,10 +1953,14 @@ class CategoryBatchManagerUI {
             this.showPreviewModal(preview);
 
         } catch (error) {
-            this.showMessage(`Error generating preview: ${error.message}`, 'error');
+            // Check if error is about duplicate categories
+            if (error.message.includes('already exist')) {
+                this.showMessage(`⚠️ ${error.message}`, 'warning');
+            } else {
+                this.showMessage(`Error generating preview: ${error.message}`, 'error');
+            }
         }
-    }
-    showPreviewModal(preview) {
+    } showPreviewModal(preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
 
@@ -1973,6 +1982,12 @@ class CategoryBatchManagerUI {
         html += '</table>';
 
         const changesCount = preview.filter(p => p.willChange).length;
+
+        if (changesCount === 0) {
+            this.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
+            return;
+        }
+
         html = `<p>${changesCount} files will be modified</p>` + html;
 
         content.innerHTML = html;
@@ -1982,7 +1997,7 @@ class CategoryBatchManagerUI {
     hidePreviewModal() {
         const modal = document.getElementById('cbm-preview-modal');
         modal.classList.add('hidden');
-    }    async handleExecute() {
+    } async handleExecute() {
         const selectedFiles = this.getSelectedFiles();
 
         if (selectedFiles.length === 0) {
@@ -2012,6 +2027,22 @@ class CategoryBatchManagerUI {
                 );
                 return;
             }
+        }
+
+        // Check for duplicate categories before execution
+        try {
+            await this.batchProcessor.previewChanges(
+                selectedFiles,
+                toAdd,
+                toRemove
+            );
+        } catch (error) {
+            if (error.message.includes('already exist')) {
+                this.showMessage(`❌ Cannot proceed: ${error.message}`, 'error');
+            } else {
+                this.showMessage(`Error: ${error.message}`, 'error');
+            }
+            return;
         }
 
         // Show a confirmation message and require a second click on GO
@@ -2095,7 +2126,7 @@ class CategoryBatchManagerUI {
             // إخفاء زر الإيقاف
             if (stopBtn) stopBtn.style.display = 'none';
         }
-    }    showProgress() {
+    } showProgress() {
         document.getElementById('cbm-progress').classList.remove('hidden');
     }
 

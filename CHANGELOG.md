@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### ✨ Enhancements
+
+#### Skipped Files Tracking
+- **Added separate tracking for files with no changes**
+  - Files that don't need modification are now counted as **"skipped"** instead of "successful"
+  - `BatchProcessor` now returns `skipped` count in results
+  - Progress display shows: `(X successful, Y skipped, Z failed)`
+  - Final results display includes skipped count
+  - **Use Cases:**
+    - Adding a category that already exists → Skipped
+    - Removing a category that doesn't exist → Skipped
+    - Actual changes made → Successful
+  - Provides better transparency and accuracy in batch operation reports
+
+### 🧪 Testing
+- Added test: `should count skipped files when no changes made`
+- All 129 tests passing ✅
+
+### 🔧 Technical Changes
+- Updated `BatchProcessor.processBatch()` to track `skipped` files separately
+- Updated `updateProgress()` to display skipped count
+- Updated `showResults()` to include skipped files in final report
+- Modified `onFileComplete` callback to distinguish between modified and skipped files
+
+---
+
 ## [1.1.1] - 2026-02-07
 
 ### 🐛 Bug Fixes

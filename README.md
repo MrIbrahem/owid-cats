@@ -6,7 +6,7 @@ A Wikimedia Commons gadget for efficient batch categorization of images uploaded
 
 - **Pattern-based Search**: Search files within a category using pattern matching (e.g., `,BLR.svg` to find Belarus charts)
 - **Optimized Performance**: Uses MediaWiki Search API for lightning-fast results even in categories with 100,000+ files (see [PERFORMANCE.md](PERFORMANCE.md))
-- **MediaWiki API Integration**: Uses native `mw.Api.edit()` and `mw.Api.getCategories()` for better conflict handling and performance (see [API_IMPROVEMENTS.md](API_IMPROVEMENTS.md))
+- **MediaWiki API Integration**: Uses native `mw.Api.edit()` and `mw.Api.getCategories()` for better conflict handling and performance (see [API_IMPROVEMENTS.md](docs/API_IMPROVEMENTS.md))
 - **Bulk Category Operations**: Add or remove categories from multiple files at once
 - **Preview Changes**: Review what will change before applying edits
 - **Progress Tracking**: Real-time progress bar with success/failure counts

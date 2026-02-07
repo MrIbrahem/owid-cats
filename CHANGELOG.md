@@ -46,8 +46,38 @@ All notable changes to this project will be documented in this file.
 - Improved workflow for progressive categorization
 - Preview modal more responsive and user-friendly
 
+#### Category Normalization (Spaces/Underscores)
+- **Fixed space vs underscore normalization bug**
+  - MediaWiki treats spaces and underscores equivalently
+  - Users can now remove/add categories using either format
+  - Example: `Our_World_in_Data` matches `Our World in Data`
+  - Added `WikitextParser.normalize()` method
+  - Updated `hasCategory()`, `removeCategory()`, and `addCategory()` to handle both formats
+  - Prevents duplicate categories with different formats
+  - **18 comprehensive tests** covering all edge cases
+
+#### Circular Category Detection
+- **Prevents adding a category to itself**
+  - Added `Validator.normalizeCategoryName()` for consistent comparison
+  - Added `Validator.isCircularCategory()` to detect self-references
+  - Handles all format variations:
+    - `Our_World_in_Data_graphs_of_Afghanistan` vs `Our World in Data graphs of Afghanistan`
+    - With/without `Category:` prefix
+    - Case-insensitive comparison
+  - Shows clear error message when attempting circular reference
+  - **12 comprehensive tests** covering validation scenarios
+
+### 📊 Testing
+- **Total Tests:** 128 (up from 98)
+- **Test Coverage:** 93% overall
+- **New Test Files:**
+  - `tests/unit/CategoryNormalization.test.js` - 18 tests
+  - Validator tests expanded by 12 tests
+- **All tests passing** ✅
+
 ### 📝 Documentation
-- Added `API_IMPROVEMENTS.md` - MediaWiki API upgrade documentation
+- Updated `CHANGELOG.md` - This file
+- Added `docs/NORMALIZATION_BUG_FIX.md` - Detailed bug fix documentation
 - Added `docs/API_USAGE_GUIDE.md` - Comprehensive API usage guide
 - Added `docs/FILE_LIST_PERSISTENCE_FIX.md` - Detailed fix documentation
 - Added `docs/MODAL_FIX.md` - Modal behavior fix documentation

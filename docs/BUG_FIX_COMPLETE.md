@@ -120,8 +120,8 @@ Time:        ~0.4s
 ## 📚 Documentation
 
 For detailed information, see:
-- [`docs/NORMALIZATION_BUG_FIX.md`](./NORMALIZATION_BUG_FIX.md) - Complete bug fix documentation
-- [`docs/TEST_COVERAGE_REPORT.md`](./TEST_COVERAGE_REPORT.md) - Test coverage details
-- [`tests/unit/CategoryNormalization.test.js`](../tests/unit/CategoryNormalization.test.js) - Test implementation
+- [`docs/NORMALIZATION_BUG_FIX.md`](../NORMALIZATION_BUG_FIX.md) - Complete bug fix documentation
+- [`docs/TEST_COVERAGE_REPORT.md`](../TEST_COVERAGE_REPORT.md) - Test coverage details
+- [`tests/unit/CategoryNormalization.test.js`](../../tests/unit/CategoryNormalization.test.js) - Test implementation
 
 ---

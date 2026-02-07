@@ -95,10 +95,10 @@ CategoryService.js  75.8% ⭐⭐⭐
 
 📁 **للمزيد من التفاصيل:**
 
-- [FINAL_SUMMARY.md](FINAL_SUMMARY.md) - الملخص الكامل
-- [TEST_COVERAGE_REPORT.md](docs/TEST_COVERAGE_REPORT.md) - تقرير التغطية
-- [TESTS_SUMMARY_AR.md](docs/TESTS_SUMMARY_AR.md) - شرح بالعربي
-- [PROJECT_STATUS.md](docs/PROJECT_STATUS.md) - حالة المشروع
+- [FINAL_SUMMARY.md](../FINAL_SUMMARY.md) - الملخص الكامل
+- [TEST_COVERAGE_REPORT.md](TEST_COVERAGE_REPORT.md) - تقرير التغطية
+- [TESTS_SUMMARY_AR.md](TESTS_SUMMARY_AR.md) - شرح بالعربي
+- [PROJECT_STATUS.md](PROJECT_STATUS.md) - حالة المشروع
 
 ---
 

@@ -139,9 +139,9 @@ const pattern = normalizedName.split(' ')
 ## 📚 التوثيق
 
 للحصول على معلومات مفصلة، راجع:
-- [`docs/NORMALIZATION_BUG_FIX.md`](./docs/NORMALIZATION_BUG_FIX.md) - توثيق كامل لإصلاح الخلل
-- [`docs/TEST_COVERAGE_REPORT.md`](./docs/TEST_COVERAGE_REPORT.md) - تفاصيل تغطية الاختبارات
-- [`tests/unit/CategoryNormalization.test.js`](./tests/unit/CategoryNormalization.test.js) - تنفيذ الاختبارات
+- [`docs/NORMALIZATION_BUG_FIX.md`](./NORMALIZATION_BUG_FIX.md) - توثيق كامل لإصلاح الخلل
+- [`docs/TEST_COVERAGE_REPORT.md`](./TEST_COVERAGE_REPORT.md) - تفاصيل تغطية الاختبارات
+- [`tests/unit/CategoryNormalization.test.js`](../tests/unit/CategoryNormalization.test.js) - تنفيذ الاختبارات
 
 ---
 

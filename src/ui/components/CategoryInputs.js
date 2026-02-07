@@ -296,6 +296,9 @@ class CategoryInputs {
    * @returns {Array<string>} Array of category names with "Category:" prefix
    */
   parseCategories(input) {
+    if (!input || typeof input !== 'string') {
+      return [];
+    }
     return input
       .split(',')
       .map(cat => cat.trim())

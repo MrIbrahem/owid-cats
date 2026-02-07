@@ -7,9 +7,26 @@ const mockElements = {
   'cbm-summary': { id: 'cbm-summary', value: 'Batch category update via Category Batch Manager', className: 'cdx-text-input__input' }
 };
 
-// Mock document.getElementById
+// Mock document
+const createdElements = [];
 global.document = {
-  getElementById: (id) => mockElements[id] || null
+  getElementById: (id) => mockElements[id] || null,
+  createElement: (tagName) => {
+    const element = {
+      tagName,
+      className: '',
+      id: '',
+      innerHTML: '',
+      children: [],
+      childNodes: [],
+      querySelectorAll: () => [],
+      appendChild: (child) => {
+        element.children.push(child);
+        createdElements.push(child);
+      }
+    };
+    return element;
+  }
 };
 
 describe('CategoryInputs', () => {

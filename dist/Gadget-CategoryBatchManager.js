@@ -1595,11 +1595,11 @@ class PreviewHandler {
      * Generates and displays a preview of category changes
      */
     async handlePreview() {
-        console.log('[CBM] Preview button clicked');
+        console.log('[CBM-P] Preview button clicked');
         const selectedFiles = this.ui.getSelectedFiles();
-        console.log('[CBM] Selected files:', selectedFiles);
+        console.log('[CBM-P] Selected files:', selectedFiles);
         if (selectedFiles.length === 0) {
-            console.log('[CBM] No files selected');
+            console.log('[CBM-P] No files selected');
             this.ui.showMessage('No files selected.', 'warning');
             return;
         }
@@ -1610,11 +1610,11 @@ class PreviewHandler {
         const toRemove = this.ui.parseCategories(
             document.getElementById('cbm-remove-cats').value
         );
-        console.log('[CBM] Categories to add:', toAdd);
-        console.log('[CBM] Categories to remove:', toRemove);
+        console.log('[CBM-P] Categories to add:', toAdd);
+        console.log('[CBM-P] Categories to remove:', toRemove);
 
         if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM] No categories specified');
+            console.log('[CBM-P] No categories specified');
             this.ui.showMessage('Please specify categories to add or remove.', 'warning');
             return;
         }
@@ -1623,7 +1623,7 @@ class PreviewHandler {
         const sourceCategory = this.ui.state.sourceCategory;
         for (const category of toAdd) {
             if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM] Circular category detected:', category);
+                console.log('[CBM-P] Circular category detected:', category);
                 this.ui.showMessage(
                     `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
                     'error'
@@ -1634,17 +1634,17 @@ class PreviewHandler {
 
         // Generate preview without affecting file list - no loading indicator
         try {
-            console.log('[CBM] Calling batchProcessor.previewChanges');
+            console.log('[CBM-P] Calling batchProcessor.previewChanges');
             const preview = await this.ui.batchProcessor.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
             );
-            console.log('[CBM] Preview result:', preview);
+            console.log('[CBM-P] Preview result:', preview);
             this.showPreviewModal(preview);
 
         } catch (error) {
-            console.log('[CBM] Error in previewChanges:', error);
+            console.log('[CBM-P] Error in previewChanges:', error);
             // Check if error is about duplicate categories
             if (error.message.includes('already exist')) {
                 this.ui.showMessage(`⚠️ ${error.message}`, 'warning');
@@ -1727,11 +1727,11 @@ class ExecuteHandler {
      * Validates input, shows confirmation, and executes the batch operation
      */
     async handleExecute() {
-        console.log('[CBM] GO button clicked');
+        console.log('[CBM-E] GO button clicked');
         const selectedFiles = this.ui.getSelectedFiles();
-        console.log('[CBM] Selected files:', selectedFiles);
+        console.log('[CBM-E] Selected files:', selectedFiles);
         if (selectedFiles.length === 0) {
-            console.log('[CBM] No files selected');
+            console.log('[CBM-E] No files selected');
             this.ui.showMessage('No files selected.', 'warning');
             return;
         }
@@ -1742,11 +1742,11 @@ class ExecuteHandler {
         const toRemove = this.ui.parseCategories(
             document.getElementById('cbm-remove-cats').value
         );
-        console.log('[CBM] Categories to add:', toAdd);
-        console.log('[CBM] Categories to remove:', toRemove);
+        console.log('[CBM-E] Categories to add:', toAdd);
+        console.log('[CBM-E] Categories to remove:', toRemove);
 
         if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM] No categories specified');
+            console.log('[CBM-E] No categories specified');
             this.ui.showMessage('Please specify categories to add or remove.', 'warning');
             return;
         }
@@ -1755,7 +1755,7 @@ class ExecuteHandler {
         const sourceCategory = this.ui.state.sourceCategory;
         for (const category of toAdd) {
             if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM] Circular category detected:', category);
+                console.log('[CBM-E] Circular category detected:', category);
                 this.ui.showMessage(
                     `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
                     'error'
@@ -1766,14 +1766,14 @@ class ExecuteHandler {
 
         // Check for duplicate categories before execution
         try {
-            console.log('[CBM] Calling batchProcessor.previewChanges (pre-execute validation)');
+            console.log('[CBM-E] Calling batchProcessor.previewChanges (pre-execute validation)');
             await this.ui.batchProcessor.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
             );
         } catch (error) {
-            console.log('[CBM] Error in previewChanges (pre-execute):', error);
+            console.log('[CBM-E] Error in previewChanges (pre-execute):', error);
             if (error.message.includes('already exist')) {
                 this.ui.showMessage(`❌ Cannot proceed: ${error.message}`, 'error');
             } else {
@@ -1789,16 +1789,16 @@ class ExecuteHandler {
             `Categories to remove: ${toRemove.length > 0 ? toRemove.join(', ') : 'none'}\n\n` +
             'Do you want to proceed?';
 
-        console.log('[CBM] Showing confirmation dialog');
+        console.log('[CBM-E] Showing confirmation dialog');
         const confirmed = await this.ui.showConfirmDialog(confirmMsg, {
             title: 'Confirm Batch Update',
             confirmLabel: 'Proceed',
             cancelLabel: 'Cancel'
         });
-        console.log('[CBM] Confirmation dialog result:', confirmed);
+        console.log('[CBM-E] Confirmation dialog result:', confirmed);
 
         if (!confirmed) {
-            console.log('[CBM] User cancelled batch operation');
+            console.log('[CBM-E] User cancelled batch operation');
             return;
         }
 
@@ -1810,7 +1810,7 @@ class ExecuteHandler {
         this.showProgress();
 
         try {
-            console.log('[CBM] Calling batchProcessor.processBatch');
+            console.log('[CBM-E] Calling batchProcessor.processBatch');
             const results = await this.ui.batchProcessor.processBatch(
                 selectedFiles,
                 toAdd,
@@ -1818,24 +1818,24 @@ class ExecuteHandler {
                 {
                     signal: this.ui.state.processAbortController.signal,
                     onProgress: (progress, results) => {
-                        console.log('[CBM] Progress:', progress, results);
+                        console.log('[CBM-E] Progress:', progress, results);
                         this.updateProgress(progress, results);
                     },
                     onFileComplete: (file, success) => {
-                        console.log(`[CBM] File complete: ${file.title}: ${success ? 'success' : 'failed'}`);
+                        console.log(`[CBM-E] File complete: ${file.title}: ${success ? 'success' : 'failed'}`);
                     },
                     onError: (file, error) => {
-                        console.error(`[CBM] Error processing ${file.title}:`, error);
+                        console.error(`[CBM-E] Error processing ${file.title}:`, error);
                     }
                 }
             );
 
-            console.log('[CBM] Batch operation results:', results);
+            console.log('[CBM-E] Batch operation results:', results);
             UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
             this.showResults(results);
 
         } catch (error) {
-            console.log('[CBM] Error in processBatch:', error);
+            console.log('[CBM-E] Error in processBatch:', error);
             if (error.name === 'AbortError') {
                 this.ui.showMessage('Batch process cancelled by user.', 'warning');
             } else {

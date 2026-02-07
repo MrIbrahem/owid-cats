@@ -437,7 +437,6 @@ class APIService {
 
     return this.makeRequest(params);
   }
-
   /**
    * Get page content (wikitext).
    * @param {string} title - Page title
@@ -460,24 +459,49 @@ class APIService {
   }
 
   /**
-   * Edit a page.
-   *
-   * Delegates to `mw.Api.postWithToken('csrf', …)` which handles
-   * token fetching, caching, and automatic retry on `badtoken` errors.
+   * Get categories that a page belongs to.
+   * @param {string} title - Page title
+   * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
+   */
+  async getCategories(title) {
+    const api = this._getMwApi();
+    try {
+      const categories = await api.getCategories(title);
+      if (categories === false) {
+        return false;
+      }
+      // Convert mw.Title objects to strings and remove "Category:" prefix
+      return categories.map(cat => {
+        const catStr = cat.toString();
+        return catStr.replace(/^Category:/, '');
+      });
+    } catch (error) {
+      if (typeof Logger !== 'undefined') {
+        Logger.error('Failed to get categories', error);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
    *
    * @param {string} title   - Page title
    * @param {string} content - New page content (wikitext)
    * @param {string} summary - Edit summary
+   * @param {Object} [options={}] - Additional edit options (minor, bot, etc.)
    * @returns {Promise<Object>} API response
    */
-  async editPage(title, content, summary) {
+  async editPage(title, content, summary, options = {}) {
     const api = this._getMwApi();
-    return api.postWithToken('csrf', {
-      action: 'edit',
-      title: title,
-      text: content,
-      summary: summary,
-      format: 'json'
+
+    // Use mw.Api.edit() with a transform function
+    return api.edit(title, function() {
+      return {
+        text: content,
+        summary: summary,
+        ...options
+      };
     });
   }
 
@@ -758,6 +782,71 @@ class CategoryService {
     }
 
     return { success: true, modified: newWikitext !== wikitext };
+  }
+
+  /**
+   * Combined add and remove operation using mw.Api.edit() for better conflict handling
+   * @param {string} fileTitle - File page title
+   * @param {Array<string>} toAdd - Categories to add
+   * @param {Array<string>} toRemove - Categories to remove
+   * @returns {Promise<{success: boolean, modified: boolean}>}
+   */
+  async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
+    const api = this.api._getMwApi();
+    const parser = this.parser;
+
+    try {
+      await api.edit(fileTitle, function(revision) {
+        let newWikitext = revision.content;
+
+        // Remove categories first
+        for (const category of toRemove) {
+          newWikitext = parser.removeCategory(newWikitext, category);
+        }
+
+        // Then add new categories
+        for (const category of toAdd) {
+          if (!parser.hasCategory(newWikitext, category)) {
+            newWikitext = parser.addCategory(newWikitext, category);
+          }
+        }
+
+        // Only save if changed
+        if (newWikitext === revision.content) {
+          return false; // No changes needed
+        }
+
+        const parts = [];
+        if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
+        if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
+
+        return {
+          text: newWikitext,
+          summary: `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`,
+          minor: false
+        };
+      });
+
+      return { success: true, modified: true };
+    } catch (error) {
+      if (error.message && error.message.includes('no changes')) {
+        return { success: true, modified: false };
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Get current categories for a file using the optimized API method
+   * @param {string} fileTitle - File page title
+   * @returns {Promise<Array<string>>} Array of category names
+   */
+  async getCurrentCategories(fileTitle) {
+    const categories = await this.api.getCategories(fileTitle);
+    if (categories === false) {
+      return [];
+    }
+    return categories;
   }
 
   /**
@@ -1484,7 +1573,6 @@ class CategoryBatchManagerUI {
 
     return div;
   }
-
   attachEventListeners() {
     document.getElementById('cbm-search-btn').addEventListener('click', () => {
       this.handleSearch();
@@ -1509,7 +1597,19 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-close').addEventListener('click', () => {
       this.close();
     });
-  }  async handleSearch() {
+
+    // Preview modal close button
+    document.getElementById('cbm-preview-close').addEventListener('click', () => {
+      this.hidePreviewModal();
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('cbm-preview-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'cbm-preview-modal') {
+        this.hidePreviewModal();
+      }
+    });
+  }async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
     const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
@@ -1689,7 +1789,6 @@ class CategoryBatchManagerUI {
       this.showMessage(`Error generating preview: ${error.message}`, 'error');
     }
   }
-
   showPreviewModal(preview) {
     const modal = document.getElementById('cbm-preview-modal');
     const content = document.getElementById('cbm-preview-content');
@@ -1716,10 +1815,11 @@ class CategoryBatchManagerUI {
 
     content.innerHTML = html;
     modal.classList.remove('hidden');
+  }
 
-    document.getElementById('cbm-preview-close').addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
+  hidePreviewModal() {
+    const modal = document.getElementById('cbm-preview-modal');
+    modal.classList.add('hidden');
   }
   async handleExecute() {
     const selectedFiles = this.getSelectedFiles();

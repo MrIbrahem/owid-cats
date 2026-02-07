@@ -194,7 +194,6 @@ class CategoryBatchManagerUI {
 
     return div;
   }
-
   attachEventListeners() {
     document.getElementById('cbm-search-btn').addEventListener('click', () => {
       this.handleSearch();
@@ -219,7 +218,19 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-close').addEventListener('click', () => {
       this.close();
     });
-  }  async handleSearch() {
+
+    // Preview modal close button
+    document.getElementById('cbm-preview-close').addEventListener('click', () => {
+      this.hidePreviewModal();
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('cbm-preview-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'cbm-preview-modal') {
+        this.hidePreviewModal();
+      }
+    });
+  } async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
     const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
@@ -247,7 +258,8 @@ class CategoryBatchManagerUI {
       this.renderFileList();
       this.hideLoading();
 
-      UsageLogger.logSearch(pattern, files.length);    } catch (error) {
+      UsageLogger.logSearch(pattern, files.length);
+    } catch (error) {
       this.hideLoading();
       this.showMessage(`Error searching files: ${error.message}`, 'error');
     }
@@ -283,7 +295,7 @@ class CategoryBatchManagerUI {
     countElement.textContent = this.state.files.length;
     headerElement.classList.remove('hidden');
 
-    listContainer.innerHTML = '';    this.state.files.forEach((file, index) => {
+    listContainer.innerHTML = ''; this.state.files.forEach((file, index) => {
       const fileRow = document.createElement('div');
       fileRow.className = 'cbm-file-row';
       fileRow.dataset.index = index;
@@ -370,7 +382,7 @@ class CategoryBatchManagerUI {
   }
 
   async handlePreview() {
-    const selectedFiles = this.getSelectedFiles();    if (selectedFiles.length === 0) {
+    const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
       this.showMessage('No files selected.', 'warning');
       return;
     }
@@ -399,7 +411,6 @@ class CategoryBatchManagerUI {
       this.showMessage(`Error generating preview: ${error.message}`, 'error');
     }
   }
-
   showPreviewModal(preview) {
     const modal = document.getElementById('cbm-preview-modal');
     const content = document.getElementById('cbm-preview-content');
@@ -426,10 +437,11 @@ class CategoryBatchManagerUI {
 
     content.innerHTML = html;
     modal.classList.remove('hidden');
+  }
 
-    document.getElementById('cbm-preview-close').addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
+  hidePreviewModal() {
+    const modal = document.getElementById('cbm-preview-modal');
+    modal.classList.add('hidden');
   }
   async handleExecute() {
     const selectedFiles = this.getSelectedFiles();

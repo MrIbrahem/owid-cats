@@ -5,7 +5,33 @@ All notable changes to this project will be documented in this file.
 ## [1.1.1] - 2026-02-07
 
 ### 🐛 Bug Fixes
-- **Search Query Format**: Fixed MediaWiki search API query syntax
+
+#### Search Results Persistence
+- **Fixed file list disappearing after clicking "GO"**
+  - Added separate `cbm-results-message` div for displaying messages
+  - `showMessage()` and `showResults()` now target message area instead of file list
+  - File list remains visible after batch operations complete
+  - Users can now perform multiple operations on the same search results
+  - Added `clearMessage()` method to clear messages when starting new search
+
+#### Preview Modal Issues
+- **Fixed preview modal close behavior**
+  - Moved event listeners to `attachEventListeners()` to prevent duplication
+  - Added `hidePreviewModal()` method for proper modal closing
+  - Added backdrop click handler to close modal when clicking outside
+  - Fixed memory leaks from repeated event listener attachment
+
+#### MediaWiki API Improvements
+- **Upgraded to native MediaWiki API methods**
+  - `APIService.editPage()` now uses `mw.Api.edit()` with transform function
+  - Added `APIService.getCategories()` using `mw.Api.getCategories()`
+  - Added `CategoryService.getCurrentCategories()` for easier category retrieval
+  - Added `CategoryService.updateCategoriesOptimized()` with automatic conflict handling
+  - Automatic edit conflict detection and retry
+  - ~33% reduction in API calls for edit operations
+
+#### Search Query Format
+- **Fixed MediaWiki search API query syntax**
   - Changed order: `incategory` now comes before `intitle`
   - Pattern now uses regex format: `intitle:/pattern/` instead of `intitle:"pattern"`
   - Removed quotes from category name in search query
@@ -14,10 +40,32 @@ All notable changes to this project will be documented in this file.
   - This fixes the issue where search wasn't working with certain patterns
   - Example: `incategory:Life_expectancy_maps_of_South_America_(no_data) intitle:/177/`
 
+### ✨ Enhancements
+- Messages now stack vertically above file list (newest on top)
+- Better user feedback with persistent context
+- Improved workflow for progressive categorization
+- Preview modal more responsive and user-friendly
+
+### 📝 Documentation
+- Added `API_IMPROVEMENTS.md` - MediaWiki API upgrade documentation
+- Added `docs/API_USAGE_GUIDE.md` - Comprehensive API usage guide
+- Added `docs/FILE_LIST_PERSISTENCE_FIX.md` - Detailed fix documentation
+- Added `docs/MODAL_FIX.md` - Modal behavior fix documentation
+- Added `docs/QUICK_FIX_SUMMARY.md` - Quick reference for fixes
+- Updated `EXAMPLES.md` with new API method examples
+
 ### 🧪 Testing
+- Added tests for `getCurrentCategories()` method
+- Added tests for `updateCategoriesOptimized()` method
 - Updated FileService tests to match new search query format
 - Added test case for category names with spaces
-- All 70 tests passing ✅ (added 1 new test)
+- All 74 tests passing ✅
+
+### 🔧 Technical Changes
+- Added `cbm-results-message` container to UI template
+- Refactored message display logic for better separation of concerns
+- Improved modal lifecycle management
+- Better memory management with proper event listener cleanup
 
 ---
 

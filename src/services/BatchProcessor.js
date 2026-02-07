@@ -88,7 +88,8 @@ class BatchProcessor {
    * @param {Array<string>} categoriesToAdd - Categories to add
    * @param {Array<string>} categoriesToRemove - Categories to remove
    * @returns {Promise<Array>} Preview of changes
-   */  async previewChanges(files, categoriesToAdd, categoriesToRemove) {
+   */
+  async previewChanges(files, categoriesToAdd, categoriesToRemove) {
     const previews = [];
 
     for (const file of files) {

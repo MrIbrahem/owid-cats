@@ -85,4 +85,67 @@ describe('Validator', () => {
       expect(Validator.sanitizeInput('')).toBe('');
     });
   });
+
+  describe('normalizeCategoryName', () => {
+    test('should remove Category: prefix', () => {
+      expect(Validator.normalizeCategoryName('Category:Test')).toBe('Test');
+    });
+
+    test('should convert underscores to spaces', () => {
+      expect(Validator.normalizeCategoryName('Test_Category')).toBe('Test Category');
+    });
+
+    test('should handle both prefix and underscores', () => {
+      expect(Validator.normalizeCategoryName('Category:Test_Category')).toBe('Test Category');
+    });
+
+    test('should trim whitespace', () => {
+      expect(Validator.normalizeCategoryName('  Test Category  ')).toBe('Test Category');
+    });
+
+    test('should handle empty input', () => {
+      expect(Validator.normalizeCategoryName('')).toBe('');
+      expect(Validator.normalizeCategoryName(null)).toBe('');
+      expect(Validator.normalizeCategoryName(undefined)).toBe('');
+    });
+  });
+
+  describe('isCircularCategory', () => {
+    test('should detect exact match', () => {
+      expect(Validator.isCircularCategory('Test', 'Test')).toBe(true);
+    });
+
+    test('should detect match with underscores vs spaces', () => {
+      expect(Validator.isCircularCategory('Our_World_in_Data_graphs_of_Afghanistan', 'Our World in Data graphs of Afghanistan')).toBe(true);
+    });
+
+    test('should detect match with Category: prefix', () => {
+      expect(Validator.isCircularCategory('Category:Test', 'Test')).toBe(true);
+      expect(Validator.isCircularCategory('Test', 'Category:Test')).toBe(true);
+      expect(Validator.isCircularCategory('Category:Test', 'Category:Test')).toBe(true);
+    });
+
+    test('should detect match with mixed formats', () => {
+      expect(Validator.isCircularCategory('Category:Our_World_in_Data_graphs_of_Afghanistan', 'Our World in Data graphs of Afghanistan')).toBe(true);
+      expect(Validator.isCircularCategory('Our World in Data graphs of Afghanistan', 'Category:Our_World_in_Data_graphs_of_Afghanistan')).toBe(true);
+    });
+
+    test('should be case-insensitive', () => {
+      expect(Validator.isCircularCategory('TEST', 'test')).toBe(true);
+      expect(Validator.isCircularCategory('Test Category', 'test_category')).toBe(true);
+    });
+
+    test('should return false for different categories', () => {
+      expect(Validator.isCircularCategory('Category A', 'Category B')).toBe(false);
+      expect(Validator.isCircularCategory('Test', 'Another Test')).toBe(false);
+    });
+
+    test('should handle empty input', () => {
+      expect(Validator.isCircularCategory('', '')).toBe(false);
+      expect(Validator.isCircularCategory('Test', '')).toBe(false);
+      expect(Validator.isCircularCategory('', 'Test')).toBe(false);
+      expect(Validator.isCircularCategory(null, 'Test')).toBe(false);
+      expect(Validator.isCircularCategory('Test', null)).toBe(false);
+    });
+  });
 });

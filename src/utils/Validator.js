@@ -27,7 +27,6 @@ class Validator {
     if (!pattern || typeof pattern !== 'string') return false;
     return pattern.trim().length > 0;
   }
-
   /**
    * Sanitize user input to prevent injection
    * @param {string} input - Raw user input
@@ -36,6 +35,34 @@ class Validator {
   static sanitizeInput(input) {
     if (!input || typeof input !== 'string') return '';
     return input.trim();
+  }
+
+  /**
+   * Normalize category name for comparison (remove prefix, convert underscores to spaces)
+   * @param {string} categoryName - Category name to normalize
+   * @returns {string} Normalized category name
+   */
+  static normalizeCategoryName(categoryName) {
+    if (!categoryName || typeof categoryName !== 'string') return '';
+    return categoryName
+      .replace(/^Category:/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+  }
+
+  /**
+   * Check if a category is trying to add itself (circular reference)
+   * @param {string} currentCategory - The category being edited
+   * @param {string} categoryToAdd - The category to be added
+   * @returns {boolean} True if circular reference detected
+   */
+  static isCircularCategory(currentCategory, categoryToAdd) {
+    if (!currentCategory || !categoryToAdd) return false;
+    
+    const normalizedCurrent = this.normalizeCategoryName(currentCategory);
+    const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
+    
+    return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
   }
 }
 

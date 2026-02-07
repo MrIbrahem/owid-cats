@@ -89,7 +89,14 @@ class PreviewHandler {
     showPreviewModal(preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
-
+        if (!modal) {
+            console.error('[CBM-P] Preview modal container not found');
+            return;
+        }
+        if (!content) {
+            console.error('[CBM-P] Preview content container not found');
+            return;
+        }
         let html = '<table class="cbm-preview-table">';
         html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
 
@@ -110,6 +117,7 @@ class PreviewHandler {
         const changesCount = preview.filter(p => p.willChange).length;
 
         if (changesCount === 0) {
+            console.log('[CBM-P] No changes detected');
             this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
             return;
         }

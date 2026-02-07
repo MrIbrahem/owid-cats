@@ -1661,7 +1661,14 @@ class PreviewHandler {
     showPreviewModal(preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
-
+        if (!modal) {
+            console.error('[CBM-P] Preview modal container not found');
+            return;
+        }
+        if (!content) {
+            console.error('[CBM-P] Preview content container not found');
+            return;
+        }
         let html = '<table class="cbm-preview-table">';
         html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
 
@@ -1682,6 +1689,7 @@ class PreviewHandler {
         const changesCount = preview.filter(p => p.willChange).length;
 
         if (changesCount === 0) {
+            console.log('[CBM-P] No changes detected');
             this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
             return;
         }
@@ -2223,7 +2231,10 @@ class CategoryBatchManagerUI {
      */
     showMessage(text, type) {
         const messageContainer = document.getElementById('cbm-results-message');
-        if (!messageContainer) return;
+        if (!messageContainer) {
+            console.error('[CBM] Message container not found');
+            return;
+        }
         const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
         messageContainer.innerHTML = `
       <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
@@ -2351,10 +2362,6 @@ class CategoryBatchManagerUI {
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
         }
-    }
-
-    hideLoading() {
-        // Content will be replaced by renderFileList or showMessage
     }
 
     /**

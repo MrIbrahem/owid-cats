@@ -1467,9 +1467,7 @@ class CategoryBatchManagerUI {
               </button>
             </div>
           </div>
-        </div>
-
-        <div class="cbm-results">
+        </div>        <div class="cbm-results">
           <div id="cbm-results-header" class="cbm-results-header hidden">
             <div class="cdx-info-chip cdx-info-chip--notice">
               <span class="cdx-info-chip__text">
@@ -1485,6 +1483,7 @@ class CategoryBatchManagerUI {
               Deselect All
             </button>
           </div>
+          <div id="cbm-results-message"></div>
           <div id="cbm-file-list"></div>
         </div>
 
@@ -1609,7 +1608,7 @@ class CategoryBatchManagerUI {
         this.hidePreviewModal();
       }
     });
-  }async handleSearch() {
+  } async handleSearch() {
     const pattern = document.getElementById('cbm-pattern').value.trim();
     const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
@@ -1623,6 +1622,7 @@ class CategoryBatchManagerUI {
       return;
     }
 
+    this.clearMessage();
     this.showLoading();
 
     try {
@@ -1637,26 +1637,36 @@ class CategoryBatchManagerUI {
       this.renderFileList();
       this.hideLoading();
 
-      UsageLogger.logSearch(pattern, files.length);    } catch (error) {
+      UsageLogger.logSearch(pattern, files.length);
+    } catch (error) {
       this.hideLoading();
       this.showMessage(`Error searching files: ${error.message}`, 'error');
     }
   }
-
   /**
    * Display a Codex CSS-only message banner above the file list.
    * @param {string} text - Message text
    * @param {string} type - One of 'notice', 'warning', 'error', 'success'
    */
   showMessage(text, type) {
-    const listContainer = document.getElementById('cbm-file-list');
-    if (!listContainer) return;
+    const messageContainer = document.getElementById('cbm-results-message');
+    if (!messageContainer) return;
     const ariaAttr = type === 'error' ? 'role="alert"' : 'aria-live="polite"';
-    listContainer.innerHTML = `
+    messageContainer.innerHTML = `
       <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
         <span class="cdx-message__icon"></span>
         <div class="cdx-message__content">${text}</div>
       </div>`;
+  }
+
+  /**
+   * Clear any displayed messages
+   */
+  clearMessage() {
+    const messageContainer = document.getElementById('cbm-results-message');
+    if (messageContainer) {
+      messageContainer.innerHTML = '';
+    }
   }
 
   renderFileList() {
@@ -1673,7 +1683,7 @@ class CategoryBatchManagerUI {
     countElement.textContent = this.state.files.length;
     headerElement.classList.remove('hidden');
 
-    listContainer.innerHTML = '';    this.state.files.forEach((file, index) => {
+    listContainer.innerHTML = ''; this.state.files.forEach((file, index) => {
       const fileRow = document.createElement('div');
       fileRow.className = 'cbm-file-row';
       fileRow.dataset.index = index;
@@ -1760,7 +1770,7 @@ class CategoryBatchManagerUI {
   }
 
   async handlePreview() {
-    const selectedFiles = this.getSelectedFiles();    if (selectedFiles.length === 0) {
+    const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
       this.showMessage('No files selected.', 'warning');
       return;
     }
@@ -1901,10 +1911,9 @@ class CategoryBatchManagerUI {
     document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
     document.getElementById('cbm-progress-text').textContent =
       `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.failed} failed)`;
-  }
-  showResults(results) {
-    const listContainer = document.getElementById('cbm-file-list');
-    if (!listContainer) return;
+  } showResults(results) {
+    const messageContainer = document.getElementById('cbm-results-message');
+    if (!messageContainer) return;
 
     const type = results.failed > 0 ? 'warning' : 'success';
     let errorsHtml = '';
@@ -1915,7 +1924,7 @@ class CategoryBatchManagerUI {
     }
 
     const ariaAttr = type === 'warning' ? 'aria-live="polite"' : 'aria-live="polite"';
-    listContainer.innerHTML = `
+    messageContainer.innerHTML = `
       <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
         <span class="cdx-message__icon"></span>
         <div class="cdx-message__content">

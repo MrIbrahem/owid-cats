@@ -1,36 +1,27 @@
 const CategoryInputs = require('../../src/ui/components/CategoryInputs');
 
 // Mock DOM elements
-function createMockElement(id, value) {
-  const element = {
-    id,
-    value,
-    className: 'cdx-text-input__input'
-  };
-  return element;
-}
+const mockElements = {
+  'cbm-add-cats': { id: 'cbm-add-cats', value: '', className: 'cdx-text-input__input' },
+  'cbm-remove-cats': { id: 'cbm-remove-cats', value: '', className: 'cdx-text-input__input' },
+  'cbm-summary': { id: 'cbm-summary', value: 'Batch category update via Category Batch Manager', className: 'cdx-text-input__input' }
+};
 
 // Mock document.getElementById
 global.document = {
-  getElementById: (id) => {
-    const elements = {
-      'cbm-add-cats': createMockElement('cbm-add-cats', ''),
-      'cbm-remove-cats': createMockElement('cbm-remove-cats', ''),
-      'cbm-summary': createMockElement('cbm-summary', 'Batch category update via Category Batch Manager')
-    };
-    return elements[id] || null;
-  }
+  getElementById: (id) => mockElements[id] || null
 };
 
 describe('CategoryInputs', () => {
   let categoryInputs;
 
   beforeEach(() => {
+    // Reset input values before each test
+    mockElements['cbm-add-cats'].value = '';
+    mockElements['cbm-remove-cats'].value = '';
+    mockElements['cbm-summary'].value = 'Batch category update via Category Batch Manager';
+
     categoryInputs = new CategoryInputs();
-    // Reset input values
-    global.document.getElementById('cbm-add-cats').value = '';
-    global.document.getElementById('cbm-remove-cats').value = '';
-    global.document.getElementById('cbm-summary').value = 'Batch category update via Category Batch Manager';
   });
 
   describe('constructor', () => {
@@ -94,7 +85,7 @@ describe('CategoryInputs', () => {
     });
 
     test('should return parsed categories', () => {
-      global.document.getElementById('cbm-add-cats').value = 'Category:Belarus, Test';
+      mockElements['cbm-add-cats'].value = 'Category:Belarus, Test';
       expect(categoryInputs.getCategoriesToAdd()).toEqual(['Category:Belarus', 'Category:Test']);
     });
   });
@@ -105,7 +96,7 @@ describe('CategoryInputs', () => {
     });
 
     test('should return parsed categories', () => {
-      global.document.getElementById('cbm-remove-cats').value = 'Category:Old, Another';
+      mockElements['cbm-remove-cats'].value = 'Category:Old, Another';
       expect(categoryInputs.getCategoriesToRemove()).toEqual(['Category:Old', 'Category:Another']);
     });
   });
@@ -116,33 +107,35 @@ describe('CategoryInputs', () => {
     });
 
     test('should return custom summary', () => {
-      global.document.getElementById('cbm-summary').value = 'Custom summary';
+      mockElements['cbm-summary'].value = 'Custom summary';
       expect(categoryInputs.getEditSummary()).toBe('Custom summary');
     });
 
     test('should return empty string when input is missing', () => {
+      const originalGetElementById = global.document.getElementById;
       global.document.getElementById = () => null;
       expect(categoryInputs.getEditSummary()).toBe('');
+      global.document.getElementById = originalGetElementById;
     });
   });
 
   describe('clear', () => {
     test('should clear add categories input', () => {
-      global.document.getElementById('cbm-add-cats').value = 'Category:Test';
+      mockElements['cbm-add-cats'].value = 'Category:Test';
       categoryInputs.clear();
-      expect(global.document.getElementById('cbm-add-cats').value).toBe('');
+      expect(mockElements['cbm-add-cats'].value).toBe('');
     });
 
     test('should clear remove categories input', () => {
-      global.document.getElementById('cbm-remove-cats').value = 'Category:Old';
+      mockElements['cbm-remove-cats'].value = 'Category:Old';
       categoryInputs.clear();
-      expect(global.document.getElementById('cbm-remove-cats').value).toBe('');
+      expect(mockElements['cbm-remove-cats'].value).toBe('');
     });
 
     test('should reset summary to default', () => {
-      global.document.getElementById('cbm-summary').value = 'Custom summary';
+      mockElements['cbm-summary'].value = 'Custom summary';
       categoryInputs.clear();
-      expect(global.document.getElementById('cbm-summary').value).toBe('Batch category update via Category Batch Manager');
+      expect(mockElements['cbm-summary'].value).toBe('Batch category update via Category Batch Manager');
     });
   });
 
@@ -167,9 +160,9 @@ describe('CategoryInputs', () => {
   describe('destroy', () => {
     test('should set widgets to null', () => {
       // Mock widgets with destroy method
-      categoryInputs.addCategoriesWidget = { destroy: jest.fn() };
-      categoryInputs.removeCategoriesWidget = { destroy: jest.fn() };
-      categoryInputs.summaryWidget = { destroy: jest.fn() };
+      categoryInputs.addCategoriesWidget = { destroy: () => {} };
+      categoryInputs.removeCategoriesWidget = { destroy: () => {} };
+      categoryInputs.summaryWidget = { destroy: () => {} };
 
       categoryInputs.destroy();
 
@@ -179,14 +172,15 @@ describe('CategoryInputs', () => {
     });
 
     test('should call destroy on widgets', () => {
-      const destroyMock = jest.fn();
+      let destroyCallCount = 0;
+      const destroyMock = () => { destroyCallCount++; };
       categoryInputs.addCategoriesWidget = { destroy: destroyMock };
       categoryInputs.removeCategoriesWidget = { destroy: destroyMock };
       categoryInputs.summaryWidget = { destroy: destroyMock };
 
       categoryInputs.destroy();
 
-      expect(destroyMock).toHaveBeenCalledTimes(3);
+      expect(destroyCallCount).toBe(3);
     });
 
     test('should handle null widgets gracefully', () => {

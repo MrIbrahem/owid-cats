@@ -57,23 +57,33 @@ class ValidationHelper {
     }
 
     /**
-     * Check for circular category references
+     * Check for circular category references and filter them out
      * @param {Array<string>} categoriesToAdd - Categories to check for circular references
-     * @returns {boolean} True if validation passes, false if circular reference detected
+     * @returns {Array<string>} Filtered categories without circular ones
      */
-    checkCircularCategories(categoriesToAdd) {
+    filterCircularCategories(categoriesToAdd) {
         const sourceCategory = this.ui.state.sourceCategory;
+        const circularCategories = [];
+        const validCategories = [];
+
         for (const category of categoriesToAdd) {
             if (Validator.isCircularCategory(sourceCategory, category)) {
                 console.log('[CBM-V] Circular category detected:', category);
-                this.ui.showMessage(
-                    `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
-                    'error'
-                );
-                return false;
+                circularCategories.push(category);
+            } else {
+                validCategories.push(category);
             }
         }
-        return true;
+
+        // Show warning if circular categories were found
+        if (circularCategories.length > 0) {
+            this.ui.showMessage(
+                `⚠️ Removed circular categorie(s) that cannot be added: ${circularCategories.join(', ')}. Continuing with ${validCategories.length} valid categorie(s).`,
+                'warning'
+            );
+        }
+
+        return validCategories;
     }
 
     /**
@@ -87,11 +97,19 @@ class ValidationHelper {
         const categoryInputs = this.parseCategoryInputs();
         if (!categoryInputs) return null;
 
-        if (!this.checkCircularCategories(categoryInputs.toAdd)) return null;
+        // Filter out circular categories instead of failing
+        const filteredToAdd = this.filterCircularCategories(categoryInputs.toAdd);
+
+        // Check if there are any valid operations remaining
+        if (filteredToAdd.length === 0 && categoryInputs.toRemove.length === 0) {
+            console.log('[CBM-V] No valid categories after filtering');
+            this.ui.showMessage('No valid categories to add or remove after filtering circular references.', 'warning');
+            return null;
+        }
 
         return {
             selectedFiles,
-            toAdd: categoryInputs.toAdd,
+            toAdd: filteredToAdd,
             toRemove: categoryInputs.toRemove
         };
     }

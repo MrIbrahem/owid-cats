@@ -8,24 +8,21 @@ const mockElements = {
 };
 
 // Mock document
-const createdElements = [];
 global.document = {
   getElementById: (id) => mockElements[id] || null,
   createElement: (tagName) => {
-    const element = {
+    let _innerHTML = '';
+    return {
       tagName,
       className: '',
       id: '',
-      innerHTML: '',
+      get innerHTML() { return _innerHTML; },
+      set innerHTML(value) { _innerHTML = value; },
       children: [],
       childNodes: [],
       querySelectorAll: () => [],
-      appendChild: (child) => {
-        element.children.push(child);
-        createdElements.push(child);
-      }
+      appendChild: (child) => {}
     };
-    return element;
   }
 };
 
@@ -162,15 +159,18 @@ describe('CategoryInputs', () => {
       expect(element.className).toBe('cbm-actions');
     });
 
-    test('should create three input fields', () => {
+    test('should create innerHTML with input fields', () => {
       const element = categoryInputs.createElement();
-      expect(element.children.length).toBe(3);
+      expect(element.innerHTML).toContain('cbm-add-cats');
+      expect(element.innerHTML).toContain('cbm-remove-cats');
+      expect(element.innerHTML).toContain('cbm-summary');
     });
 
     test('should have correct field labels', () => {
       const element = categoryInputs.createElement();
-      const labels = element.querySelectorAll('.cdx-label__label__text');
-      expect(labels.length).toBeGreaterThanOrEqual(3);
+      expect(element.innerHTML).toContain('Add Categories');
+      expect(element.innerHTML).toContain('Remove Categories');
+      expect(element.innerHTML).toContain('Edit Summary');
     });
   });
 

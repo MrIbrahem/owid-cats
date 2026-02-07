@@ -6,23 +6,30 @@ All notable changes to this project will be documented in this file.
 
 ### ✨ Enhancements
 
-#### Category Autocomplete
-- **Added autocomplete support for category input fields**
-  - "Add Categories" and "Remove Categories" fields now suggest matching categories as you type
-  - Uses OOUI `ComboBoxInputWidget` for dropdown suggestions
+#### Category Multiselect with Autocomplete
+- **Added multiselect support for category input fields**
+  - "Add Categories" and "Remove Categories" now use `OO.ui.MenuTagMultidget`
+  - Users can select multiple categories with visual tags/chips
+  - Real-time category suggestions as you type (300ms debounce)
   - Searches MediaWiki API (opensearch) for category matches
-  - 300ms debounce delay to avoid excessive API calls
-  - Automatically adds "Category:" prefix to suggestions
-  - Falls back to plain text inputs if OOUI is not available
+  - Maximum 10 categories per field
+  - Tags can be removed by clicking the × button
+  - **Fallback:** If `MenuTagMultidget` is not available, uses `ComboBoxInputWidget`
+  - **Features:**
+    - `allowArbitrary: false` - Only selections from menu are allowed
+    - `allowEditTags: false` - Tags cannot be edited after selection
+    - `filterFromInput: true` - Menu filters based on input
   - **New methods in CategoryInputs:**
-    - `_createAutocompleteWidget()` - Creates OOUI combobox with search
-    - `_setupAutocompleteSearch()` - Configures debounced search handler
-    - `_searchCategories()` - Queries MediaWiki API for category suggestions
-    - `getEditSummary()` - Returns the edit summary text
-    - `clear()` - Clears all input fields
-    - `destroy()` - Cleanup method for widget disposal
-  - **Enhanced `parseCategories()`** - Now handles null/undefined input safely
-  - **New test file:** `tests/unit/CategoryInputs.test.js` - 30+ tests
+    - `_createMultiselectWidget()` - Creates MenuTagMultidget with search
+    - `_setupMultiselectSearch()` - Configures debounced search for multiselect
+    - `_searchCategoriesForMultiselect()` - Queries API and updates menu options
+    - `_createComboBoxWidget()` - Fallback to ComboBoxInputWidget
+    - `_searchCategoriesForCombobox()` - Fallback search for combobox
+    - `_initComboBoxWidgets()` - Initializes fallback widgets
+  - **Updated methods:**
+    - `getCategoriesToAdd()` - Returns array from multiselect items
+    - `getCategoriesToRemove()` - Returns array from multiselect items
+    - `clear()` - Clears items using `clearItems()` for multiselect
 
 #### Skipped Files Tracking
 - **Added separate tracking for files with no changes**

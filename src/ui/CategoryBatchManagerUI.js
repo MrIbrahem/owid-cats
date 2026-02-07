@@ -35,6 +35,7 @@ class CategoryBatchManagerUI {
         this.createUI();
         this.attachEventListeners();
     }
+
     createUI() {
         // Create reopen button
         const reopenBtn = document.createElement('button');
@@ -54,6 +55,7 @@ class CategoryBatchManagerUI {
             this.reopenModal();
         });
     }
+
     buildContainer() {
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
@@ -219,6 +221,7 @@ class CategoryBatchManagerUI {
 
         return div;
     }
+
     attachEventListeners() {
         document.getElementById('cbm-search-btn').addEventListener('click', () => {
             this.handleSearch();
@@ -261,7 +264,9 @@ class CategoryBatchManagerUI {
                 this.hidePreviewModal();
             }
         });
-    } async handleSearch() {
+    }
+
+    async handleSearch() {
         // إذا كان البحث جارياً، أوقفه
         if (this.state.isSearching) {
             this.stopSearch();
@@ -355,6 +360,7 @@ class CategoryBatchManagerUI {
     hideSearchProgress() {
         // Content will be replaced by renderFileList
     }
+
     /**
      * Display a Codex CSS-only message banner above the file list.
      * @param {string} text - Message text
@@ -479,7 +485,9 @@ class CategoryBatchManagerUI {
             .map(cat => cat.trim())
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-    } async handlePreview() {
+    }
+
+    async handlePreview() {
         console.log('[CBM] Preview button clicked');
         const selectedFiles = this.getSelectedFiles();
         console.log('[CBM] Selected files:', selectedFiles);
@@ -537,7 +545,10 @@ class CategoryBatchManagerUI {
                 this.showMessage(`Error generating preview: ${error.message}`, 'error');
             }
         }
-    } showPreviewModal(preview) {
+    }
+
+
+    showPreviewModal(preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
 
@@ -574,7 +585,10 @@ class CategoryBatchManagerUI {
     hidePreviewModal() {
         const modal = document.getElementById('cbm-preview-modal');
         modal.classList.add('hidden');
-    } async handleExecute() {
+    }
+
+
+    async handleExecute() {
         console.log('[CBM] GO button clicked');
         const selectedFiles = this.getSelectedFiles();
         console.log('[CBM] Selected files:', selectedFiles);
@@ -719,7 +733,9 @@ class CategoryBatchManagerUI {
             // إخفاء زر الإيقاف
             if (stopBtn) stopBtn.style.display = 'none';
         }
-    } showProgress() {
+    }
+
+    showProgress() {
         document.getElementById('cbm-progress').classList.remove('hidden');
     }
 
@@ -730,7 +746,9 @@ class CategoryBatchManagerUI {
         document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
         document.getElementById('cbm-progress-text').textContent =
             `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
-    } showResults(results) {
+    }
+
+    showResults(results) {
         const messageContainer = document.getElementById('cbm-results-message');
         if (!messageContainer) return;
 
@@ -756,6 +774,8 @@ class CategoryBatchManagerUI {
         </div>
       </div>`;
     }
+
+
     showLoading() {
         const listContainer = document.getElementById('cbm-file-list');
         if (listContainer) {
@@ -765,7 +785,9 @@ class CategoryBatchManagerUI {
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
         }
-    } hideLoading() {
+    }
+
+    hideLoading() {
         // Content will be replaced by renderFileList or showMessage
     }
 
@@ -824,7 +846,9 @@ class CategoryBatchManagerUI {
         const reopenBtn = document.getElementById('cbm-reopen-btn');
         if (modal) modal.style.display = 'flex';
         if (reopenBtn) reopenBtn.style.display = 'none';
-    } async close() {
+    }
+
+    async close() {
         const confirmed = await this.showConfirmDialog(
             'Are you sure you want to close? Any unsaved changes will be lost.',
             {

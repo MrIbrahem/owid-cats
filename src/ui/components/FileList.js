@@ -1,5 +1,6 @@
 /**
- * File list UI component
+ * File list UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class FileList
  */
 class FileList {
@@ -11,7 +12,7 @@ class FileList {
   }
 
   /**
-   * Render the file list
+   * Render the file list using Codex CdxCheckbox CSS-only pattern.
    * @param {Array} files - Files to display
    */
   render(files) {
@@ -20,7 +21,11 @@ class FileList {
     const headerElement = document.getElementById('cbm-results-header');
 
     if (files.length === 0) {
-      listContainer.innerHTML = '<p>No files found matching the pattern.</p>';
+      listContainer.innerHTML = `
+        <div class="cdx-message cdx-message--block cdx-message--notice" aria-live="polite">
+          <span class="cdx-message__icon"></span>
+          <div class="cdx-message__content">No files found matching the pattern.</div>
+        </div>`;
       headerElement.classList.add('hidden');
       return;
     }
@@ -36,10 +41,22 @@ class FileList {
       fileRow.dataset.index = index;
 
       fileRow.innerHTML = `
-        <input type="checkbox" class="cbm-file-checkbox" 
-               id="file-${index}" checked>
-        <label for="file-${index}">${file.title}</label>
-        <button class="cbm-remove-btn" data-index="${index}">&#215;</button>
+        <div class="cdx-checkbox cbm-file-checkbox-wrapper">
+          <div class="cdx-checkbox__wrapper">
+            <input id="file-${index}" class="cdx-checkbox__input cbm-file-checkbox"
+                   type="checkbox" checked>
+            <span class="cdx-checkbox__icon"></span>
+            <div class="cdx-checkbox__label cdx-label">
+              <label for="file-${index}" class="cdx-label__label">
+                <span class="cdx-label__label__text">${file.title}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button class="cdx-button cdx-button--action-destructive cdx-button--weight-quiet cdx-button--size-medium cbm-remove-btn"
+                data-index="${index}" aria-label="Remove file">
+          &#215;
+        </button>
       `;
 
       listContainer.appendChild(fileRow);

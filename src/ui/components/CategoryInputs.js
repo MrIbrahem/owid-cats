@@ -1,30 +1,61 @@
 /**
- * Category inputs UI component
+ * Category inputs UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class CategoryInputs
  */
 class CategoryInputs {
   /**
-   * Create the category inputs HTML element
+   * Create the category inputs HTML element with Codex components.
+   * Uses CdxField, CdxTextInput CSS-only patterns.
    * @returns {HTMLElement} The inputs element
    */
   createElement() {
     const div = document.createElement('div');
     div.className = 'cbm-actions';
     div.innerHTML = `
-      <div class="cbm-input-group">
-        <label>Add Categories (comma-separated):</label>
-        <input type="text" id="cbm-add-cats" placeholder="Category:Example">
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-add-cats">
+            <span class="cdx-label__label__text">Add Categories (comma-separated)</span>
+          </label>
+          <span class="cdx-label__description">
+            e.g., Category:Belarus, Category:Europe
+          </span>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-add-cats" class="cdx-text-input__input" type="text"
+                   placeholder="Category:Example">
+          </div>
+        </div>
       </div>
-      
-      <div class="cbm-input-group">
-        <label>Remove Categories (comma-separated):</label>
-        <input type="text" id="cbm-remove-cats" placeholder="Category:Old">
+
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-remove-cats">
+            <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
+          </label>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-remove-cats" class="cdx-text-input__input" type="text"
+                   placeholder="Category:Old">
+          </div>
+        </div>
       </div>
-      
-      <div class="cbm-input-group">
-        <label>Edit Summary:</label>
-        <input type="text" id="cbm-summary" 
-               value="Batch category update via Category Batch Manager">
+
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-summary">
+            <span class="cdx-label__label__text">Edit Summary</span>
+          </label>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-summary" class="cdx-text-input__input" type="text"
+                   value="Batch category update via Category Batch Manager">
+          </div>
+        </div>
       </div>
     `;
     return div;

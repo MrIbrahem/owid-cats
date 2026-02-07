@@ -1,5 +1,6 @@
 /**
- * Progress bar UI component
+ * Progress bar UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class ProgressBar
  */
 class ProgressBar {
@@ -20,7 +21,9 @@ class ProgressBar {
   }
 
   /**
-   * Update the progress bar
+   * Update the progress bar.
+   * Note: Codex CdxProgressBar is indeterminate only (CSS-only).
+   * We keep the custom fill bar for determinate progress alongside Codex styling.
    * @param {number} percentage - Progress percentage (0-100)
    * @param {Object} results - Current results
    */

@@ -1441,6 +1441,8 @@ class ProgressBar {
  * @description
  * Main UI class for the Category Batch Manager tool.
  * Manages the user interface, file selection, and batch operations.
+ * 
+ * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
 
@@ -1640,9 +1642,7 @@ class CategoryBatchManagerUI {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div id="cbm-preview-modal" class="cbm-modal hidden">
+            </div>            <div id="cbm-preview-modal" class="cbm-modal hidden">
                 <div class="cbm-modal-content">
                     <h3>Preview Changes</h3>
                     <div id="cbm-preview-content"></div>
@@ -2027,9 +2027,7 @@ class CategoryBatchManagerUI {
                 );
                 return;
             }
-        }
-
-        // Check for duplicate categories before execution
+        }        // Check for duplicate categories before execution
         try {
             await this.batchProcessor.previewChanges(
                 selectedFiles,
@@ -2043,21 +2041,22 @@ class CategoryBatchManagerUI {
                 this.showMessage(`Error: ${error.message}`, 'error');
             }
             return;
-        }
-
-        // Show a confirmation message and require a second click on GO
+        }        // Show confirmation dialog
         const confirmMsg =
-            `About to update ${selectedFiles.length} file(s). ` +
-            `Add: ${toAdd.join(', ') || 'none'}. ` +
-            `Remove: ${toRemove.join(', ') || 'none'}. ` +
-            'Click GO again to confirm.';
+            `You are about to update ${selectedFiles.length} file(s).\n\n` +
+            `Categories to add: ${toAdd.length > 0 ? toAdd.join(', ') : 'none'}\n` +
+            `Categories to remove: ${toRemove.length > 0 ? toRemove.join(', ') : 'none'}\n\n` +
+            'Do you want to proceed?';
 
-        if (!this._executeConfirmed) {
-            this.showMessage(confirmMsg, 'notice');
-            this._executeConfirmed = true;
+        const confirmed = await this.showConfirmDialog(confirmMsg, {
+            title: 'Confirm Batch Update',
+            confirmLabel: 'Proceed',
+            cancelLabel: 'Cancel'
+        });
+
+        if (!confirmed) {
             return;
         }
-        this._executeConfirmed = false;
 
         this.state.isProcessing = true;
         this.state.processAbortController = new AbortController();
@@ -2176,6 +2175,42 @@ class CategoryBatchManagerUI {
         // Content will be replaced by renderFileList or showMessage
     }
 
+    /**
+     * Show a confirmation dialog using MediaWiki's OO.ui.confirm
+     * @param {string} message - Dialog message
+     * @param {Object} options - Dialog options
+     * @returns {Promise<boolean>} True if confirmed, false if cancelled
+     */
+    async showConfirmDialog(message, options = {}) {
+        const title = options.title || 'Confirm';
+
+        return new Promise((resolve) => {
+            if (typeof OO === 'undefined' || !OO.ui || !OO.ui.confirm) {
+                // Fallback to native confirm if OO.ui is not available
+                resolve(confirm(message));
+                return;
+            }
+
+            OO.ui.confirm(message, {
+                title: title,
+                actions: [
+                    {
+                        action: 'accept',
+                        label: options.confirmLabel || 'Confirm',
+                        flags: ['primary', 'progressive']
+                    },
+                    {
+                        action: 'reject',
+                        label: options.cancelLabel || 'Cancel',
+                        flags: 'safe'
+                    }
+                ]
+            }).done((confirmed) => {
+                resolve(confirmed);
+            });
+        });
+    }
+
     minimizeModal() {
         const modal = document.getElementById('category-batch-manager');
         const reopenBtn = document.getElementById('cbm-reopen-btn');
@@ -2195,10 +2230,17 @@ class CategoryBatchManagerUI {
         const reopenBtn = document.getElementById('cbm-reopen-btn');
         if (modal) modal.style.display = 'flex';
         if (reopenBtn) reopenBtn.style.display = 'none';
-    }
+    } async close() {
+        const confirmed = await this.showConfirmDialog(
+            'Are you sure you want to close? Any unsaved changes will be lost.',
+            {
+                title: 'Close Category Batch Manager',
+                confirmLabel: 'Close',
+                cancelLabel: 'Cancel'
+            }
+        );
 
-    close() {
-        if (confirm('Are you sure you want to close? Unsaved changes will be lost.')) {
+        if (confirmed) {
             const el = document.getElementById('category-batch-manager');
             const reopenBtn = document.getElementById('cbm-reopen-btn');
             if (el) el.remove();

@@ -30,12 +30,11 @@ class BatchProcessor {
       onProgress = () => {},
       onFileComplete = () => {},
       onError = () => {}
-    } = callbacks;
-
-    const results = {
+    } = callbacks;    const results = {
       total: files.length,
       processed: 0,
       successful: 0,
+      skipped: 0,
       failed: 0,
       errors: []
     };
@@ -55,8 +54,13 @@ class BatchProcessor {
 
         results.processed++;
         if (result.success) {
-          results.successful++;
-          onFileComplete(file, true);
+          if (result.modified) {
+            results.successful++;
+            onFileComplete(file, true);
+          } else {
+            results.skipped++;
+            onFileComplete(file, false);
+          }
         }
 
         // Update progress

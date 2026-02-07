@@ -57,14 +57,13 @@ class CategoryBatchManagerUI {
         reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
-        // Create main container
-        const container = this.buildContainer();
-        document.body.appendChild(container);
-
         // Append SearchPanel element
         const searchContainer = document.getElementById('cbm-search-container');
         const searchPanelElement = this.searchPanel.createElement(this.state.sourceCategory);
-        searchContainer.appendChild(searchPanelElement);
+
+        // Create main container
+        const container = this.buildContainer(searchPanelElement);
+        document.body.appendChild(container);
 
         // Add reopen button listener
         reopenBtn.addEventListener('click', () => {
@@ -72,7 +71,7 @@ class CategoryBatchManagerUI {
         });
     }
 
-    buildContainer() {
+    buildContainer(searchPanelElement) {
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
         div.className = 'cbm-container';
@@ -93,7 +92,7 @@ class CategoryBatchManagerUI {
                 <div class="cbm-main-layout">
                     <!-- Left Panel: Search and Actions -->
                     <div class="cbm-left-panel">
-                        <div id="cbm-search-container"></div>
+                        ${searchPanelElement.outerHTML}
                         <div id="cbm-results-message" class="hidden"></div>
 
                         <div class="cbm-actions">

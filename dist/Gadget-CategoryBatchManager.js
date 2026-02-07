@@ -190,7 +190,7 @@ class WikitextParser {
     let match;
 
     while ((match = categoryRegex.exec(wikitext)) !== null) {
-      matches.push(`Category:${match[1].trim()}`);
+      matches.push(`Category:${this.normalize(match[1].trim())}`);
     }
 
     return matches;
@@ -1097,6 +1097,39 @@ class BatchProcessor {
 
     return results;
   }
+
+  /**
+   * Normalize category name for comparison
+   * @param {string} categoryName - Category name to normalize
+   * @returns {string} Normalized category name
+   */
+  normalizeCategoryName(categoryName) {
+    return Validator.normalizeCategoryName(categoryName);
+  }
+
+  /**
+   * Check if a category exists in a list (with normalization)
+   * @param {string} category - Category to find
+   * @param {Array<string>} categoryList - List to search in
+   * @returns {number} Index of the category in the list, or -1 if not found
+   */
+  findCategoryIndex(category, categoryList) {
+    const normalized = this.normalizeCategoryName(category);
+    return categoryList.findIndex(cat => {
+      return this.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
+    });
+  }
+
+  /**
+   * Check if category exists in a list (with normalization)
+   * @param {string} category - Category to check
+   * @param {Array<string>} categoryList - List to search in
+   * @returns {boolean} True if category exists in the list
+   */
+  categoryExists(category, categoryList) {
+    return this.findCategoryIndex(category, categoryList) !== -1;
+  }
+
   /**
    * Preview changes without actually editing
    * @param {Array} files - Files to preview
@@ -1110,9 +1143,9 @@ class BatchProcessor {
     for (const file of files) {
       const current = file.currentCategories || [];
 
-      // Check if trying to add categories that already exist (only if we're adding categories)
+      // Check if trying to add categories that already exist (with normalization)
       if (categoriesToAdd.length > 0) {
-        const duplicateCategories = categoriesToAdd.filter(cat => current.includes(cat));
+        const duplicateCategories = categoriesToAdd.filter(cat => this.categoryExists(cat, current));
         if (duplicateCategories.length > 0) {
           throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
         }
@@ -1120,15 +1153,15 @@ class BatchProcessor {
 
       const after = [...current];
 
-      // Simulate removal
+      // Simulate removal (with normalization for matching)
       categoriesToRemove.forEach(cat => {
-        const index = after.indexOf(cat);
+        const index = this.findCategoryIndex(cat, after);
         if (index > -1) after.splice(index, 1);
       });
 
-      // Simulate addition
+      // Simulate addition (with normalization for checking duplicates)
       categoriesToAdd.forEach(cat => {
-        if (!after.includes(cat)) after.push(cat);
+        if (!this.categoryExists(cat, after)) after.push(cat);
       });
 
       previews.push({

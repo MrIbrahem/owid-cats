@@ -5,6 +5,17 @@ global.RateLimiter = class {
   async wait() { return Promise.resolve(); }
 };
 
+// Mock Validator
+global.Validator = {
+  normalizeCategoryName: (categoryName) => {
+    if (!categoryName || typeof categoryName !== 'string') return '';
+    return categoryName
+      .replace(/^Category:/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+  }
+};
+
 describe('BatchProcessor', () => {
   let processor;
   let mockCategoryService;

@@ -24,7 +24,7 @@ const SOURCE_FILES = [
   'src/ui/components/FileList.js',
   'src/ui/components/CategoryInputs.js',
   'src/ui/components/ProgressBar.js',
-  'src/main.js',
+  'src/ui/CategoryBatchManagerUI.js',
   'src/gadget-entry.js',
 ];
 

@@ -1,13 +1,9 @@
 /**
- * Category Batch Manager for Wikimedia Commons
- *
- * @version 1.0.0
- * @license MIT
+ * Category Batch Manager UI
  *
  * @description
- * A tool for batch categorization of files in Wikimedia Commons.
- * Allows filtering files by pattern and applying category changes
- * to multiple files at once.
+ * Main UI class for the Category Batch Manager tool.
+ * Manages the user interface, file selection, and batch operations.
  */
 
 /* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator */

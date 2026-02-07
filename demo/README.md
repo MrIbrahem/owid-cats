@@ -348,8 +348,8 @@ Edit `css.css` or add inline styles:
 npm run build
 
 # Output:
-# - dist/Gadget-CategoryBatchManager.js
-# - dist/Gadget-CategoryBatchManager.css
+# - demo/Gadget-CategoryBatchManager.js
+# - demo/Gadget-CategoryBatchManager.css
 ```
 
 ### File Sources:
@@ -365,21 +365,21 @@ npm run build
 ## 🔗 Quick Links
 
 ### Preview Files:
-- [index.html](index.html) - Landing page ⭐
-- [modal.html](modal.html) - Interactive preview 🎯
-- [demo.html](demo.html) - Advanced demo 🎮
-- [guide.html](guide.html) - Usage guide 📖
+- [index.html](../demo/index.html) - Landing page ⭐
+- [modal.html](../demo/modal.html) - Interactive preview 🎯
+- [demo.html](../demo/demo.html) - Advanced demo 🎮
+- [guide.html](../demo/guide.html) - Usage guide 📖
 
 ### Documentation:
 - [README_PREVIEW.md](README_PREVIEW.md) - Preview docs
 - [COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md) - Summary
-- [../docs/](../docs/) - Full documentation
+- [../docs/](../docs) - Full documentation
 - [../README.md](../README.md) - Project README
 - [../CHANGELOG.md](../CHANGELOG.md) - Changelog
 
 ### Production:
-- [Gadget-CategoryBatchManager.js](Gadget-CategoryBatchManager.js)
-- [Gadget-CategoryBatchManager.css](Gadget-CategoryBatchManager.css)
+- [Gadget-CategoryBatchManager.js](../demo/Gadget-CategoryBatchManager.js)
+- [Gadget-CategoryBatchManager.css](../demo/Gadget-CategoryBatchManager.css)
 
 ---
 
@@ -424,7 +424,7 @@ npm run build
 
 ## 🎉 Summary
 
-This `dist/` folder contains everything you need:
+This `demo/` folder contains everything you need:
 
 ✅ **Production files** ready for deployment
 ✅ **Interactive preview** for testing

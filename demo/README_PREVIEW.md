@@ -13,7 +13,7 @@
 ### 1️⃣ فتح المعاينة
 افتح ملف `modal.html` مباشرة في المتصفح:
 ```
-file:///path/to/owid-cats/dist/modal.html
+file:///path/to/owid-cats/demo/modal.html
 ```
 
 أو استخدم Live Server في VS Code.
@@ -156,7 +156,7 @@ const mockFiles = [
 | البيانات | Mock data | MediaWiki API |
 | التنفيذ | Simulation | فعلي على Commons |
 | الأنماط | Codex CSS | Codex CSS |
-| JavaScript | مضمن في HTML | مجمّع في dist/js.js |
+| JavaScript | مضمن في HTML | مجمّع في demo/js.js |
 | التفاعلية | ✅ كاملة | ✅ كاملة |
 | الحفظ | ❌ لا يحفظ | ✅ يحفظ فعلياً |
 

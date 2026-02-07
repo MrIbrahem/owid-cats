@@ -241,8 +241,8 @@ currentCategories: ['YourCategory1', 'YourCategory2']
 ### ✅ للاستخدام الفعلي:
 استخدم الملفات المجمعة:
 ```
-dist/Gadget-CategoryBatchManager.js
-dist/Gadget-CategoryBatchManager.css
+demo/Gadget-CategoryBatchManager.js
+demo/Gadget-CategoryBatchManager.css
 ```
 
 ---
@@ -284,10 +284,10 @@ dist/Gadget-CategoryBatchManager.css
 ## 📞 الدعم
 
 ### موارد مفيدة:
-- 📖 [guide.html](guide.html) - دليل الاستخدام الكامل
+- 📖 [guide.html](../demo/guide.html) - دليل الاستخدام الكامل
 - 📄 [README_PREVIEW.md](README_PREVIEW.md) - التوثيق التقني
-- 🏠 [index.html](index.html) - الصفحة الرئيسية
-- 📚 [../docs/](../docs/) - التوثيق الشامل
+- 🏠 [index.html](../demo/index.html) - الصفحة الرئيسية
+- 📚 [../docs/](../docs) - التوثيق الشامل
 
 ### للمساعدة:
 - راجع console في المتصفح للأخطاء

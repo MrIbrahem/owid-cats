@@ -123,6 +123,7 @@ class CategoryBatchManagerUI {
                         <div id="cbm-results-message" class="hidden"></div>
 
                         <div class="cbm-actions">
+
                             <div class="cdx-field">
                                 <div class="cdx-label">
                                     <label class="cdx-label__label" for="cbm-add-cats">

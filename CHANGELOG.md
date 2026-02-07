@@ -105,12 +105,11 @@ All notable changes to this project will be documented in this file.
 
 ### 📝 Documentation
 - Updated `CHANGELOG.md` - This file
-- Added `docs/NORMALIZATION_BUG_FIX.md` - Detailed bug fix documentation
 - Added `docs/API_USAGE_GUIDE.md` - Comprehensive API usage guide
-- Added `docs/FILE_LIST_PERSISTENCE_FIX.md` - Detailed fix documentation
-- Added `docs/MODAL_FIX.md` - Modal behavior fix documentation
-- Added `docs/QUICK_FIX_SUMMARY.md` - Quick reference for fixes
-- Updated `EXAMPLES.md` with new API method examples
+- Added `docs/VISUAL_GUIDE.md` - Visual before/after guide for fixes
+- Added `docs/DEPLOYMENT_CHECKLIST.md` - Pre-deployment verification checklist
+- Updated `docs/EXAMPLES.md` with new API method examples
+- Updated `docs/QUICK_REFERENCE.md` with new features
 
 ### 🧪 Testing
 - Added tests for `getCurrentCategories()` method

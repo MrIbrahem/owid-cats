@@ -625,6 +625,7 @@ class CategoryBatchManagerUI {
                 return;
             }
         }
+
         // Check for duplicate categories before execution
         try {
             console.log('[CBM] Calling batchProcessor.previewChanges (pre-execute validation)');

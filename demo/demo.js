@@ -52,8 +52,11 @@ function attachEventListeners() {
     document.getElementById('cbm-execute').addEventListener('click', handleExecute);
 
     // Close buttons
-    document.getElementById('cbm-close').addEventListener('click', close);
+    document.getElementById('cbm-close').addEventListener('click', closeModal);
     document.getElementById('cbm-preview-close').addEventListener('click', hidePreviewModal);
+
+    // Reopen button
+    document.getElementById('cbm-reopen-btn').addEventListener('click', reopenModal);
 
     // Close modal when clicking outside
     document.getElementById('cbm-preview-modal').addEventListener('click', function (e) {
@@ -357,4 +360,14 @@ function close() {
     if (confirm('Are you sure you want to close? Unsaved changes will be lost.')) {
         document.getElementById('category-batch-manager').style.display = 'none';
     }
+}
+
+function closeModal() {
+    document.getElementById('category-batch-manager').style.display = 'none';
+    document.getElementById('cbm-reopen-btn').style.display = 'block';
+}
+
+function reopenModal() {
+    document.getElementById('category-batch-manager').style.display = 'flex';
+    document.getElementById('cbm-reopen-btn').style.display = 'none';
 }

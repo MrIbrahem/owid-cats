@@ -8,7 +8,7 @@
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler */
+/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper */
 
 class CategoryBatchManagerUI {
     constructor() {
@@ -17,7 +17,8 @@ class CategoryBatchManagerUI {
         this.categoryService = new CategoryService(this.apiService);
         this.batchProcessor = new BatchProcessor(this.categoryService);
 
-        // Initialize handlers
+        // Initialize helpers and handlers
+        this.validationHelper = new ValidationHelper(this);
         this.searchHandler = new SearchHandler(this);
         this.previewHandler = new PreviewHandler(this);
         this.executeHandler = new ExecuteHandler(this);

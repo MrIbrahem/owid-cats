@@ -5,10 +5,10 @@
  * Handles all preview-related functionality for CategoryBatchManagerUI.
  * Manages preview generation, modal display, and validation.
  *
- * @requires Validator - For checking circular category references
+ * @requires ValidationHelper - For common validation logic
  */
 
-/* global Validator */
+/* global ValidationHelper */
 
 class PreviewHandler {
     /**
@@ -16,6 +16,7 @@ class PreviewHandler {
      */
     constructor(ui) {
         this.ui = ui;
+        this.validator = new ValidationHelper(ui);
     }
 
     /**
@@ -23,56 +24,27 @@ class PreviewHandler {
      * Generates and displays a preview of category changes
      */
     async handlePreview() {
-        console.log('[CBM] Preview button clicked');
-        const selectedFiles = this.ui.getSelectedFiles();
-        console.log('[CBM] Selected files:', selectedFiles);
-        if (selectedFiles.length === 0) {
-            console.log('[CBM] No files selected');
-            this.ui.showMessage('No files selected.', 'warning');
-            return;
-        }
+        console.log('[CBM-P] Preview button clicked');
 
-        const toAdd = this.ui.parseCategories(
-            document.getElementById('cbm-add-cats').value
-        );
-        const toRemove = this.ui.parseCategories(
-            document.getElementById('cbm-remove-cats').value
-        );
-        console.log('[CBM] Categories to add:', toAdd);
-        console.log('[CBM] Categories to remove:', toRemove);
+        // Use ValidationHelper for common validation
+        const validation = this.validator.validateBatchOperation();
+        if (!validation) return;
 
-        if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM] No categories specified');
-            this.ui.showMessage('Please specify categories to add or remove.', 'warning');
-            return;
-        }
-
-        // Check for circular category reference
-        const sourceCategory = this.ui.state.sourceCategory;
-        for (const category of toAdd) {
-            if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM] Circular category detected:', category);
-                this.ui.showMessage(
-                    `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
-                    'error'
-                );
-                return;
-            }
-        }
+        const { selectedFiles, toAdd, toRemove } = validation;
 
         // Generate preview without affecting file list - no loading indicator
         try {
-            console.log('[CBM] Calling batchProcessor.previewChanges');
+            console.log('[CBM-P] Calling batchProcessor.previewChanges');
             const preview = await this.ui.batchProcessor.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
             );
-            console.log('[CBM] Preview result:', preview);
+            console.log('[CBM-P] Preview result:', preview);
             this.showPreviewModal(preview);
 
         } catch (error) {
-            console.log('[CBM] Error in previewChanges:', error);
+            console.log('[CBM-P] Error in previewChanges:', error);
             // Check if error is about duplicate categories
             if (error.message.includes('already exist')) {
                 this.ui.showMessage(`⚠️ ${error.message}`, 'warning');

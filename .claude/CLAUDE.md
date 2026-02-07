@@ -1,36 +1,36 @@
-# تعليمات للمطورين والـ AI Assistants
+# Instructions for Developers and AI Assistants
 
-## 📋 نظرة عامة
+## 📋 Overview
 
-هذا المشروع هو **Category Batch Manager** - أداة لإدارة التصنيفات الجماعية في Wikimedia Commons.
+This project is **Category Batch Manager** - a tool for batch category management in Wikimedia Commons.
 
 ---
 
-## 🚨 قواعد مهمة
+## 🚨 Important Rules
 
-### 1. التوثيق
-**❌ لا تنشئ ملفات توثيق جديدة بشكل عشوائي!**
+### 1. Documentation
+**❌ Don't create new documentation files randomly!**
 
-استخدم الملفات الموجودة:
-- `CHANGELOG.md` - لتوثيق جميع التغييرات والميزات الجديدة
-- `README.md` - للوصف العام والاستخدام الأساسي
-- `docs/PROJECT_STATUS.md` - لحالة المشروع والمهام
-- `docs/API_USAGE_GUIDE.md` - لتوثيق الـ API
-- `docs/DEPLOYMENT.md` - لتعليمات النشر
+Use existing files:
+- `CHANGELOG.md` - for documenting all changes and new features
+- `README.md` - for general description and basic usage
+- `docs/PROJECT_STATUS.md` - for project status and tasks
+- `docs/API_USAGE_GUIDE.md` - for API documentation
+- `docs/DEPLOYMENT.md` - for deployment instructions
 
-**✅ إذا احتجت ملف جديد:**
-- اسأل أولاً
-- ضعه في مجلد `docs/`
-- وثقه في `PROJECT_STATUS.md`
+**✅ If you need a new file:**
+- Ask first
+- Place it in the `docs/` folder
+- Document it in `PROJECT_STATUS.md`
 
-### 2. الاختبارات
-**✅ دائماً:**
-- اكتب اختبارات لأي كود جديد
-- شغل الاختبارات قبل الـ commit: `npm test`
-- تأكد من التغطية: `npm test -- --coverage`
-- الهدف: 90%+ تغطية
+### 2. Tests
+**✅ Always:**
+- Write tests for any new code
+- Run tests before commit: `npm test`
+- Check coverage: `npm test -- --coverage`
+- Goal: 90%+ coverage
 
-**📍 أماكن الاختبارات:**
+**📍 Test locations:**
 ```
 tests/unit/
   ├── APIService.test.js
@@ -42,192 +42,192 @@ tests/unit/
   └── CategoryNormalization.test.js
 ```
 
-### 3. البناء والنشر
-**⚠️ قبل النشر:**
+### 3. Build and Deployment
+**⚠️ Before deployment:**
 ```bash
-# 1. شغل الاختبارات
+# 1. Run tests
 npm test
 
-# 2. ابني المشروع
+# 2. Build the project
 npm run build
 
-# 3. تأكد من ملف dist/Gadget-CategoryBatchManager.js
+# 3. Verify dist/Gadget-CategoryBatchManager.js file
 ```
 
-**📦 الملفات المبنية:**
+**📦 Built files:**
 - `dist/Gadget-CategoryBatchManager.js` - JavaScript bundle
 - `dist/Gadget-CategoryBatchManager.css` - CSS bundle
 
-### 4. هيكل الكود
+### 4. Code Structure
 
 ```
 src/
-├── utils/           # أدوات مساعدة (Validator, WikitextParser, Logger)
-├── services/        # خدمات API (APIService, CategoryService, FileService)
-├── models/          # نماذج البيانات
+├── utils/           # Helper utilities (Validator, WikitextParser, Logger)
+├── services/        # API services (APIService, CategoryService, FileService)
+├── models/          # Data models
 ├── ui/
-│   ├── components/  # مكونات الواجهة
+│   ├── components/  # UI components
 │   └── styles/      # CSS
-├── main.js          # الواجهة الرئيسية
-└── gadget-entry.js  # نقطة الدخول
+├── main.js          # Main interface
+└── gadget-entry.js  # Entry point
 ```
 
-**⚠️ ترتيب التحميل مهم!** راجع `build.js`
+**⚠️ Load order is important!** Check `build.js`
 
 ---
 
-## 🎯 الميزات الحالية
+## 🎯 Current Features
 
-### 1. تطبيع التصنيفات (Normalization)
-- MediaWiki يعامل المسافات والشرطات السفلية بنفس الطريقة
+### 1. Category Normalization
+- MediaWiki treats spaces and underscores the same way
 - `Our_World_in_Data` = `Our World in Data`
-- الكود يجب أن يتعامل مع كلا الشكلين
+- Code must handle both formats
 
-### 2. كشف التصنيف الدائري (Circular Category)
-- منع إضافة تصنيف لنفسه
+### 2. Circular Category Detection
+- Prevent adding a category to itself
 - `Validator.isCircularCategory(current, toAdd)`
-- يتحقق مع التطبيع والـ prefix
+- Checks with normalization and prefix
 
-### 3. البحث والفلترة
-- البحث في تصنيف معين
-- فلترة حسب نمط (pattern)
-- دعم regex في البحث
+### 3. Search and Filtering
+- Search within a specific category
+- Filter by pattern
+- Regex support in search
 
-### 4. العمليات الجماعية
-- إضافة/إزالة تصنيفات لملفات متعددة
-- معاينة قبل التنفيذ
-- شريط تقدم
-- معالجة الأخطاء
-
----
-
-## 🐛 المشاكل المعروفة المحلولة
-
-### ✅ محلولة:
-1. ~~اختفاء قائمة الملفات بعد GO~~ - تم الإصلاح v1.1.1
-2. ~~مشاكل في إغلاق modal المعاينة~~ - تم الإصلاح v1.1.1
-3. ~~عدم دعم المسافات في أسماء التصنيفات~~ - تم الإصلاح v1.1.1
-4. ~~التصنيف الدائري~~ - تم الإصلاح v1.1.1
+### 4. Batch Operations
+- Add/remove categories for multiple files
+- Preview before execution
+- Progress bar
+- Error handling
 
 ---
 
-## 📝 كيفية إضافة ميزة جديدة
+## 🐛 Known Issues - Resolved
 
-### الخطوات:
-1. **خطط:**
-   - اكتب وصف للميزة
-   - حدد الملفات المتأثرة
-   - خطط للاختبارات
+### ✅ Resolved:
+1. ~~File list disappearing after GO~~ - Fixed v1.1.1
+2. ~~Preview modal close issues~~ - Fixed v1.1.1
+3. ~~Spaces in category names not supported~~ - Fixed v1.1.1
+4. ~~Circular category~~ - Fixed v1.1.1
 
-2. **اكتب الكود:**
-   - ابدأ بالـ utils/services إذا لزم
-   - ثم الـ UI
-   - اتبع نمط الكود الموجود
+---
 
-3. **اكتب الاختبارات:**
-   - أضف ملف test جديد أو وسع موجود
-   - تأكد من تغطية جميع الحالات
-   - شغل `npm test`
+## 📝 How to Add a New Feature
 
-4. **وثق:**
-   - أضف entry في `CHANGELOG.md`
-   - حدث `docs/PROJECT_STATUS.md` إذا لزم
-   - أضف تعليقات في الكود
+### Steps:
+1. **Plan:**
+   - Write feature description
+   - Identify affected files
+   - Plan for tests
 
-5. **ابني:**
+2. **Write code:**
+   - Start with utils/services if needed
+   - Then UI
+   - Follow existing code patterns
+
+3. **Write tests:**
+   - Add new test file or extend existing
+   - Ensure all cases are covered
+   - Run `npm test`
+
+4. **Document:**
+   - Add entry in `CHANGELOG.md`
+   - Update `docs/PROJECT_STATUS.md` if needed
+   - Add comments in code
+
+5. **Build:**
    - `npm run build`
-   - اختبر الملف المبني
+   - Test the built file
 
-### مثال - إضافة validation جديد:
+### Example - Adding new validation:
 
 ```javascript
-// 1. أضف في src/utils/Validator.js
+// 1. Add in src/utils/Validator.js
 static isValidFileName(name) {
   // logic here
 }
 
-// 2. أضف في tests/unit/Validator.test.js
+// 2. Add in tests/unit/Validator.test.js
 describe('isValidFileName', () => {
   test('should accept valid file name', () => {
     expect(Validator.isValidFileName('File:Test.svg')).toBe(true);
   });
 });
 
-// 3. وثق في CHANGELOG.md
+// 3. Document in CHANGELOG.md
 #### File Name Validation
 - Added `Validator.isValidFileName()` method
 - Validates MediaWiki file name format
 - Tests: 5 new tests covering edge cases
 
-// 4. ابني
+// 4. Build
 npm test && npm run build
 ```
 
 ---
 
-## 🔧 أدوات التطوير
+## 🔧 Development Tools
 
-### الأوامر المتاحة:
+### Available commands:
 ```bash
-npm test                    # شغل جميع الاختبارات
-npm test -- --coverage      # مع التغطية
-npm test -- path/to/test    # اختبار محدد
-npm run build               # بناء المشروع
+npm test                    # Run all tests
+npm test -- --coverage      # With coverage
+npm test -- path/to/test    # Specific test
+npm run build               # Build project
 ```
 
-### التحقق من الجودة:
-- ✅ جميع الاختبارات تمر
-- ✅ التغطية 90%+
-- ✅ لا أخطاء في console
-- ✅ الكود مقروء ومعلق
-- ✅ متوافق مع MediaWiki
+### Quality checks:
+- ✅ All tests pass
+- ✅ Coverage 90%+
+- ✅ No console errors
+- ✅ Code is readable and commented
+- ✅ MediaWiki compatible
 
 ---
 
 ## 🌐 MediaWiki API
 
-### استخدم الدوال المحسّنة:
+### Use optimized functions:
 ```javascript
-// ✅ صح
+// ✅ Correct
 const categories = await apiService.getCategories(fileName);
 
-// ❌ خطأ
+// ❌ Wrong
 const categories = await apiService.get({...complex params...});
 ```
 
-### الدوال المتاحة:
-- `apiService.getCategories(title)` - جلب التصنيفات
-- `apiService.editPage(title, transform, options)` - تعديل صفحة
-- `categoryService.getCurrentCategories(fileName)` - التصنيفات الحالية
-- `categoryService.updateCategoriesOptimized(fileName, toAdd, toRemove)` - تحديث محسّن
+### Available functions:
+- `apiService.getCategories(title)` - Fetch categories
+- `apiService.editPage(title, transform, options)` - Edit page
+- `categoryService.getCurrentCategories(fileName)` - Current categories
+- `categoryService.updateCategoriesOptimized(fileName, toAdd, toRemove)` - Optimized update
 
 ---
 
-## 🎨 الواجهة (UI)
+## 🎨 UI
 
-### استخدم Codex CSS:
+### Use Codex CSS:
 ```html
-<!-- ✅ صح -->
+<!-- ✅ Correct -->
 <button class="cdx-button cdx-button--action-progressive">OK</button>
 
-<!-- ❌ خطأ -->
+<!-- ❌ Wrong -->
 <button class="my-custom-button">OK</button>
 ```
 
-### الكلاسات المتاحة:
-- `cdx-button` - أزرار
-- `cdx-field` - حقول الإدخال
-- `cdx-text-input` - مدخلات نصية
-- `cdx-info-chip` - رسائل إعلامية
-- `cdx-progress-bar` - شريط التقدم
+### Available classes:
+- `cdx-button` - Buttons
+- `cdx-field` - Input fields
+- `cdx-text-input` - Text inputs
+- `cdx-info-chip` - Info messages
+- `cdx-progress-bar` - Progress bar
 
-**📖 المرجع:** https://doc.wikimedia.org/codex/latest/
+**📖 Reference:** https://doc.wikimedia.org/codex/latest/
 
 ---
 
-## 🧪 معايير الاختبار
+## 🧪 Testing Standards
 
-### اختبار جيد:
+### Good test:
 ```javascript
 test('should normalize category name with underscores', () => {
   const result = Validator.normalizeCategoryName('Test_Category');
@@ -235,75 +235,75 @@ test('should normalize category name with underscores', () => {
 });
 ```
 
-### تغطي:
-- ✅ الحالة الطبيعية
-- ✅ حالات الخطأ
-- ✅ القيم الحدية (edge cases)
-- ✅ القيم الفارغة/null
+### Covers:
+- ✅ Normal case
+- ✅ Error cases
+- ✅ Edge cases
+- ✅ Empty/null values
 
 ---
 
-## 📊 الإحصائيات الحالية
+## 📊 Current Statistics
 
-- **الإصدار:** 1.1.1
-- **الاختبارات:** 128 passing
-- **التغطية:** 93%
-- **الملفات:** ~20 ملف مصدر
-- **الحجم:** ~50KB minified
-
----
-
-## 🤝 للمساهمين
-
-### قبل الـ Pull Request:
-1. ✅ شغل `npm test`
-2. ✅ تحقق من التغطية
-3. ✅ حدث `CHANGELOG.md`
-4. ✅ اكتب وصف واضح للتغيير
-
-### نمط الكود:
-- استخدم JSDoc للتوثيق
-- سمي المتغيرات بوضوح
-- اتبع النمط الموجود
-- علق الكود المعقد
+- **Version:** 1.1.1
+- **Tests:** 128 passing
+- **Coverage:** 93%
+- **Files:** ~20 source files
+- **Size:** ~50KB minified
 
 ---
 
-## 🆘 حل المشاكل
+## 🤝 For Contributors
 
-### المشكلة: الاختبارات تفشل
+### Before Pull Request:
+1. ✅ Run `npm test`
+2. ✅ Check coverage
+3. ✅ Update `CHANGELOG.md`
+4. ✅ Write clear description of change
+
+### Code style:
+- Use JSDoc for documentation
+- Name variables clearly
+- Follow existing patterns
+- Comment complex code
+
+---
+
+## 🆘 Troubleshooting
+
+### Problem: Tests failing
 ```bash
-# 1. تأكد من dependencies
+# 1. Check dependencies
 npm install
 
-# 2. امسح cache
+# 2. Clear cache
 npm test -- --clearCache
 
-# 3. شغل اختبار محدد
+# 3. Run specific test
 npm test -- tests/unit/Validator.test.js
 ```
 
-### المشكلة: build فاشل
+### Problem: Build failed
 ```bash
-# 1. تحقق من syntax errors
+# 1. Check for syntax errors
 node build.js
 
-# 2. تحقق من ترتيب الملفات في build.js
+# 2. Check file order in build.js
 ```
 
-### المشكلة: لا يعمل في Wikimedia
-- تحقق من console errors
-- تأكد من تحميل mw.Api
-- جرب في sandbox أولاً
+### Problem: Not working in Wikimedia
+- Check console errors
+- Ensure mw.Api is loaded
+- Try in sandbox first
 
 ---
 
-## 📞 اتصل
+## 📞 Contact
 
-- **GitHub Issues:** لتقارير الأخطاء والميزات
-- **Documentation:** راجع `docs/` folder
+- **GitHub Issues:** For bug reports and features
+- **Documentation:** Check `docs/` folder
 
 ---
 
-**آخر تحديث:** 7 فبراير 2026
-**الإصدار:** 1.1.1
+**Last updated:** February 7, 2026
+**Version:** 1.1.1

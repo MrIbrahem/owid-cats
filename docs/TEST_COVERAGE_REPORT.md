@@ -10,9 +10,9 @@
 
 ### Overall Coverage
 ```
-Test Suites: 6 passed, 6 total ✅
-Tests:       98 passed, 98 total ✅
-Time:        0.537 s
+Test Suites: 7 passed, 7 total ✅
+Tests:       116 passed, 116 total ✅ (+18 new normalization tests)
+Time:        ~0.4 s
 ```
 
 ### Code Coverage
@@ -20,15 +20,15 @@ Time:        0.537 s
 ---------------------|---------|----------|---------|---------|-------------------
 File                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ---------------------|---------|----------|---------|---------|-------------------
-All files            |   92.7% |   76.92% |  97.77% |  93.05% |
- services            |  91.28% |   73.07% |  97.22% |  91.75% |
-  APIService.js      |    100% |     87.5% |    100% |    100% | 135,178-186
-  BatchProcessor.js  |    100% |    81.25% |    100% |    100% | 57,99,119
-  CategoryService.js |   75.8% |   61.76% |   87.5% |  77.58% | 113-136,148
-  FileService.js     |  96.15% |       70% |    100% |  95.65% | 81-82
- utils               |    100% |     92.3% |    100% |    100% |
-  Validator.js       |    100% |       95% |    100% |    100% | 42
-  WikitextParser.js  |    100% |    83.33% |    100% |    100% | 98
+All files            |      93% |   77.27% |  97.91% |   93.3% |
+ services            |   91.28% |   73.07% |  97.22% |  91.75% |
+  APIService.js      |     100% |     87.5% |    100% |    100% | 135,178-186
+  BatchProcessor.js  |     100% |    81.25% |    100% |    100% | 57,99,119
+  CategoryService.js |    75.8% |   61.76% |   87.5% |  77.58% | 113-136,148
+  FileService.js     |   96.15% |       70% |    100% |  95.65% | 81-82
+ utils               |     100% |    92.85% |    100% |    100% |
+  Validator.js       |     100% |       95% |    100% |    100% | 42
+  WikitextParser.js  |     100% |     87.5% |    100% |    100% | 119
 ---------------------|---------|----------|---------|---------|-------------------
 ```
 
@@ -102,6 +102,22 @@ All files            |   92.7% |   76.92% |  97.77% |  93.05% |
 - **Tests:** 23
 - **Coverage:** 100% statements
 - All existing functionality preserved
+
+#### CategoryNormalization.test.js (NEW! 🎉)
+- **Tests:** 18
+- **Coverage:** Tests the critical space/underscore normalization bug fix
+- **Status:** All passing ✅
+
+**Test Categories:**
+1. Real-world Afghanistan graphs scenario (3 tests)
+2. Normalization behavior (3 tests)
+3. Edge cases (3 tests)
+4. Edit summary accuracy (3 tests)
+5. Category prefix handling (3 tests)
+6. Case sensitivity (1 test)
+7. Real scenario validation (2 tests)
+
+**Bug Fixed:** Users can now remove/add categories using underscores even when wikitext has spaces (and vice versa), matching MediaWiki behavior.
 
 #### FileService.test.js
 - **Tests:** 10

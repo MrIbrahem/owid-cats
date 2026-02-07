@@ -23,11 +23,11 @@ class PreviewHandler {
      * Generates and displays a preview of category changes
      */
     async handlePreview() {
-        console.log('[CBM-P] Preview button clicked');
+        console.log('[CBM] Preview button clicked');
         const selectedFiles = this.ui.getSelectedFiles();
-        console.log('[CBM-P] Selected files:', selectedFiles);
+        console.log('[CBM] Selected files:', selectedFiles);
         if (selectedFiles.length === 0) {
-            console.log('[CBM-P] No files selected');
+            console.log('[CBM] No files selected');
             this.ui.showMessage('No files selected.', 'warning');
             return;
         }
@@ -38,11 +38,11 @@ class PreviewHandler {
         const toRemove = this.ui.parseCategories(
             document.getElementById('cbm-remove-cats').value
         );
-        console.log('[CBM-P] Categories to add:', toAdd);
-        console.log('[CBM-P] Categories to remove:', toRemove);
+        console.log('[CBM] Categories to add:', toAdd);
+        console.log('[CBM] Categories to remove:', toRemove);
 
         if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM-P] No categories specified');
+            console.log('[CBM] No categories specified');
             this.ui.showMessage('Please specify categories to add or remove.', 'warning');
             return;
         }
@@ -51,7 +51,7 @@ class PreviewHandler {
         const sourceCategory = this.ui.state.sourceCategory;
         for (const category of toAdd) {
             if (Validator.isCircularCategory(sourceCategory, category)) {
-                console.log('[CBM-P] Circular category detected:', category);
+                console.log('[CBM] Circular category detected:', category);
                 this.ui.showMessage(
                     `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
                     'error'
@@ -62,17 +62,17 @@ class PreviewHandler {
 
         // Generate preview without affecting file list - no loading indicator
         try {
-            console.log('[CBM-P] Calling batchProcessor.previewChanges');
+            console.log('[CBM] Calling batchProcessor.previewChanges');
             const preview = await this.ui.batchProcessor.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
             );
-            console.log('[CBM-P] Preview result:', preview);
+            console.log('[CBM] Preview result:', preview);
             this.showPreviewModal(preview);
 
         } catch (error) {
-            console.log('[CBM-P] Error in previewChanges:', error);
+            console.log('[CBM] Error in previewChanges:', error);
             // Check if error is about duplicate categories
             if (error.message.includes('already exist')) {
                 this.ui.showMessage(`⚠️ ${error.message}`, 'warning');
@@ -90,11 +90,11 @@ class PreviewHandler {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
         if (!modal) {
-            console.error('[CBM-P] Preview modal container not found');
+            console.error('[CBM] Preview modal container not found');
             return;
         }
         if (!content) {
-            console.error('[CBM-P] Preview content container not found');
+            console.error('[CBM] Preview content container not found');
             return;
         }
         let html = '<table class="cbm-preview-table">';
@@ -117,7 +117,7 @@ class PreviewHandler {
         const changesCount = preview.filter(p => p.willChange).length;
 
         if (changesCount === 0) {
-            console.log('[CBM-P] No changes detected');
+            console.log('[CBM] No changes detected');
             this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
             return;
         }

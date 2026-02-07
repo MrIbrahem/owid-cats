@@ -1916,7 +1916,7 @@ class CategoryBatchManagerUI {
             .map(cat => cat.trim())
             .filter(cat => cat.length > 0)
             .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
-    } async handlePreview() {
+    }    async handlePreview() {
         const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
             this.showMessage('No files selected.', 'warning');
             return;
@@ -1928,6 +1928,11 @@ class CategoryBatchManagerUI {
         const toRemove = this.parseCategories(
             document.getElementById('cbm-remove-cats').value
         );
+
+        if (toAdd.length === 0 && toRemove.length === 0) {
+            this.showMessage('Please specify categories to add or remove.', 'warning');
+            return;
+        }
 
         // Check for circular category reference
         const sourceCategory = this.state.sourceCategory;
@@ -1959,7 +1964,7 @@ class CategoryBatchManagerUI {
                 this.showMessage(`Error generating preview: ${error.message}`, 'error');
             }
         }
-    } showPreviewModal(preview) {
+    }showPreviewModal(preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
 

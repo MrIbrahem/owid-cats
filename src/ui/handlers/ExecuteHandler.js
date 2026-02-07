@@ -7,9 +7,10 @@
  *
  * @requires ValidationHelper - For common validation logic
  * @requires UsageLogger - For logging batch operations
+ * @requires ProgressBar - For progress display
  */
 
-/* global ValidationHelper, UsageLogger */
+/* global ValidationHelper, UsageLogger, ProgressBar */
 
 class ExecuteHandler {
     /**
@@ -18,6 +19,7 @@ class ExecuteHandler {
     constructor(ui) {
         this.ui = ui;
         this.validator = new ValidationHelper(ui);
+        this.progressBar = new ProgressBar();
     }
 
     /**
@@ -76,7 +78,7 @@ class ExecuteHandler {
 
         // إخفاء أزرار Preview و GO وإظهار زر الإيقاف
         this.toggleProcessButtons(true);
-        this.showProgress();
+        this.progressBar.show();
 
         try {
             console.log('[CBM-E] Calling batchProcessor.processBatch');
@@ -88,7 +90,7 @@ class ExecuteHandler {
                     signal: this.ui.state.processAbortController.signal,
                     onProgress: (progress, results) => {
                         console.log('[CBM-E] Progress:', progress, results);
-                        this.updateProgress(progress, results);
+                        this.progressBar.update(progress, results);
                     },
                     onFileComplete: (file, success) => {
                         console.log(`[CBM-E] File complete: ${file.title}: ${success ? 'success' : 'failed'}`);
@@ -112,7 +114,7 @@ class ExecuteHandler {
             }
         } finally {
             this.ui.state.isProcessing = false;
-            this.hideProgress();
+            this.progressBar.hide();
             this.toggleProcessButtons(false);
         }
     }
@@ -149,31 +151,6 @@ class ExecuteHandler {
             // إخفاء زر الإيقاف
             if (stopBtn) stopBtn.style.display = 'none';
         }
-    }
-
-    /**
-     * Show the progress bar
-     */
-    showProgress() {
-        document.getElementById('cbm-progress').classList.remove('hidden');
-    }
-
-    /**
-     * Hide the progress bar
-     */
-    hideProgress() {
-        document.getElementById('cbm-progress').classList.add('hidden');
-    }
-
-    /**
-     * Update the progress bar and status text
-     * @param {number} percentage - Progress percentage (0-100)
-     * @param {Object} results - Current results object
-     */
-    updateProgress(percentage, results) {
-        document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;
-        document.getElementById('cbm-progress-text').textContent =
-            `Processing: ${results.processed}/${results.total} (${results.successful} successful, ${results.skipped || 0} skipped, ${results.failed} failed)`;
     }
 
     /**

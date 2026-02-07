@@ -134,7 +134,6 @@ class Validator {
     if (!pattern || typeof pattern !== 'string') return false;
     return pattern.trim().length > 0;
   }
-
   /**
    * Sanitize user input to prevent injection
    * @param {string} input - Raw user input
@@ -143,6 +142,34 @@ class Validator {
   static sanitizeInput(input) {
     if (!input || typeof input !== 'string') return '';
     return input.trim();
+  }
+
+  /**
+   * Normalize category name for comparison (remove prefix, convert underscores to spaces)
+   * @param {string} categoryName - Category name to normalize
+   * @returns {string} Normalized category name
+   */
+  static normalizeCategoryName(categoryName) {
+    if (!categoryName || typeof categoryName !== 'string') return '';
+    return categoryName
+      .replace(/^Category:/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+  }
+
+  /**
+   * Check if a category is trying to add itself (circular reference)
+   * @param {string} currentCategory - The category being edited
+   * @param {string} categoryToAdd - The category to be added
+   * @returns {boolean} True if circular reference detected
+   */
+  static isCircularCategory(currentCategory, categoryToAdd) {
+    if (!currentCategory || !categoryToAdd) return false;
+
+    const normalizedCurrent = this.normalizeCategoryName(currentCategory);
+    const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
+
+    return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
   }
 }
 
@@ -1789,7 +1816,6 @@ class CategoryBatchManagerUI {
       .filter(cat => cat.length > 0)
       .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
   }
-
   async handlePreview() {
     const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
       this.showMessage('No files selected.', 'warning');
@@ -1802,6 +1828,18 @@ class CategoryBatchManagerUI {
     const toRemove = this.parseCategories(
       document.getElementById('cbm-remove-cats').value
     );
+
+    // Check for circular category reference
+    const sourceCategory = this.state.sourceCategory;
+    for (const category of toAdd) {
+      if (Validator.isCircularCategory(sourceCategory, category)) {
+        this.showMessage(
+          `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
+          'error'
+        );
+        return;
+      }
+    }
 
     this.showLoading();
 
@@ -1851,8 +1889,7 @@ class CategoryBatchManagerUI {
   hidePreviewModal() {
     const modal = document.getElementById('cbm-preview-modal');
     modal.classList.add('hidden');
-  }
-  async handleExecute() {
+  }  async handleExecute() {
     const selectedFiles = this.getSelectedFiles();
 
     if (selectedFiles.length === 0) {
@@ -1870,6 +1907,18 @@ class CategoryBatchManagerUI {
     if (toAdd.length === 0 && toRemove.length === 0) {
       this.showMessage('Please specify categories to add or remove.', 'warning');
       return;
+    }
+
+    // Check for circular category reference
+    const sourceCategory = this.state.sourceCategory;
+    for (const category of toAdd) {
+      if (Validator.isCircularCategory(sourceCategory, category)) {
+        this.showMessage(
+          `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
+          'error'
+        );
+        return;
+      }
     }
 
     // Show a confirmation message and require a second click on GO

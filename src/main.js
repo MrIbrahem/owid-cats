@@ -389,7 +389,6 @@ class CategoryBatchManagerUI {
       .filter(cat => cat.length > 0)
       .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
   }
-
   async handlePreview() {
     const selectedFiles = this.getSelectedFiles(); if (selectedFiles.length === 0) {
       this.showMessage('No files selected.', 'warning');
@@ -402,6 +401,18 @@ class CategoryBatchManagerUI {
     const toRemove = this.parseCategories(
       document.getElementById('cbm-remove-cats').value
     );
+
+    // Check for circular category reference
+    const sourceCategory = this.state.sourceCategory;
+    for (const category of toAdd) {
+      if (Validator.isCircularCategory(sourceCategory, category)) {
+        this.showMessage(
+          `⚠️ Cannot add category "${category}" to itself. You are trying to add a category to the same category page you're working in.`,
+          'error'
+        );
+        return;
+      }
+    }
 
     this.showLoading();
 

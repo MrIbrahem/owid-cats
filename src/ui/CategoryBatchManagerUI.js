@@ -4,7 +4,7 @@
  * @description
  * Main UI class for the Category Batch Manager tool.
  * Manages the user interface, file selection, and batch operations.
- * 
+ *
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 

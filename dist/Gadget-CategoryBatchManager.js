@@ -2282,8 +2282,8 @@ class CategoryBatchManagerUI {
     );    portletLink.addEventListener('click', function (e) {
       e.preventDefault();
 
-      // Ensure Codex styles and mediawiki.api are loaded, then open the UI
-      mw.loader.using(['@wikimedia/codex', 'mediawiki.api']).then(function () {
+      // Ensure Codex styles, mediawiki.api, and OO.ui are loaded, then open the UI
+      mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'oojs-ui', 'oojs-ui-windows']).then(function () {
         // Check if modal exists and is hidden
         var existingModal = document.getElementById('category-batch-manager');
         var reopenBtn = document.getElementById('cbm-reopen-btn');

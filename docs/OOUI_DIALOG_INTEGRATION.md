@@ -18,7 +18,7 @@
  */
 async showConfirmDialog(message, options = {}) {
     const title = options.title || 'Confirm';
-    
+
     return new Promise((resolve) => {
         if (typeof OO === 'undefined' || !OO.ui || !OO.ui.confirm) {
             // Fallback to native confirm if OO.ui is not available

@@ -12,9 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codex/2.3.2/codex.style.min.css" />
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/codex-design-tokens/2.3.2/theme-wikimedia-ui.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codex-icons/2.3.2/codex-icons.min.js"
-        integrity="sha512-F0ucOfA8MVA4wswXAtmLaGDdJCXtW4gCBKN/KLgrDgTxxZ2Lf+N4SCwT7sWz/KkO/paT37x/JuLuQBrgvLgehw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <!-- <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/codex/2.3.2/codex.min.js"></script> -->
     <style>
         /* زر إعادة الفتح */
@@ -209,8 +207,7 @@
 
                         <div class="cbm-selected-count">
                             Selected: <strong id="cbm-selected">0</strong> files
-                        </div>
-                        <div class="cbm-buttons">
+                        </div>                        <div class="cbm-buttons">
                             <button id="cbm-preview"
                                 class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
                                 Preview Changes
@@ -218,6 +215,10 @@
                             <button id="cbm-execute"
                                 class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
                                 GO
+                            </button>
+                            <button id="cbm-stop" style="display: none;"
+                                class="cdx-button cdx-button--action-destructive cdx-button--weight-primary cdx-button--size-medium">
+                                Stop Process
                             </button>
                         </div>
                     </div>

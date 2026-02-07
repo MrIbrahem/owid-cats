@@ -27,6 +27,10 @@ const mockFiles = [
 ];
 
 let currentFiles = [];
+let isSearching = false;
+let searchTimeout = null;
+let isProcessing = false;
+let processInterval = null;
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', function () {
@@ -50,6 +54,7 @@ function attachEventListeners() {
     // Preview and Execute
     document.getElementById('cbm-preview').addEventListener('click', handlePreview);
     document.getElementById('cbm-execute').addEventListener('click', handleExecute);
+    document.getElementById('cbm-stop').addEventListener('click', stopProcess);
 
     // Minimize and Close buttons
     document.getElementById('cbm-minimize').addEventListener('click', minimizeModal);
@@ -68,13 +73,21 @@ function attachEventListeners() {
 }
 
 function handleSearch() {
+    // إذا كان البحث جارياً، أوقفه
+    if (isSearching) {
+        stopSearch();
+        return;
+    }
+
     const pattern = document.getElementById('cbm-pattern').value.trim();
 
     clearMessage();
-    showLoading();
+    isSearching = true;
+    updateSearchButton(true);
+    showSearchProgress();
 
     // Simulate API delay
-    setTimeout(function () {
+    searchTimeout = setTimeout(function () {
         // Filter files by pattern
         currentFiles = pattern
             ? mockFiles.filter(f => f.title.includes(pattern))
@@ -90,8 +103,51 @@ function handleSearch() {
         }
 
         renderFileList();
-        hideLoading();
-    }, 500);
+        isSearching = false;
+        updateSearchButton(false);
+    }, 1500); // زيادة الوقت لتتمكن من رؤية زر الإيقاف
+}
+
+function stopSearch() {
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+        searchTimeout = null;
+    }
+    isSearching = false;
+    updateSearchButton(false);
+    showMessage('Search cancelled by user.', 'notice');
+
+    // عرض النتائج الحالية إن وجدت
+    if (currentFiles.length > 0) {
+        renderFileList();
+    }
+}
+
+function updateSearchButton(isSearching) {
+    const searchBtn = document.getElementById('cbm-search-btn');
+    if (searchBtn) {
+        if (isSearching) {
+            searchBtn.textContent = 'Stop';
+            searchBtn.className = 'cdx-button cdx-button--action-destructive cdx-button--weight-primary cdx-button--size-medium';
+        } else {
+            searchBtn.textContent = 'Search';
+            searchBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium';
+        }
+    }
+}
+
+function showSearchProgress() {
+    const listContainer = document.getElementById('cbm-file-list');
+    if (listContainer) {
+        listContainer.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; padding: 20px; justify-content: center;">
+                <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar" aria-label="Searching">
+                    <div class="cdx-progress-bar__bar"></div>
+                </div>
+                <span style="color: #54595d;">Searching for files...</span>
+            </div>
+        `;
+    }
 }
 
 function renderFileList() {
@@ -253,21 +309,26 @@ function handleExecute() {
         return;
     }
 
+    isProcessing = true;
+    toggleProcessButtons(true);
     showProgress();
     clearMessage();
 
     // Simulate batch processing
     let processed = 0;
     const total = selectedFiles.length;
-    const interval = setInterval(function () {
+    processInterval = setInterval(function () {
         processed++;
         const percentage = Math.round((processed / total) * 100);
         updateProgress(percentage, { success: processed, failed: 0 });
 
         if (processed >= total) {
-            clearInterval(interval);
+            clearInterval(processInterval);
+            processInterval = null;
             setTimeout(function () {
                 hideProgress();
+                toggleProcessButtons(false);
+                isProcessing = false;
                 showResults({
                     success: processed,
                     failed: 0,
@@ -276,6 +337,37 @@ function handleExecute() {
             }, 500);
         }
     }, 200);
+}
+
+function stopProcess() {
+    if (processInterval) {
+        clearInterval(processInterval);
+        processInterval = null;
+    }
+    isProcessing = false;
+    hideProgress();
+    toggleProcessButtons(false);
+    showMessage('Batch process cancelled by user.', 'warning');
+}
+
+function toggleProcessButtons(isProcessing) {
+    const previewBtn = document.getElementById('cbm-preview');
+    const executeBtn = document.getElementById('cbm-execute');
+    const stopBtn = document.getElementById('cbm-stop');
+
+    if (isProcessing) {
+        // Hide Preview and GO buttons
+        if (previewBtn) previewBtn.style.display = 'none';
+        if (executeBtn) executeBtn.style.display = 'none';
+        // Show Stop button
+        if (stopBtn) stopBtn.style.display = 'block';
+    } else {
+        // Show Preview and GO buttons
+        if (previewBtn) previewBtn.style.display = 'block';
+        if (executeBtn) executeBtn.style.display = 'block';
+        // Hide Stop button
+        if (stopBtn) stopBtn.style.display = 'none';
+    }
 }
 
 function showProgress() {

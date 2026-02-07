@@ -1444,16 +1444,17 @@ class CategoryBatchManagerUI {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
         this.categoryService = new CategoryService(this.apiService);
-        this.batchProcessor = new BatchProcessor(this.categoryService);
-
-        this.state = {
+        this.batchProcessor = new BatchProcessor(this.categoryService);        this.state = {
             sourceCategory: mw.config.get('wgPageName'),
             searchPattern: '',
             files: [],
             selectedFiles: [],
             categoriesToAdd: [],
             categoriesToRemove: [],
-            isProcessing: false
+            isProcessing: false,
+            isSearching: false,
+            searchAbortController: null,
+            processAbortController: null
         };
 
         this.init();
@@ -1587,9 +1588,7 @@ class CategoryBatchManagerUI {
 
                             <div class="cbm-selected-count">
                                 Selected: <strong id="cbm-selected">0</strong> files
-                            </div>
-
-                            <div class="cbm-buttons">
+                            </div>                            <div class="cbm-buttons">
                                 <button id="cbm-preview"
                                     class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
                                     Preview Changes
@@ -1597,6 +1596,10 @@ class CategoryBatchManagerUI {
                                 <button id="cbm-execute"
                                     class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
                                     GO
+                                </button>
+                                <button id="cbm-stop" style="display: none;"
+                                    class="cdx-button cdx-button--action-destructive cdx-button--weight-primary cdx-button--size-medium">
+                                    Stop Process
                                 </button>
                             </div>
                         </div>
@@ -1663,8 +1666,12 @@ class CategoryBatchManagerUI {
 
         document.getElementById('cbm-preview').addEventListener('click', () => {
             this.handlePreview();
-        }); document.getElementById('cbm-execute').addEventListener('click', () => {
+        });        document.getElementById('cbm-execute').addEventListener('click', () => {
             this.handleExecute();
+        });
+
+        document.getElementById('cbm-stop').addEventListener('click', () => {
+            this.stopProcess();
         });
 
         document.getElementById('cbm-minimize').addEventListener('click', () => {
@@ -1686,7 +1693,13 @@ class CategoryBatchManagerUI {
                 this.hidePreviewModal();
             }
         });
-    } async handleSearch() {
+    }    async handleSearch() {
+        // إذا كان البحث جارياً، أوقفه
+        if (this.state.isSearching) {
+            this.stopSearch();
+            return;
+        }
+
         const pattern = document.getElementById('cbm-pattern').value.trim();
         const sourceCategory = document.getElementById('cbm-source-category').value.trim();
 
@@ -1701,25 +1714,78 @@ class CategoryBatchManagerUI {
         }
 
         this.clearMessage();
-        this.showLoading();
+        this.state.isSearching = true;
+        this.state.searchAbortController = new AbortController();
+
+        // تغيير زر البحث إلى زر إيقاف
+        this.updateSearchButton(true);
+        this.showSearchProgress();
 
         try {
             const files = await this.fileService.searchFiles(
                 sourceCategory,
-                pattern
+                pattern,
+                { signal: this.state.searchAbortController.signal }
             );
 
             this.state.files = files;
             this.state.searchPattern = pattern;
             this.state.sourceCategory = sourceCategory;
             this.renderFileList();
-            this.hideLoading();
+            this.hideSearchProgress();
+            this.updateSearchButton(false);
+            this.state.isSearching = false;
 
             UsageLogger.logSearch(pattern, files.length);
         } catch (error) {
-            this.hideLoading();
-            this.showMessage(`Error searching files: ${error.message}`, 'error');
+            this.hideSearchProgress();
+            this.updateSearchButton(false);
+            this.state.isSearching = false;
+
+            if (error.name === 'AbortError') {
+                this.showMessage('Search cancelled by user.', 'notice');
+            } else {
+                this.showMessage(`Error searching files: ${error.message}`, 'error');
+            }
         }
+    }
+
+    stopSearch() {
+        if (this.state.searchAbortController) {
+            this.state.searchAbortController.abort();
+            this.state.searchAbortController = null;
+        }
+    }
+
+    updateSearchButton(isSearching) {
+        const searchBtn = document.getElementById('cbm-search-btn');
+        if (searchBtn) {
+            if (isSearching) {
+                searchBtn.textContent = 'Stop';
+                searchBtn.className = 'cdx-button cdx-button--action-destructive cdx-button--weight-primary cdx-button--size-medium';
+            } else {
+                searchBtn.textContent = 'Search';
+                searchBtn.className = 'cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium';
+            }
+        }
+    }
+
+    showSearchProgress() {
+        const listContainer = document.getElementById('cbm-file-list');
+        if (listContainer) {
+            listContainer.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 20px; justify-content: center;">
+                    <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar" aria-label="Searching">
+                        <div class="cdx-progress-bar__bar"></div>
+                    </div>
+                    <span style="color: #54595d;">Searching for files...</span>
+                </div>
+            `;
+        }
+    }
+
+    hideSearchProgress() {
+        // Content will be replaced by renderFileList
     }
     /**
      * Display a Codex CSS-only message banner above the file list.
@@ -1916,7 +1982,7 @@ class CategoryBatchManagerUI {
     hidePreviewModal() {
         const modal = document.getElementById('cbm-preview-modal');
         modal.classList.add('hidden');
-    } async handleExecute() {
+    }    async handleExecute() {
         const selectedFiles = this.getSelectedFiles();
 
         if (selectedFiles.length === 0) {
@@ -1963,6 +2029,10 @@ class CategoryBatchManagerUI {
         this._executeConfirmed = false;
 
         this.state.isProcessing = true;
+        this.state.processAbortController = new AbortController();
+
+        // إخفاء أزرار Preview و GO وإظهار زر الإيقاف
+        this.toggleProcessButtons(true);
         this.showProgress();
 
         try {
@@ -1971,6 +2041,7 @@ class CategoryBatchManagerUI {
                 toAdd,
                 toRemove,
                 {
+                    signal: this.state.processAbortController.signal,
                     onProgress: (progress, results) => {
                         this.updateProgress(progress, results);
                     },
@@ -1987,21 +2058,49 @@ class CategoryBatchManagerUI {
             this.showResults(results);
 
         } catch (error) {
-            this.showMessage(`Batch process failed: ${error.message}`, 'error');
+            if (error.name === 'AbortError') {
+                this.showMessage('Batch process cancelled by user.', 'warning');
+            } else {
+                this.showMessage(`Batch process failed: ${error.message}`, 'error');
+            }
         } finally {
             this.state.isProcessing = false;
             this.hideProgress();
+            this.toggleProcessButtons(false);
         }
     }
 
-    showProgress() {
+    stopProcess() {
+        if (this.state.processAbortController) {
+            this.state.processAbortController.abort();
+            this.state.processAbortController = null;
+        }
+    }
+
+    toggleProcessButtons(isProcessing) {
+        const previewBtn = document.getElementById('cbm-preview');
+        const executeBtn = document.getElementById('cbm-execute');
+        const stopBtn = document.getElementById('cbm-stop');
+
+        if (isProcessing) {
+            // إخفاء Preview و GO
+            if (previewBtn) previewBtn.style.display = 'none';
+            if (executeBtn) executeBtn.style.display = 'none';
+            // إظهار زر الإيقاف
+            if (stopBtn) stopBtn.style.display = 'block';
+        } else {
+            // إظهار Preview و GO
+            if (previewBtn) previewBtn.style.display = 'block';
+            if (executeBtn) executeBtn.style.display = 'block';
+            // إخفاء زر الإيقاف
+            if (stopBtn) stopBtn.style.display = 'none';
+        }
+    }    showProgress() {
         document.getElementById('cbm-progress').classList.remove('hidden');
-        document.getElementById('cbm-execute').disabled = true;
     }
 
     hideProgress() {
         document.getElementById('cbm-progress').classList.add('hidden');
-        document.getElementById('cbm-execute').disabled = false;
     }
     updateProgress(percentage, results) {
         document.getElementById('cbm-progress-fill').style.width = `${percentage}%`;

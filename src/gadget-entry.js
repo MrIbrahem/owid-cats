@@ -33,10 +33,8 @@
     );
 
     portletLink.addEventListener('click', function (e) {
-      e.preventDefault();
-
-      // Ensure Codex design-system styles are loaded, then open the UI
-      mw.loader.using(['@wikimedia/codex']).then(function () {
+      e.preventDefault();      // Ensure Codex styles and mediawiki.api are loaded, then open the UI
+      mw.loader.using(['@wikimedia/codex', 'mediawiki.api']).then(function () {
         if (!window.categoryBatchManager) {
           window.categoryBatchManager = new CategoryBatchManagerUI();
         }

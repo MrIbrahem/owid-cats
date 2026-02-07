@@ -210,7 +210,10 @@ class ExecuteHandler {
      */
     showResults(results) {
         const messageContainer = document.getElementById('cbm-results-message');
-        if (!messageContainer) return;
+        if (!messageContainer) {
+            console.error('[CBM-E] Message container not found');
+            return;
+        }
 
         const type = results.failed > 0 ? 'warning' : 'success';
         let errorsHtml = '';
@@ -222,17 +225,18 @@ class ExecuteHandler {
 
         const ariaAttr = type === 'warning' ? 'aria-live="polite"' : 'aria-live="polite"';
         messageContainer.innerHTML = `
-      <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
-        <span class="cdx-message__icon"></span>
-        <div class="cdx-message__content">
-          <p><strong>Batch process complete!</strong></p>
-          <p>Total: ${results.total} &mdash;
-             Successful: ${results.successful} &mdash;
-             Skipped: ${results.skipped || 0} &mdash;
-             Failed: ${results.failed}</p>
-          ${errorsHtml}
-        </div>
-      </div>`;
+            <div class="cdx-message cdx-message--block cdx-message--${type}" ${ariaAttr}>
+                <span class="cdx-message__icon"></span>
+                <div class="cdx-message__content">
+                <p><strong>Batch process complete!</strong></p>
+                <p>Total: ${results.total} &mdash;
+                    Successful: ${results.successful} &mdash;
+                    Skipped: ${results.skipped || 0} &mdash;
+                    Failed: ${results.failed}</p>
+                ${errorsHtml}
+                </div>
+            </div>`;
+        messageContainer.classList.remove('hidden');
     }
 }
 

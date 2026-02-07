@@ -115,6 +115,49 @@ class APIService {
   }
 
   /**
+   * Search for categories by prefix.
+   * Uses MediaWiki's opensearch API for category suggestions.
+   * @param {string} prefix - Search prefix (can include or exclude "Category:" prefix)
+   * @param {Object} [options={}] - Search options
+   * @param {number} [options.limit=10] - Maximum results to return
+   * @returns {Promise<Array<string>>} Array of category names with "Category:" prefix
+   */
+  async searchCategories(prefix, options = {}) {
+    const limit = options.limit || 10;
+
+    // Remove "Category:" prefix if present for the search
+    const searchPrefix = prefix.replace(/^Category:/, '');
+
+    const params = {
+      action: 'opensearch',
+      search: `Category:${searchPrefix}`,
+      namespace: 14, // Category namespace
+      limit: limit,
+      format: 'json'
+    };
+
+    try {
+      const data = await this.makeRequest(params);
+      // opensearch returns: [query, [titles], [descriptions], [urls]]
+      // We only need the titles
+      const titles = data[1] || [];
+
+      // Ensure all results have "Category:" prefix and filter to only categories
+      return titles
+        .filter(title => title.startsWith('Category:'))
+        .map(title => {
+          // Preserve the exact format from API (already has Category: prefix)
+          return title;
+        });
+    } catch (error) {
+      if (typeof Logger !== 'undefined') {
+        Logger.error('Failed to search categories', error);
+      }
+      return [];
+    }
+  }
+
+  /**
    * Get categories that a page belongs to.
    * @param {string} title - Page title
    * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found

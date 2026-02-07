@@ -394,4 +394,116 @@ describe('APIService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('searchCategories', () => {
+    test('should search categories by prefix', async () => {
+      mockMwApi.get.mockResolvedValue([
+        'Category:Belarus',
+        ['Category:Belarus', 'Category:Belarusian maps', 'Category:Belarus charts'],
+        [],
+        []
+      ]);
+
+      const result = await service.searchCategories('Bel');
+
+      expect(result).toEqual(['Category:Belarus', 'Category:Belarusian maps', 'Category:Belarus charts']);
+      expect(mockMwApi.get).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'opensearch',
+          search: 'Category:Bel',
+          namespace: 14
+        })
+      );
+    });
+
+    test('should handle prefix with Category: prefix', async () => {
+      mockMwApi.get.mockResolvedValue([
+        'Category:Europe',
+        ['Category:Europe', 'Category:European maps'],
+        [],
+        []
+      ]);
+
+      const result = await service.searchCategories('Category:Eur');
+
+      expect(result).toEqual(['Category:Europe', 'Category:European maps']);
+      expect(mockMwApi.get).toHaveBeenCalledWith(
+        expect.objectContaining({
+          search: 'Category:Eur'
+        })
+      );
+    });
+
+    test('should filter non-category results', async () => {
+      mockMwApi.get.mockResolvedValue([
+        'Category:Test',
+        ['Category:Test', 'File:Test.jpg', 'Category:Test maps'],
+        [],
+        []
+      ]);
+
+      const result = await service.searchCategories('Test');
+
+      expect(result).toEqual(['Category:Test', 'Category:Test maps']);
+    });
+
+    test('should return empty array on error', async () => {
+      mockMwApi.get.mockRejectedValue(new Error('API error'));
+
+      const result = await service.searchCategories('Test');
+
+      expect(result).toEqual([]);
+      expect(global.Logger.error).toHaveBeenCalledWith(
+        'Failed to search categories',
+        expect.any(Error)
+      );
+    });
+
+    test('should handle empty results', async () => {
+      mockMwApi.get.mockResolvedValue([
+        'Category:Test',
+        [],
+        [],
+        []
+      ]);
+
+      const result = await service.searchCategories('NonExistent');
+
+      expect(result).toEqual([]);
+    });
+
+    test('should use custom limit option', async () => {
+      mockMwApi.get.mockResolvedValue([
+        'Category:Test',
+        ['Category:Test'],
+        [],
+        []
+      ]);
+
+      await service.searchCategories('Test', { limit: 20 });
+
+      expect(mockMwApi.get).toHaveBeenCalledWith(
+        expect.objectContaining({
+          limit: 20
+        })
+      );
+    });
+
+    test('should use default limit of 10', async () => {
+      mockMwApi.get.mockResolvedValue([
+        'Category:Test',
+        ['Category:Test'],
+        [],
+        []
+      ]);
+
+      await service.searchCategories('Test');
+
+      expect(mockMwApi.get).toHaveBeenCalledWith(
+        expect.objectContaining({
+          limit: 10
+        })
+      );
+    });
+  });
 });

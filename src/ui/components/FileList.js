@@ -6,9 +6,12 @@
 class FileList {
     /**
      * @param {Function} onSelectionChange - Callback when selection changes
+     * @param {Function} onRemoveFile - Callback when remove button is clicked (receives index)
+     * @constructor
      */
-    constructor(onSelectionChange) {
+    constructor(onSelectionChange, onRemoveFile) {
         this.onSelectionChange = onSelectionChange;
+        this.onRemoveFile = onRemoveFile;
     }
 
     /**
@@ -58,7 +61,7 @@ class FileList {
         document.querySelectorAll('.cbm-remove-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const index = parseInt(e.target.dataset.index);
-                this.removeFile(index);
+                this.onRemoveFile(index);
             });
         });
 
@@ -66,6 +69,9 @@ class FileList {
         document.querySelectorAll('.cbm-file-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', () => {
                 this.updateSelectedCount();
+                if (this.onSelectionChange) {
+                    this.onSelectionChange();
+                }
             });
         });
 

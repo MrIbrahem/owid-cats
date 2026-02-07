@@ -55,13 +55,17 @@ class CategoryBatchManagerUI {
     buildContainer() {
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
-        div.className = 'cbm-container';
-        div.innerHTML = `
+        div.className = 'cbm-container'; div.innerHTML = `
             <div class="cbm-header">
                 <h2>Category Batch Manager</h2>
-                <button
-                    class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
-                    id="cbm-close" aria-label="Close">&#215;</button>
+                <div>
+                    <button
+                        class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only"
+                        id="cbm-minimize" aria-label="Minimize" title="Minimize">−</button>
+                    <button
+                        class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
+                        id="cbm-close" aria-label="Close" title="Close">&#215;</button>
+                </div>
             </div>
 
             <div class="cbm-body">
@@ -228,12 +232,16 @@ class CategoryBatchManagerUI {
 
         document.getElementById('cbm-preview').addEventListener('click', () => {
             this.handlePreview();
+        }); document.getElementById('cbm-execute').addEventListener('click', () => {
+            this.handleExecute();
         });
 
-        document.getElementById('cbm-execute').addEventListener('click', () => {
-            this.handleExecute();
-        }); document.getElementById('cbm-close').addEventListener('click', () => {
-            this.closeModal();
+        document.getElementById('cbm-minimize').addEventListener('click', () => {
+            this.minimizeModal();
+        });
+
+        document.getElementById('cbm-close').addEventListener('click', () => {
+            this.close();
         });
 
         // Preview modal close button
@@ -607,6 +615,13 @@ class CategoryBatchManagerUI {
         // Content will be replaced by renderFileList or showMessage
     }
 
+    minimizeModal() {
+        const modal = document.getElementById('category-batch-manager');
+        const reopenBtn = document.getElementById('cbm-reopen-btn');
+        if (modal) modal.style.display = 'none';
+        if (reopenBtn) reopenBtn.style.display = 'block';
+    }
+
     closeModal() {
         const modal = document.getElementById('category-batch-manager');
         const reopenBtn = document.getElementById('cbm-reopen-btn');
@@ -622,8 +637,12 @@ class CategoryBatchManagerUI {
     }
 
     close() {
-        const el = document.getElementById('category-batch-manager');
-        if (el) el.remove();
+        if (confirm('Are you sure you want to close? Unsaved changes will be lost.')) {
+            const el = document.getElementById('category-batch-manager');
+            const reopenBtn = document.getElementById('cbm-reopen-btn');
+            if (el) el.remove();
+            if (reopenBtn) reopenBtn.remove();
+        }
     }
 }
 

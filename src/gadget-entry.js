@@ -30,12 +30,21 @@
       'Batch Manager',
       'ca-batch-manager',
       'Open Category Batch Manager'
-    );
+    );    portletLink.addEventListener('click', function (e) {
+      e.preventDefault();
 
-    portletLink.addEventListener('click', function (e) {
-      e.preventDefault();      // Ensure Codex styles and mediawiki.api are loaded, then open the UI
+      // Ensure Codex styles and mediawiki.api are loaded, then open the UI
       mw.loader.using(['@wikimedia/codex', 'mediawiki.api']).then(function () {
-        if (!window.categoryBatchManager) {
+        // Check if modal exists and is hidden
+        var existingModal = document.getElementById('category-batch-manager');
+        var reopenBtn = document.getElementById('cbm-reopen-btn');
+
+        if (existingModal && existingModal.style.display === 'none') {
+          // Just show the existing modal
+          existingModal.style.display = 'flex';
+          if (reopenBtn) reopenBtn.style.display = 'none';
+        } else if (!existingModal) {
+          // Create new instance
           window.categoryBatchManager = new CategoryBatchManagerUI();
         }
       });

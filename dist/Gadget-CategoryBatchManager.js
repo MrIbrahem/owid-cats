@@ -1486,13 +1486,17 @@ class CategoryBatchManagerUI {
     buildContainer() {
         const div = document.createElement('div');
         div.id = 'category-batch-manager';
-        div.className = 'cbm-container';
-        div.innerHTML = `
+        div.className = 'cbm-container';        div.innerHTML = `
             <div class="cbm-header">
                 <h2>Category Batch Manager</h2>
-                <button
-                    class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
-                    id="cbm-close" aria-label="Close">&#215;</button>
+                <div>
+                    <button
+                        class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only"
+                        id="cbm-minimize" aria-label="Minimize" title="Minimize">−</button>
+                    <button
+                        class="cdx-button cdx-button--action-default cdx-button--weight-quiet cdx-button--size-medium cdx-button--icon-only cbm-close"
+                        id="cbm-close" aria-label="Close" title="Close">&#215;</button>
+                </div>
             </div>
 
             <div class="cbm-body">
@@ -1659,12 +1663,16 @@ class CategoryBatchManagerUI {
 
         document.getElementById('cbm-preview').addEventListener('click', () => {
             this.handlePreview();
+        });        document.getElementById('cbm-execute').addEventListener('click', () => {
+            this.handleExecute();
         });
 
-        document.getElementById('cbm-execute').addEventListener('click', () => {
-            this.handleExecute();
-        }); document.getElementById('cbm-close').addEventListener('click', () => {
-            this.closeModal();
+        document.getElementById('cbm-minimize').addEventListener('click', () => {
+            this.minimizeModal();
+        });
+
+        document.getElementById('cbm-close').addEventListener('click', () => {
+            this.close();
         });
 
         // Preview modal close button
@@ -2034,8 +2042,15 @@ class CategoryBatchManagerUI {
           <div class="cdx-progress-bar__bar"></div>
         </div>`;
         }
-    } hideLoading() {
+    }    hideLoading() {
         // Content will be replaced by renderFileList or showMessage
+    }
+
+    minimizeModal() {
+        const modal = document.getElementById('category-batch-manager');
+        const reopenBtn = document.getElementById('cbm-reopen-btn');
+        if (modal) modal.style.display = 'none';
+        if (reopenBtn) reopenBtn.style.display = 'block';
     }
 
     closeModal() {
@@ -2053,8 +2068,12 @@ class CategoryBatchManagerUI {
     }
 
     close() {
-        const el = document.getElementById('category-batch-manager');
-        if (el) el.remove();
+        if (confirm('Are you sure you want to close? Unsaved changes will be lost.')) {
+            const el = document.getElementById('category-batch-manager');
+            const reopenBtn = document.getElementById('cbm-reopen-btn');
+            if (el) el.remove();
+            if (reopenBtn) reopenBtn.remove();
+        }
     }
 }
 
@@ -2088,12 +2107,21 @@ class CategoryBatchManagerUI {
       'Batch Manager',
       'ca-batch-manager',
       'Open Category Batch Manager'
-    );
-
-    portletLink.addEventListener('click', function (e) {
-      e.preventDefault();      // Ensure Codex styles and mediawiki.api are loaded, then open the UI
+    );    portletLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      
+      // Ensure Codex styles and mediawiki.api are loaded, then open the UI
       mw.loader.using(['@wikimedia/codex', 'mediawiki.api']).then(function () {
-        if (!window.categoryBatchManager) {
+        // Check if modal exists and is hidden
+        var existingModal = document.getElementById('category-batch-manager');
+        var reopenBtn = document.getElementById('cbm-reopen-btn');
+        
+        if (existingModal && existingModal.style.display === 'none') {
+          // Just show the existing modal
+          existingModal.style.display = 'flex';
+          if (reopenBtn) reopenBtn.style.display = 'none';
+        } else if (!existingModal) {
+          // Create new instance
           window.categoryBatchManager = new CategoryBatchManagerUI();
         }
       });

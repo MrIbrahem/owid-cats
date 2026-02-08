@@ -60,15 +60,15 @@ class FilesList {
     }
 
     // Select all files
-    selectAll() {
-        this.selectedFiles.forEach(file => {
+    selectAll(selectedFiles) {
+        selectedFiles.forEach(file => {
             file.selected = true;
         });
     }
 
     // Deselect all files
-    deselectAll() {
-        this.selectedFiles.forEach(file => {
+    deselectAll(selectedFiles) {
+        selectedFiles.forEach(file => {
             file.selected = false;
         });
     }

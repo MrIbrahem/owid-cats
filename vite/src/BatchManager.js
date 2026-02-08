@@ -18,13 +18,12 @@ function BatchManager(api) {
     const ProgressSectionHtml = progress_section.createElement();
 
     const template = `
-        <div style="max-width: 1200px; margin: 30px auto; padding: 30px; border: 1px solid #a2a9b1; border-radius: 4px; background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h2
-            style="margin-top: 0; margin-bottom: 25px; font-size: 1.5em; color: #202122; border-bottom: 2px solid #0645ad; padding-bottom: 10px;">
+        <div class="cbm-container">
+        <h2 class="cbm-title">
             Category Batch Manager
         </h2>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="cbm-grid">
             <!-- Left Panel: Search and Actions -->
             <div>
                 <!-- Search Section -->
@@ -41,27 +40,25 @@ function BatchManager(api) {
                     ${CategoryInputPanelHtml}
 
                     <div class="margin-bottom-20">
-                        <cdx-label input-id="cbm-summary" style="font-weight: 600; margin-bottom: 5px; display: block;">
+                        <cdx-label input-id="cbm-summary" class="cbm-label">
                             Edit Summary
                         </cdx-label>
                         <cdx-text-input id="cbm-summary" v-model="editSummary" />
                     </div>
 
-                    <div style="margin-bottom: 15px; padding: 10px; background-color: #eaecf0; border-radius: 4px;">
+                    <div class="cbm-selected-info">
                         Selected: <strong>{{ selectedCount }}</strong> files
                     </div>
 
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <cdx-button @click="previewChanges" action="default" weight="normal" style="flex: 1;"
+                    <div class="cbm-button-group">
+                        <cdx-button @click="previewChanges" action="default" weight="normal"
                             :disabled="isProcessing">
                             Preview Changes
                         </cdx-button>
-                        <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary"
-                            style="flex: 1;">
+                        <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary">
                             GO
                         </cdx-button>
-                        <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary"
-                            style="flex: 1;">
+                        <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary">
                             Stop Process
                         </cdx-button>
                     </div>
@@ -78,8 +75,7 @@ function BatchManager(api) {
     </div>
 
     <!-- Message Display -->
-    <div v-if="showMessage"
-        style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 60%; max-width: 600px; z-index: 999;">
+    <div v-if="showMessage" class="cbm-fixed-message">
         <cdx-message :type="messageType" :fade-in="true" :auto-dismiss="messageType === 'success'" :display-time="3000"
             dismiss-button-label="Close" @dismissed="handleMessageDismiss">
             {{ messageContent }}

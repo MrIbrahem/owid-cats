@@ -18,8 +18,8 @@ const SOURCE_FILES = [
     'vue-src/main.js',
 ];
 
-const DIST_DIR = 'vue-dist';
-const OUTPUT_JS = 'vue-dist/Gadget-CategoryBatchManager.js';
+const DIST_DIR = 'dist';
+const OUTPUT_JS = 'dist/Gadget-CategoryBatchManager.js';
 
 /**
  * Strip module.exports blocks from JavaScript code

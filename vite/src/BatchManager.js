@@ -185,15 +185,9 @@ function BatchManager() {
                 }
             },
 
-            /* *************************
-            **      BatchProcessor
-            ** *************************
-            */
-
-            // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
-            previewTheChanges: function () {
-                return this.preview_handler.previewTheChanges(this);
+            handlePreview: function () {
+                return this.preview_handler.handlePreview(this);
             },
 
             /* *************************

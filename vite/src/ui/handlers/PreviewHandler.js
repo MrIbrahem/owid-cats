@@ -18,7 +18,7 @@ class PreviewHandler {
     }
     createElement() {
         return `
-        <cdx-button @click="previewTheChanges" action="default" weight="normal"
+        <cdx-button @click="handlePreview" action="default" weight="normal"
             :disabled="isProcessing">
             Preview Changes
         </cdx-button>
@@ -64,6 +64,18 @@ class PreviewHandler {
     async handlePreview(self) {
         console.log('[CBM-P] Preview button clicked');
 
+        const selectedCount = self.selectedCount;
+
+        if (selectedCount === 0) {
+            self.showWarningMessage('Please select at least one file.');
+            return;
+        }
+
+        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+            self.showWarningMessage('Please specify categories to add or remove.');
+            return;
+        }
+
         // Use ValidationHelper for common validation
         const validation = this.validator.validateBatchOperation(self);
         if (!validation) return;
@@ -73,7 +85,7 @@ class PreviewHandler {
         // Generate preview without affecting file list - no loading indicator
         try {
             console.log('[CBM-P] Calling batchProcessor.previewChanges');
-            const preview = await self.batchProcessor.previewChanges(
+            const preview = await this.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
@@ -144,6 +156,73 @@ class PreviewHandler {
     hidePreviewModal() {
         const modal = document.getElementById('cbm-preview-modal');
         modal.classList.add('hidden');
+    }
+
+    /**
+     * Check if a category exists in a list (with normalization)
+     * @param {string} category - Category to find
+     * @param {Array<string>} categoryList - List to search in
+     * @returns {number} Index of the category in the list, or -1 if not found
+     */
+    findCategoryIndex(category, categoryList) {
+        const normalized = this.validator.normalizeCategoryName(category);
+        return categoryList.findIndex(cat => {
+            return this.validator.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
+        });
+    }
+    /**
+     * Check if category exists in a list (with normalization)
+     * @param {string} category - Category to check
+     * @param {Array<string>} categoryList - List to search in
+     * @returns {boolean} True if category exists in the list
+     */
+    categoryExists(category, categoryList) {
+        return this.findCategoryIndex(category, categoryList) !== -1;
+    }
+
+    /**
+     * Preview changes without actually editing
+     * @param {Array} files - Files to preview
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @returns {Promise<Array>} Preview of changes
+     */
+    async previewChanges(files, categoriesToAdd, categoriesToRemove) {
+        const previews = [];
+
+        for (const file of files) {
+            const current = file.currentCategories || [];
+
+            // Check if trying to add categories that already exist (with normalization)
+            if (categoriesToAdd.length > 0) {
+                const duplicateCategories = categoriesToAdd.filter(cat => this.categoryExists(cat, current));
+                if (duplicateCategories.length > 0) {
+                    throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+                }
+            }
+
+            const after = [...current];
+
+            // Simulate removal (with normalization for matching)
+            categoriesToRemove.forEach(cat => {
+                const index = this.findCategoryIndex(cat, after);
+                if (index > -1) after.splice(index, 1);
+            });
+
+            // Simulate addition (with normalization for checking duplicates)
+            categoriesToAdd.forEach(cat => {
+                if (!this.categoryExists(cat, after)) after.push(cat);
+            });
+
+            previews.push({
+                file: file.title,
+                currentCategories: current,
+                newCategories: after,
+                willChange: JSON.stringify(current) !== JSON.stringify(after)
+            });
+        }
+
+        return previews;
     }
 }
 

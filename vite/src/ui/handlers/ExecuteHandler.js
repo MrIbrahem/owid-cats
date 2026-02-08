@@ -6,7 +6,9 @@
 class ExecuteHandler {
     /**
      */
-    constructor() {
+    constructor(mwApi) {
+        this.categoryService = new CategoryService(mwApi)
+        this.batchProcessor = new BatchProcessor(this.categoryService)
     }
 
     /**

@@ -12,54 +12,6 @@
 (function () {
 'use strict';
 
-// === src/utils/Logger.js ===
-/**
- * Logger utility for debugging and monitoring
- * @class Logger
- */
-class Logger {
-    /**
-     * Log a message at the specified level
-     * @param {string} message - The message to log
-     * @param {string} level - Log level: 'info', 'warn', 'error', 'debug'
-     */
-    static log(message, level = 'info') {
-        const timestamp = new Date().toISOString();
-        const prefix = `[CategoryBatchManager][${level.toUpperCase()}][${timestamp}]`;
-
-        switch (level) {
-            case 'error':
-                console.error(`${prefix} ${message}`);
-                break;
-            case 'warn':
-                console.warn(`${prefix} ${message}`);
-                break;
-            case 'debug':
-                console.debug(`${prefix} ${message}`);
-                break;
-            default:
-                console.log(`${prefix} ${message}`);
-        }
-    }
-
-    /**
-     * Log an error with optional error object
-     * @param {string} message - The error message
-     * @param {Error} error - The error object
-     */
-    static error(message, error) {
-        Logger.log(`${message}: ${error && error.message ? error.message : error}`, 'error');
-    }
-
-    /**
-     * Log a warning
-     * @param {string} message - The warning message
-     */
-    static warn(message) {
-        Logger.log(message, 'warn');
-    }
-}
-
 // === src/utils/RateLimiter.js ===
 /**
  * Rate limiter to prevent API abuse
@@ -298,55 +250,6 @@ class WikitextParser {
     }
 }
 
-// === src/utils/UsageLogger.js ===
-/**
- * Usage logger for monitoring and analytics
- * @class UsageLogger
- */
-class UsageLogger {
-    /**
-     * Log a search operation
-     * @param {string} pattern - Search pattern used
-     * @param {number} resultsCount - Number of results found
-     */
-    static logSearch(pattern, resultsCount) {
-        console.log(`[CBM] Search: "${pattern}" - ${resultsCount} results`);
-    }
-
-    /**
-     * Log a batch operation
-     * @param {number} filesCount - Number of files processed
-     * @param {Array<string>} categoriesAdded - Categories that were added
-     * @param {Array<string>} categoriesRemoved - Categories that were removed
-     */
-    static logBatchOperation(filesCount, categoriesAdded, categoriesRemoved) {
-        console.log(
-            `[CBM] Batch: ${filesCount} files, ` +
-            `+${categoriesAdded.length} -${categoriesRemoved.length} categories`
-        );
-    }
-
-    /**
-     * TODO: use it in the workflow
-     * Log an error
-     * @param {string} context - Where the error occurred
-     * @param {Error} error - The error object
-     */
-    static logError(context, error) {
-        console.error(`[CBM] Error in ${context}:`, error);
-    }
-
-    /**
-     * TODO: use it in the workflow
-     * Log performance metrics
-     * @param {string} operation - Operation name
-     * @param {number} duration - Duration in milliseconds
-     */
-    static logPerformance(operation, duration) {
-        console.log(`[CBM] Performance: ${operation} took ${duration}ms`);
-    }
-}
-
 // === src/models/FileModel.js ===
 /**
  * File model representing a Wikimedia Commons file
@@ -532,9 +435,7 @@ class APIService {
                     return title;
                 });
         } catch (error) {
-            if (typeof Logger !== 'undefined') {
-                Logger.error('Failed to search categories', error);
-            }
+            console.error('Failed to search categories', error);
             return [];
         }
     }
@@ -584,9 +485,7 @@ class APIService {
                 return catStr.replace(/^Category:/, '');
             });
         } catch (error) {
-            if (typeof Logger !== 'undefined') {
-                Logger.error('Failed to get categories', error);
-            }
+            console.error('Failed to get categories', error);
             throw error;
         }
     }
@@ -681,9 +580,8 @@ class APIService {
         try {
             return await this.mwApi.get(params);
         } catch (error) {
-            if (typeof Logger !== 'undefined') {
-                Logger.error('API request failed', error);
-            }
+            console.error('API request failed', error);
+
             throw error;
         }
     }
@@ -1002,110 +900,6 @@ class CategoryService {
         if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
         if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
         return `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`;
-    }
-}
-
-// === src/services/ErrorRecovery.js ===
-/**
- * TODO: use it in the workflow
- * Error recovery system for failed operations
- * @class ErrorRecovery
- */
-class ErrorRecovery {
-    constructor() {
-        this.failedOperations = [];
-        this.loadFromStorage();
-    }
-
-    /**
-     * Record a failed operation
-     * @param {Object} operation - The failed operation details
-     */
-    recordFailure(operation) {
-        this.failedOperations.push({
-            ...operation,
-            timestamp: new Date().toISOString(),
-            attemptCount: (operation.attemptCount || 0) + 1
-        });
-
-        this.saveToStorage();
-    }
-
-    /**
-     * TODO: use it in the workflow
-     * Retry all failed operations that haven't exceeded max attempts
-     * @param {Function} executeOperation - Function to retry an operation
-     * @returns {Promise<Object>} Results of retry attempts
-     */
-    async retryFailed(executeOperation) {
-        const toRetry = this.failedOperations.filter(
-            op => op.attemptCount < 3
-        );
-
-        const results = { retried: 0, succeeded: 0, failed: 0 };
-
-        for (const operation of toRetry) {
-            try {
-                await executeOperation(operation);
-                this.removeFailure(operation);
-                results.succeeded++;
-            } catch (error) {
-                this.recordFailure(operation);
-                results.failed++;
-            }
-            results.retried++;
-        }
-
-        return results;
-    }
-
-    /**
-     * Remove a failure from the list
-     * @param {Object} operation - The operation to remove
-     */
-    removeFailure(operation) {
-        const index = this.failedOperations.indexOf(operation);
-        if (index > -1) {
-            this.failedOperations.splice(index, 1);
-            this.saveToStorage();
-        }
-    }
-
-    /**
-     * Save failed operations to localStorage
-     */
-    saveToStorage() {
-        try {
-            localStorage.setItem(
-                'cbm-failed-operations',
-                JSON.stringify(this.failedOperations)
-            );
-        } catch (e) {
-            // localStorage may not be available
-        }
-    }
-
-    /**
-     * Load failed operations from localStorage
-     */
-    loadFromStorage() {
-        try {
-            const stored = localStorage.getItem('cbm-failed-operations');
-            if (stored) {
-                this.failedOperations = JSON.parse(stored);
-            }
-        } catch (e) {
-            this.failedOperations = [];
-        }
-    }
-
-    /**
-     * TODO: use it in the workflow
-     * Clear all failed operations
-     */
-    clearAll() {
-        this.failedOperations = [];
-        this.saveToStorage();
     }
 }
 
@@ -1962,10 +1756,7 @@ class ValidationHelper {
  * Handles all search-related functionality for BatchManager.
  * Manages search execution, stopping, progress display, and button state.
  *
- * @requires UsageLogger - For logging search operations
  */
-
-
 
 class SearchHandler {
     /**
@@ -2023,7 +1814,7 @@ class SearchHandler {
             this.updateSearchButton(false);
             this.ui.state.isSearching = false;
 
-            UsageLogger.logSearch(pattern, files.length);
+            console.log(`[CBM] Search: "${pattern}" - ${files.length} results`);
         } catch (error) {
             this.hideSearchProgress();
             this.updateSearchButton(false);
@@ -2211,7 +2002,6 @@ class PreviewHandler {
  * Manages batch execution, progress display, and result reporting.
  *
  * @requires ValidationHelper - For common validation logic
- * @requires UsageLogger - For logging batch operations
  * @requires ProgressBar - For progress display
  */
 
@@ -2307,7 +2097,10 @@ class ExecuteHandler {
             );
 
             console.log('[CBM-E] Batch operation results:', results);
-            UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
+            console.log(
+                `[CBM] Batch: ${selectedFiles.length} files, ` +
+                `+${toAdd.length} -${toRemove.length} categories`
+            );
             this.showResults(results);
 
         } catch (error) {

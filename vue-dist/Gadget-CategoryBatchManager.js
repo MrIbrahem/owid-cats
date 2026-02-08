@@ -19,10 +19,8 @@
  */
 class SearchPanel {
     /**
-     * @param {Function} onSearch - Callback when search is triggered
      */
-    constructor(onSearch) {
-        this.onSearch = onSearch;
+    constructor() {
     }
 
     /**
@@ -639,8 +637,6 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     categoryBatchManager.api = new mw.Api();
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
-
-    const { createCategoryBatchManager } = require('./createCategoryBatchManager');
 
     const app = createCategoryBatchManager(categoryBatchManager.api);
 

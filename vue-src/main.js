@@ -9,8 +9,6 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
 
-    const { createCategoryBatchManager } = require('./createCategoryBatchManager');
-
     const app = createCategoryBatchManager(categoryBatchManager.api);
 
     Vue.createMwApp(app)

@@ -5,10 +5,8 @@
  */
 class SearchPanel {
     /**
-     * @param {Function} onSearch - Callback when search is triggered
      */
-    constructor(onSearch) {
-        this.onSearch = onSearch;
+    constructor() {
     }
 
     /**

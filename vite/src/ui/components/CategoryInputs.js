@@ -78,12 +78,14 @@ class CategoryInputs {
     async onAddCategoryInput(self, value) {
         // Clear menu items if the input was cleared.
         if (!value) {
+            console.warn('Add category input cleared, clearing menu items.');
             self.addCategoryMenuItems = [];
             return;
         }
 
         // If empty, clear menu items
         if (!value || value.trim().length < 2) {
+            console.warn('Add category input too short, clearing menu items.');
             self.addCategoryMenuItems = [];
             return;
         }
@@ -92,11 +94,13 @@ class CategoryInputs {
 
         // Make sure this data is still relevant first.
         if (self.addInputValue !== value) {
+            console.warn('Add category input value changed during fetch, discarding results.');
             return;
         }
 
         // Reset the menu items if there are no results.
         if (!data || data.length === 0) {
+            console.warn('No results for add category input, clearing menu items.');
             self.addCategoryMenuItems = [];
             return;
         }
@@ -112,12 +116,14 @@ class CategoryInputs {
     async onRemoveCategoryInput(self, value) {
         // Clear menu items if the input was cleared.
         if (!value) {
+            console.warn('Remove category input cleared, clearing menu items.');
             self.removeCategoryMenuItems = [];
             return;
         }
 
         // If empty, clear menu items
         if (!value || value.trim().length < 2) {
+            console.warn('Remove category input too short, clearing menu items.');
             self.removeCategoryMenuItems = [];
             return;
         }
@@ -126,11 +132,13 @@ class CategoryInputs {
 
         // Make sure this data is still relevant first.
         if (self.removeInputValue !== value) {
+            console.warn('Remove category input value changed during fetch, discarding results.');
             return;
         }
 
         // Reset the menu items if there are no results.
         if (!data || data.length === 0) {
+            console.warn('No results for remove category input, clearing menu items.');
             self.removeCategoryMenuItems = [];
             return;
         }
@@ -141,12 +149,14 @@ class CategoryInputs {
 
     async addOnLoadMore(self) {
         if (!self.addInputValue) {
+            console.warn('No input value for add categories, cannot load more.');
             return;
         }
 
         const data = await this.apiService.fetchCategories(self.addInputValue, { offset: self.addCategoryMenuItems.length });
 
         if (!data || data.length === 0) {
+            console.warn('No more results to load for add categories.');
             return;
         }
 
@@ -157,12 +167,14 @@ class CategoryInputs {
 
     async removeOnLoadMore(self) {
         if (!self.removeInputValue) {
+            console.warn('No input value for remove categories, cannot load more.');
             return;
         }
 
         const data = await this.apiService.fetchCategories(self.removeInputValue, { offset: self.removeCategoryMenuItems.length });
 
         if (!data || data.length === 0) {
+            console.warn('No more results to load for remove categories.');
             return;
         }
 

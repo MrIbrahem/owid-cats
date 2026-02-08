@@ -7,7 +7,6 @@ class FilesList {
      */
     constructor(apiService) {
         this.apiService = apiService;
-        this.selectedFiles = [];
     }
 
     /**

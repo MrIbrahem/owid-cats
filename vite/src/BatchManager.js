@@ -148,7 +148,6 @@ function BatchManager(api) {
             ** *************************
             */
 
-            // should be moved to services/FileService.js
             searchFiles: function () {
                 return this.file_service.searchFilesOld(this)
             },

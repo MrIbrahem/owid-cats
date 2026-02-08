@@ -26,7 +26,7 @@ class FileService {
 
         // Placeholder - implement actual search logic
         // Mock results for demonstration
-        self.searchResults = this.searchFiles(self.sourceCategory, self.searchPattern);
+        self.searchResults = await this.searchFiles(self.sourceCategory, self.searchPattern);
         const searchResults_demo = [
             { title: 'File:GDP-per-capita,BLR.svg', selected: false },
             { title: 'File:Life-expectancy,BLR.svg', selected: false },

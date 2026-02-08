@@ -1403,18 +1403,44 @@ class PreviewHandler {
             :disabled="isProcessing">
             Preview Changes
         </cdx-button>
-
         <cdx-dialog
             v-model:open="openPreviewHandler"
-            title="Save changes"
+            class="cbm-preview-dialog"
+            title="Preview Changes"
+            subtitle="{{ changesCount }} files will be modified"
             :use-close-button="true"
             :primary-action="primaryAction"
             :default-action="defaultAction"
             @primary="onPrimaryAction"
             @default="openPreviewHandler = false"
         >
-            {{ previewHtml }}
+            <table v-if="previewRows.length > 0" class="cbm-preview-table">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Current Categories</th>
+                        <th>New Categories</th>
+                    </tr>
+                </thead>
 
+                <tbody>
+                    <tr v-for="(row, index) in previewRows" :key="index">
+                        <td>{{ row.file }}</td>
+
+                        <td>
+                            <div v-for="(cat, i) in row.currentCategories" :key="i">
+                                {{ cat }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div v-for="(cat, i) in row.newCategories" :key="i">
+                                {{ cat }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <template #footer-text>
             </template>
         </cdx-dialog>
@@ -1505,35 +1531,38 @@ class PreviewHandler {
      * @param {Array} preview - Array of preview items
      */
     showPreviewModal(self, preview) {
-        let html = '<table class="cbm-preview-table">';
-        html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
 
+        self.previewRows = preview
+            .filter(item => item.willChange)
+            .map(item => ({
+                file: item.file,
+                currentCategories: [...item.currentCategories],
+                newCategories: [...item.newCategories]
+            }));
+
+        self.openPreviewHandler = true;
+
+        /*
+        let html = '';
         preview.forEach(item => {
             if (item.willChange) {
                 html += `
-          <tr>
-            <td>${item.file}</td>
-            <td>${item.currentCategories.join('<br>')}</td>
-            <td>${item.newCategories.join('<br>')}</td>
-          </tr>
-        `;
+                    <tr>
+                        <td>${item.file}</td>
+                        <td>${item.currentCategories.join('<br>')}</td>
+                        <td>${item.newCategories.join('<br>')}</td>
+                    </tr>
+                `;
             }
-        });
+        });*/
 
-        html += '</table>';
+        self.changesCount = preview.filter(p => p.willChange).length;
 
-        const changesCount = preview.filter(p => p.willChange).length;
-
-        if (changesCount === 0) {
+        if (self.changesCount === 0) {
             console.log('[CBM] No changes detected');
             self.displayCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice', 'add');
             return;
         }
-
-        html = `<p>${changesCount} files will be modified</p>` + html;
-
-        self.previewHtml = html;
-        self.openPreviewHandler = true;
     }
     /**
      * Check if a category exists in a list (with normalization)
@@ -1885,6 +1914,8 @@ function BatchManager() {
                 showResultsMessage: false,
                 resultsMessageText: '',
 
+                previewRows: [],
+                changesCount: '',
                 previewHtml: '',
                 openPreviewHandler: false,
 

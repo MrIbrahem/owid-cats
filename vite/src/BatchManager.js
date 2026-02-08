@@ -3,14 +3,14 @@
  * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
  * @returns {Object} Vue app definition object.
  */
-/* global APIService, SearchPanel, CategoryInputs, FilesList, ProgressSection */
+/* global APIService, SearchPanel, CategoryInputs, FilesList, ProgressBar */
 
 function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
-    const progress_section = new ProgressSection();
+    const progress_section = new ProgressBar();
     const file_service = new FileService(mwApi);
 
     const Search_SectionHtml = search_panel.createElement();

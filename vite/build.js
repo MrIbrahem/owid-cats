@@ -16,7 +16,7 @@ const SOURCE_FILES = [
     'vite/src/ui/components/SearchPanel.js',
     'vite/src/ui/components/CategoryInputs.js',
     'vite/src/ui/components/FilesList.js',
-    'vite/src/ui/components/ProgressSection.js',
+    'vite/src/ui/components/ProgressBar.js',
     'vite/src/BatchManager.js',
     'vite/src/gadget-entry.js',
 ];

@@ -1,7 +1,7 @@
 /**
- * @class ProgressSection
+ * @class ProgressBar
  */
-class ProgressSection {
+class ProgressBar {
     /**
      */
     constructor() {
@@ -33,5 +33,5 @@ class ProgressSection {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ProgressSection;
+    module.exports = ProgressBar;
 }

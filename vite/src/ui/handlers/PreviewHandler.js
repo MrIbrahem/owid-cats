@@ -22,7 +22,6 @@ class PreviewHandler {
             :disabled="isProcessing">
             Preview Changes
         </cdx-button>
-
         <cdx-dialog
             v-model:open="openPreviewHandler"
             title="Preview Changes"
@@ -32,15 +31,46 @@ class PreviewHandler {
             @primary="onPrimaryAction"
             @default="openPreviewHandler = false"
         >
-        <table v-if="previewFiles.length > 0" class="cbm-preview-table">
-            <tr>
-                <th>File</th>
-                <th>Current Categories</th>
-                <th>New Categories</th>
-            </tr>
-            {{ previewHtml }}
-        </table>
-            <p> {{ changesCount }} files will be modified </p>
+            <table v-if="previewFiles.length > 0" class="cbm-preview-table">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Current Categories</th>
+                        <th>New Categories</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr
+                        v-for="(item, index) in previewFiles"
+                        :key="index"
+                        v-if="item.willChange"
+                    >
+                        <td>{{ item.file }}</td>
+
+                        <td>
+                            <div
+                                v-for="(cat, i) in item.currentCategories"
+                                :key="i"
+                            >
+                                {{ cat }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div
+                                v-for="(cat, i) in item.newCategories"
+                                :key="i"
+                            >
+                                {{ cat }}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>{{ changesCount }} files will be modified</p>
+
             <template #footer-text>
             </template>
         </cdx-dialog>

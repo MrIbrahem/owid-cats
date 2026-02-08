@@ -69,8 +69,7 @@ category-batch-manager/
 │   │   ├── APIService.js
 │   │   ├── CategoryService.js
 │   │   ├── FileService.js
-│   │   ├── BatchProcessor.js
-│   │   └── ErrorRecovery.js
+│   │   └── BatchProcessor.js
 │   ├── models/
 │   │   ├── FileModel.js
 │   │   └── CategoryOperation.js

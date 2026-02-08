@@ -8,7 +8,6 @@
 - [x] APIService
 - [ ] BatchProcessor
 - [x] CategoryService
-- [ ] ErrorRecovery
 - [x] FileService
 
 ## UI/components

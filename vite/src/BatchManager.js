@@ -115,7 +115,7 @@ function BatchManager() {
                 showResultsMessage: false,
                 resultsMessageText: '',
 
-                previewFiles: [],
+                previewRows: [],
                 changesCount: '',
                 previewHtml: '',
                 openPreviewHandler: false,

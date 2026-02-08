@@ -1,3 +1,7 @@
+.cbm-preview-dialog {
+    --cdx-dialog-max-width: 80vw;
+}
+
 /* Container styles */
 .cbm-container {
     max-width: 1200px;
@@ -6,7 +10,7 @@
     border: 1px solid #a2a9b1;
     border-radius: 4px;
     background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Title styles */
@@ -84,7 +88,7 @@
     gap: 10px;
 }
 
-.cbm-input-button-group > * {
+.cbm-input-button-group>* {
     flex: 1;
 }
 

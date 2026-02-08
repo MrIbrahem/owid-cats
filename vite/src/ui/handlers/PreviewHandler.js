@@ -24,14 +24,16 @@ class PreviewHandler {
         </cdx-button>
         <cdx-dialog
             v-model:open="openPreviewHandler"
+            class="cbm-preview-dialog"
             title="Preview Changes"
+            subtitle="{{ changesCount }} files will be modified"
             :use-close-button="true"
             :primary-action="primaryAction"
             :default-action="defaultAction"
             @primary="onPrimaryAction"
             @default="openPreviewHandler = false"
         >
-            <table v-if="previewFiles.length > 0" class="cbm-preview-table">
+            <table v-if="previewRows.length > 0" class="cbm-preview-table">
                 <thead>
                     <tr>
                         <th>File</th>
@@ -41,36 +43,23 @@ class PreviewHandler {
                 </thead>
 
                 <tbody>
-                    <tr
-                        v-for="(item, index) in previewFiles"
-                        :key="index"
-                        v-if="item.willChange"
-                    >
-                        <td>{{ item.file }}</td>
+                    <tr v-for="(row, index) in previewRows" :key="index">
+                        <td>{{ row.file }}</td>
 
                         <td>
-                            <div
-                                v-for="(cat, i) in item.currentCategories"
-                                :key="i"
-                            >
+                            <div v-for="(cat, i) in row.currentCategories" :key="i">
                                 {{ cat }}
                             </div>
                         </td>
 
                         <td>
-                            <div
-                                v-for="(cat, i) in item.newCategories"
-                                :key="i"
-                            >
+                            <div v-for="(cat, i) in row.newCategories" :key="i">
                                 {{ cat }}
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
-            <p>{{ changesCount }} files will be modified</p>
-
             <template #footer-text>
             </template>
         </cdx-dialog>
@@ -161,12 +150,20 @@ class PreviewHandler {
      * @param {Array} preview - Array of preview items
      */
     showPreviewModal(self, preview) {
-        let html = '';
 
-        self.previewFiles = preview;
+        self.previewRows = preview
+            .filter(item => item.willChange)
+            .map(item => ({
+                file: item.file,
+                currentCategories: [...item.currentCategories],
+                newCategories: [...item.newCategories]
+            }));
+
         self.openPreviewHandler = true;
 
-        self.previewFiles.forEach(item => {
+        /*
+        let html = '';
+        preview.forEach(item => {
             if (item.willChange) {
                 html += `
                     <tr>
@@ -176,7 +173,7 @@ class PreviewHandler {
                     </tr>
                 `;
             }
-        });
+        });*/
 
         self.changesCount = preview.filter(p => p.willChange).length;
 

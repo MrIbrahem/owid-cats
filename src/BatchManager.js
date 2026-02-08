@@ -8,7 +8,7 @@
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FilesList, CategoryInputs */
+/* global APIService, FileService, CategoryService, BatchProcessor, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, FilesList, CategoryInputs */
 
 class BatchManager {
     constructor() {
@@ -18,7 +18,6 @@ class BatchManager {
         this.batchProcessor = new BatchProcessor(this.categoryService);
 
         // Initialize UI components
-        this.searchPanel = new SearchPanel(() => this.searchHandler.handleSearch());
         this.categoryInputs = new CategoryInputs(this.apiService);
         this.fileList = new FilesList(
             () => this.updateSelectedCount(),
@@ -64,7 +63,7 @@ class BatchManager {
         document.body.appendChild(reopenBtn);
 
         // SearchPanel element
-        const searchPanelElement = this.searchPanel.createElement(this.state.sourceCategory);
+        const searchPanelElement = this.searchHandler.createElement(this.state.sourceCategory);
         // Create main container
         const container = this.buildContainer(searchPanelElement);
         document.body.appendChild(container);

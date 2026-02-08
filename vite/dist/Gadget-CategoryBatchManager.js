@@ -501,6 +501,13 @@ class CategoryInputs {
                 </cdx-multiselect-lookup>
             </div>
 
+            <!-- Category Add Message -->
+            <div v-if="showAddCategoryMessage" class="margin-bottom-20">
+                <cdx-message type="{{ addCategoryMessageType }}" :inline="false">
+                    {{ addCategoryMessageText }}
+                </cdx-message>
+            </div>
+
             <div class="cbm-category-input-group">
                 <cdx-label input-id="cbm-remove-cats" class="cbm-label">
                     Remove Categories
@@ -524,7 +531,15 @@ class CategoryInputs {
             </div>
     `;
     }
-
+    displayAddCategoryMessage(self, text, type = 'error') {
+        self.showAddCategoryMessage = true;
+        self.addCategoryMessageType = type;
+        self.addCategoryMessageText = text;
+    }
+    hideAddCategoryMessage(self) {
+        self.showAddCategoryMessage = false;
+        self.addCategoryMessageText = '';
+    }
     deduplicateResults(items1, results) {
         const seen = new Set(items1.map((result) => result.value));
         return results.filter((result) => !seen.has(result.value));
@@ -851,11 +866,9 @@ class ExecuteHandler {
 
 class PreviewHandler {
     /**
-     * @param {BatchManager} ui - The main UI instance
      */
-    constructor(ui) {
-        this.ui = ui;
-        this.validator = new ValidationHelper(ui);
+    constructor() {
+        this.validator = new ValidationHelper();
     }
     createElement() {
         return `
@@ -867,6 +880,8 @@ class PreviewHandler {
     }
     // Preview changes before executing
     previewTheChanges(self) {
+        console.log('[CBM-P] Preview button clicked');
+
         const selectedCount = self.selectedCount;
 
         if (selectedCount === 0) {
@@ -879,13 +894,18 @@ class PreviewHandler {
             return;
         }
 
+        const validation = this.validator.validateBatchOperation(self);
+        if (!validation) return;
+
+        const { selectedFiles, toAdd, toRemove } = validation;
+
         // Placeholder - implement preview logic
-        let previewMessage = `Preview for ${selectedCount} file(s):\n`;
-        if (self.addCategories.length > 0) {
-            previewMessage += `\nAdding: ${self.addCategories.join(', ')}`;
+        let previewMessage = `Preview for ${selectedFiles.length} file(s):\n`;
+        if (toAdd.length > 0) {
+            previewMessage += `\nAdding: ${toAdd.join(', ')}`;
         }
-        if (self.removeCategories.length > 0) {
-            previewMessage += `\nRemoving: ${self.removeCategories.join(', ')}`;
+        if (toRemove.length > 0) {
+            previewMessage += `\nRemoving: ${toRemove.join(', ')}`;
         }
 
         // should be replaced by showPreviewModal
@@ -895,11 +915,11 @@ class PreviewHandler {
      * Handle preview button click
      * Generates and displays a preview of category changes
      */
-    async handlePreview() {
+    async handlePreview(self) {
         console.log('[CBM-P] Preview button clicked');
 
         // Use ValidationHelper for common validation
-        const validation = this.validator.validateBatchOperation();
+        const validation = this.validator.validateBatchOperation(self);
         if (!validation) return;
 
         const { selectedFiles, toAdd, toRemove } = validation;
@@ -907,21 +927,21 @@ class PreviewHandler {
         // Generate preview without affecting file list - no loading indicator
         try {
             console.log('[CBM-P] Calling batchProcessor.previewChanges');
-            const preview = await this.ui.batchProcessor.previewChanges(
+            const preview = await self.batchProcessor.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
             );
             console.log('[CBM-P] Preview result:', preview);
-            this.showPreviewModal(preview);
+            this.showPreviewModal(self, preview);
 
         } catch (error) {
             console.log('[CBM-P] Error in previewChanges:', error);
             // Check if error is about duplicate categories
             if (error.message.includes('already exist')) {
-                this.ui.showMessage(`⚠️ ${error.message}`, 'warning');
+                self.showWarningMessage(`⚠️ ${error.message}`);
             } else {
-                this.ui.showMessage(`Error generating preview: ${error.message}`, 'error');
+                self.showErrorMessage(`Error generating preview: ${error.message}`);
             }
         }
     }
@@ -930,7 +950,7 @@ class PreviewHandler {
      * Show the preview modal with changes
      * @param {Array} preview - Array of preview items
      */
-    showPreviewModal(preview) {
+    showPreviewModal(self, preview) {
         const modal = document.getElementById('cbm-preview-modal');
         const content = document.getElementById('cbm-preview-content');
         if (!modal) {
@@ -962,7 +982,7 @@ class PreviewHandler {
 
         if (changesCount === 0) {
             console.log('[CBM] No changes detected');
-            this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
+            self.displayAddCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
             return;
         }
 
@@ -1025,6 +1045,12 @@ class SearchHandler {
                 </div>
             </div>
         </div>
+        <!-- Results Message -->
+        <div v-if="showResultsMessage" class="margin-bottom-20">
+            <cdx-message type="success" :inline="false">
+                {{ resultsMessageText }}
+            </cdx-message>
+        </div>
         `;
     }
 
@@ -1075,48 +1101,8 @@ class SearchHandler {
 
 class ValidationHelper {
     /**
-     * @param {BatchManager} ui - The main UI instance
      */
-    constructor(ui) {
-        this.ui = ui;
-    }
-
-    /**
-     * Get and validate selected files
-     * @returns {Array|null} Array of selected files, or null if validation fails
-     */
-    getSelectedFiles() {
-        const selectedFiles = this.ui.getSelectedFiles();
-        console.log('[CBM-V] Selected files:', selectedFiles);
-        if (selectedFiles.length === 0) {
-            console.log('[CBM-V] No files selected');
-            this.ui.showMessage('No files selected.', 'warning');
-            return null;
-        }
-        return selectedFiles;
-    }
-
-    /**
-     * Parse and validate category inputs
-     * @returns {Object|null} Object with toAdd and toRemove arrays, or null if validation fails
-     */
-    parseCategoryInputs() {
-        const toAdd = this.ui.parseCategories(
-            document.getElementById('cbm-add-cats').value
-        );
-        const toRemove = this.ui.parseCategories(
-            document.getElementById('cbm-remove-cats').value
-        );
-        console.log('[CBM-V] Categories to add:', toAdd);
-        console.log('[CBM-V] Categories to remove:', toRemove);
-
-        if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM-V] No categories specified');
-            this.ui.showMessage('Please specify categories to add or remove.', 'warning');
-            return null;
-        }
-
-        return { toAdd, toRemove };
+    constructor() {
     }
 
     /**
@@ -1125,13 +1111,11 @@ class ValidationHelper {
      * @param {Array<string>} categoriesToAdd - Categories to check for circular references
      * @returns {Array<string>|null} Filtered categories, or null if all are circular
      */
-    filterCircularCategories(categoriesToAdd) {
-        const sourceCategory = this.ui.state.sourceCategory;
+    filterCircularCategories(self) {
         const circularCategories = [];
         const validCategories = [];
-
-        for (const category of categoriesToAdd) {
-            if (Validator.isCircularCategory(sourceCategory, category)) {
+        for (const category of self.addCategories) {
+            if (Validator.isCircularCategory(self.sourceCategory, category)) {
                 console.log('[CBM-V] Circular category detected (silently removed):', category);
                 circularCategories.push(category);
             } else {
@@ -1141,7 +1125,7 @@ class ValidationHelper {
 
         // If all categories are circular, show error
         if (circularCategories.length > 0 && validCategories.length === 0) {
-            this.ui.showMessage(
+            self.displayAddCategoryMessage(
                 `❌ Cannot add: all categorie(s) are circular references to the current page. Cannot add "${circularCategories.join(', ')}" to itself.`,
                 'error'
             );
@@ -1156,28 +1140,25 @@ class ValidationHelper {
      * Perform all validation steps before a batch operation
      * @returns {Object|null} Object with selectedFiles, toAdd, toRemove, or null if validation fails
      */
-    validateBatchOperation() {
-        const selectedFiles = this.getSelectedFiles();
-        if (!selectedFiles) return null;
-
-        const categoryInputs = this.parseCategoryInputs();
-        if (!categoryInputs) return null;
+    validateBatchOperation(self) {
+        if (!self.selectedFiles) return null;
+        if (!self.addCategories && !self.removeCategories) return null;
 
         // Filter out circular categories (returns null if ALL are circular)
-        const filteredToAdd = this.filterCircularCategories(categoryInputs.toAdd);
+        const filteredToAdd = this.filterCircularCategories(self);
         if (filteredToAdd === null) return null; // All categories were circular
 
         // Check if there are any valid operations remaining
-        if (filteredToAdd.length === 0 && categoryInputs.toRemove.length === 0) {
+        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
-            this.ui.showMessage('No valid categories to add or remove.', 'warning');
+            self.displayAddCategoryMessage('No valid categories to add or remove.', 'warning');
             return null;
         }
 
         return {
-            selectedFiles,
+            selectedFiles: self.selectedFiles,
             toAdd: filteredToAdd,
-            toRemove: categoryInputs.toRemove
+            toRemove: self.removeCategories
         };
     }
 }
@@ -1217,12 +1198,6 @@ function BatchManager() {
             <div>
                 <!-- Search Section -->
                 ${Search_SectionHtml}
-                <!-- Results Message -->
-                <div v-if="showResultsMessage" class="margin-bottom-20">
-                    <cdx-message type="success" :inline="false">
-                        {{ resultsMessageText }}
-                    </cdx-message>
-                </div>
 
                 <!-- Actions Section -->
                 <div>
@@ -1294,6 +1269,10 @@ function BatchManager() {
                 isProcessing: false,
                 shouldStopProgress: false,
                 shouldStopSearch: false,
+
+                showAddCategoryMessage: false,
+                addCategoryMessageText: '',
+
                 showResultsMessage: false,
                 resultsMessageText: '',
 
@@ -1402,6 +1381,12 @@ function BatchManager() {
             **      CategoryInputs
             ** *************************
             */
+            displayAddCategoryMessage: function (text, type) {
+                return this.category_inputs.displayAddCategoryMessage(this, text, type);
+            },
+            hideAddCategoryMessage: function () {
+                return this.category_inputs.hideAddCategoryMessage(this);
+            },
             onAddCategoryInput: function (value) {
                 return this.category_inputs.onAddCategoryInput(this, value);
             },

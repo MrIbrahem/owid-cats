@@ -12,48 +12,8 @@
 
 class ValidationHelper {
     /**
-     * @param {BatchManager} ui - The main UI instance
      */
-    constructor(ui) {
-        this.ui = ui;
-    }
-
-    /**
-     * Get and validate selected files
-     * @returns {Array|null} Array of selected files, or null if validation fails
-     */
-    getSelectedFiles() {
-        const selectedFiles = this.ui.getSelectedFiles();
-        console.log('[CBM-V] Selected files:', selectedFiles);
-        if (selectedFiles.length === 0) {
-            console.log('[CBM-V] No files selected');
-            this.ui.showMessage('No files selected.', 'warning');
-            return null;
-        }
-        return selectedFiles;
-    }
-
-    /**
-     * Parse and validate category inputs
-     * @returns {Object|null} Object with toAdd and toRemove arrays, or null if validation fails
-     */
-    parseCategoryInputs() {
-        const toAdd = this.ui.parseCategories(
-            document.getElementById('cbm-add-cats').value
-        );
-        const toRemove = this.ui.parseCategories(
-            document.getElementById('cbm-remove-cats').value
-        );
-        console.log('[CBM-V] Categories to add:', toAdd);
-        console.log('[CBM-V] Categories to remove:', toRemove);
-
-        if (toAdd.length === 0 && toRemove.length === 0) {
-            console.log('[CBM-V] No categories specified');
-            this.ui.showMessage('Please specify categories to add or remove.', 'warning');
-            return null;
-        }
-
-        return { toAdd, toRemove };
+    constructor() {
     }
 
     /**

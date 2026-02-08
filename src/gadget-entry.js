@@ -9,7 +9,7 @@
  * are available before the UI is rendered.
  */
 
-/* global mw, CategoryBatchManagerUI */
+/* global mw, BatchManager */
 
 (function () {
   'use strict';
@@ -45,7 +45,7 @@
           if (reopenBtn) reopenBtn.style.display = 'none';
         } else if (!existingModal) {
           // Create new instance
-          window.categoryBatchManager = new CategoryBatchManagerUI();
+          window.categoryBatchManager = new BatchManager();
         }
       });
     });

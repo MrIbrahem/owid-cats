@@ -10,7 +10,7 @@
 
 /* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FilesList, CategoryInputs */
 
-class CategoryBatchManagerUI {
+class BatchManager {
     constructor() {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
@@ -396,5 +396,5 @@ class CategoryBatchManagerUI {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CategoryBatchManagerUI;
+    module.exports = BatchManager;
 }

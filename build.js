@@ -28,7 +28,7 @@ const SOURCE_FILES = [
   'src/ui/handlers/SearchHandler.js',
   'src/ui/handlers/PreviewHandler.js',
   'src/ui/handlers/ExecuteHandler.js',
-  'src/ui/CategoryBatchManagerUI.js',
+  'src/BatchManager.js',
   'src/gadget-entry.js',
 ];
 

@@ -2,7 +2,7 @@
  * Execute Handler
  *
  * @description
- * Handles all execute-related functionality for CategoryBatchManagerUI.
+ * Handles all execute-related functionality for BatchManager.
  * Manages batch execution, progress display, and result reporting.
  *
  * @requires ValidationHelper - For common validation logic
@@ -14,7 +14,7 @@
 
 class ExecuteHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;

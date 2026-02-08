@@ -2,7 +2,7 @@
  * Search Handler
  *
  * @description
- * Handles all search-related functionality for CategoryBatchManagerUI.
+ * Handles all search-related functionality for BatchManager.
  * Manages search execution, stopping, progress display, and button state.
  *
  * @requires UsageLogger - For logging search operations
@@ -12,7 +12,7 @@
 
 class SearchHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;

@@ -3,7 +3,7 @@
  */
 class FilesList {
     /**
-     * @param {APIService} apiService - API service for category search
+     * @param {mw.Api} apiService - API service for category search
      */
     constructor(apiService) {
         this.apiService = apiService;

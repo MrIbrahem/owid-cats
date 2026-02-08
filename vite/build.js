@@ -18,7 +18,7 @@ const SOURCE_FILES = [
     'vite/src/ui/components/FilesList.js',
     'vite/src/ui/components/ProgressSection.js',
     'vite/src/BatchManager.js',
-    'vite/src/main.js',
+    'vite/src/gadget-entry.js',
 ];
 
 const DIST_DIR = 'vite/dist';
@@ -74,8 +74,8 @@ function processFile(filePath) {
     // Strip global comments
     content = stripGlobalComments(content);
 
-    // For main.js, we need to wrap it differently since it's the entry point
-    if (filePath === 'vite/src/main.js') {
+    // For gadget-entry.js, we need to wrap it differently since it's the entry point
+    if (filePath === 'vite/src/gadget-entry.js') {
         // Remove the outer wrapper
         content = content.replace(/\/\/ <nowiki>\n\nif \(typeof categoryBatchManager === 'undefined'\) \{\s*var categoryBatchManager = \{\};\s*\}\n\n/m, '');
         content = content.replace(/\n\n\/\/ <\/nowiki>\n$/, '');

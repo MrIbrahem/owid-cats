@@ -13,219 +13,219 @@
 /* global Logger, mw */
 
 class APIService {
-  constructor() {
+    constructor() {
+        /**
+         * Native MediaWiki API helper — instantiated lazily on first use.
+         * @type {mw.Api|null}
+         */
+        this.mwApi = null;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  mw.Api helper                                                      */
+    /* ------------------------------------------------------------------ */
+
     /**
-     * Native MediaWiki API helper — instantiated lazily on first use.
-     * @type {mw.Api|null}
+     * Return (and lazily create) an mw.Api instance.
+     * @returns {mw.Api}
+     * @throws {Error} If mw.Api is not available
      */
-    this.mwApi = null;
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  mw.Api helper                                                      */
-  /* ------------------------------------------------------------------ */
-
-  /**
-   * Return (and lazily create) an mw.Api instance.
-   * @returns {mw.Api}
-   * @throws {Error} If mw.Api is not available
-   */
-  _getMwApi() {
-    if (this.mwApi) return this.mwApi;
-    if (typeof mw !== 'undefined' && mw.Api) {
-      this.mwApi = new mw.Api();
-      return this.mwApi;
+    _getMwApi() {
+        if (this.mwApi) return this.mwApi;
+        if (typeof mw !== 'undefined' && mw.Api) {
+            this.mwApi = new mw.Api();
+            return this.mwApi;
+        }
+        throw new Error('mw.Api is not available — are you running inside MediaWiki?');
     }
-    throw new Error('mw.Api is not available — are you running inside MediaWiki?');
-  }
 
-  /* ------------------------------------------------------------------ */
-  /*  Public helpers used by other services                              */
-  /* ------------------------------------------------------------------ */
+    /* ------------------------------------------------------------------ */
+    /*  Public helpers used by other services                              */
+    /* ------------------------------------------------------------------ */
 
-  /**
-   * Fetch files from a category with pagination support.
-   * @param {string} categoryName - Full category name including "Category:" prefix
-   * @param {Object} [options={}] - Query options
-   * @param {number} [options.limit=500] - Maximum files to retrieve per request
-   * @returns {Promise<Array>} Array of file objects
-   */
-  async getCategoryMembers(categoryName, options = {}) {
-    const allMembers = [];
-    let cmcontinue = null;
+    /**
+     * Fetch files from a category with pagination support.
+     * @param {string} categoryName - Full category name including "Category:" prefix
+     * @param {Object} [options={}] - Query options
+     * @param {number} [options.limit=500] - Maximum files to retrieve per request
+     * @returns {Promise<Array>} Array of file objects
+     */
+    async getCategoryMembers(categoryName, options = {}) {
+        const allMembers = [];
+        let cmcontinue = null;
 
-    do {
-      const params = {
-        action: 'query',
-        list: 'categorymembers',
-        cmtitle: categoryName,
-        cmtype: 'file',
-        cmlimit: options.limit || 500,
-        format: 'json'
-      };
+        do {
+            const params = {
+                action: 'query',
+                list: 'categorymembers',
+                cmtitle: categoryName,
+                cmtype: 'file',
+                cmlimit: options.limit || 500,
+                format: 'json'
+            };
 
-      if (cmcontinue) {
-        params.cmcontinue = cmcontinue;
-      }
+            if (cmcontinue) {
+                params.cmcontinue = cmcontinue;
+            }
 
-      const data = await this.makeRequest(params);
-      allMembers.push(...data.query.categorymembers);
+            const data = await this.makeRequest(params);
+            allMembers.push(...data.query.categorymembers);
 
-      cmcontinue = data.continue ? data.continue.cmcontinue : null;
-    } while (cmcontinue);
+            cmcontinue = data.continue ? data.continue.cmcontinue : null;
+        } while (cmcontinue);
 
-    return allMembers;
-  }
+        return allMembers;
+    }
 
-  /**
-   * Get file details including categories.
-   * @param {Array<string>} titles - Array of file titles
-   * @returns {Promise<Object>} API response with file info
-   */
-  async getFileInfo(titles) {
-    const params = {
-      action: 'query',
-      titles: titles.join('|'),
-      prop: 'categories|imageinfo',
-      cllimit: 500,
-      format: 'json'
-    };
+    /**
+     * Get file details including categories.
+     * @param {Array<string>} titles - Array of file titles
+     * @returns {Promise<Object>} API response with file info
+     */
+    async getFileInfo(titles) {
+        const params = {
+            action: 'query',
+            titles: titles.join('|'),
+            prop: 'categories|imageinfo',
+            cllimit: 500,
+            format: 'json'
+        };
 
-    return this.makeRequest(params);
-  }
-  /**
-   * Get page content (wikitext).
-   * @param {string} title - Page title
-   * @returns {Promise<string>} Page wikitext content
-   */
-  async getPageContent(title) {
-    const params = {
-      action: 'query',
-      titles: title,
-      prop: 'revisions',
-      rvprop: 'content',
-      rvslots: 'main',
-      format: 'json'
-    };
+        return this.makeRequest(params);
+    }
+    /**
+     * Get page content (wikitext).
+     * @param {string} title - Page title
+     * @returns {Promise<string>} Page wikitext content
+     */
+    async getPageContent(title) {
+        const params = {
+            action: 'query',
+            titles: title,
+            prop: 'revisions',
+            rvprop: 'content',
+            rvslots: 'main',
+            format: 'json'
+        };
 
-    const data = await this.makeRequest(params);
-    const pages = data.query.pages;
-    const pageId = Object.keys(pages)[0];
-    return pages[pageId].revisions[0].slots.main['*'];
-  }
+        const data = await this.makeRequest(params);
+        const pages = data.query.pages;
+        const pageId = Object.keys(pages)[0];
+        return pages[pageId].revisions[0].slots.main['*'];
+    }
 
-  /**
-   * Search for categories by prefix.
-   * Uses MediaWiki's opensearch API for category suggestions.
-   * @param {string} prefix - Search prefix (can include or exclude "Category:" prefix)
-   * @param {Object} [options={}] - Search options
-   * @param {number} [options.limit=10] - Maximum results to return
-   * @returns {Promise<Array<string>>} Array of category names with "Category:" prefix
-   */
-  async searchCategories(prefix, options = {}) {
-    const limit = options.limit || 10;
+    /**
+     * Search for categories by prefix.
+     * Uses MediaWiki's opensearch API for category suggestions.
+     * @param {string} prefix - Search prefix (can include or exclude "Category:" prefix)
+     * @param {Object} [options={}] - Search options
+     * @param {number} [options.limit=10] - Maximum results to return
+     * @returns {Promise<Array<string>>} Array of category names with "Category:" prefix
+     */
+    async searchCategories(prefix, options = {}) {
+        const limit = options.limit || 10;
 
-    // Remove "Category:" prefix if present for the search
-    const searchPrefix = prefix.replace(/^Category:/, '');
+        // Remove "Category:" prefix if present for the search
+        const searchPrefix = prefix.replace(/^Category:/, '');
 
-    const params = {
-      action: 'opensearch',
-      search: `Category:${searchPrefix}`,
-      namespace: 14, // Category namespace
-      limit: limit,
-      format: 'json'
-    };
+        const params = {
+            action: 'opensearch',
+            search: `Category:${searchPrefix}`,
+            namespace: 14, // Category namespace
+            limit: limit,
+            format: 'json'
+        };
 
-    try {
-      const data = await this.makeRequest(params);
-      // opensearch returns: [query, [titles], [descriptions], [urls]]
-      // We only need the titles
-      const titles = data[1] || [];
+        try {
+            const data = await this.makeRequest(params);
+            // opensearch returns: [query, [titles], [descriptions], [urls]]
+            // We only need the titles
+            const titles = data[1] || [];
 
-      // Ensure all results have "Category:" prefix and filter to only categories
-      return titles
-        .filter(title => title.startsWith('Category:'))
-        .map(title => {
-          // Preserve the exact format from API (already has Category: prefix)
-          return title;
+            // Ensure all results have "Category:" prefix and filter to only categories
+            return titles
+                .filter(title => title.startsWith('Category:'))
+                .map(title => {
+                    // Preserve the exact format from API (already has Category: prefix)
+                    return title;
+                });
+        } catch (error) {
+            if (typeof Logger !== 'undefined') {
+                Logger.error('Failed to search categories', error);
+            }
+            return [];
+        }
+    }
+
+    /**
+     * Get categories that a page belongs to.
+     * @param {string} title - Page title
+     * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
+     */
+    async getCategories(title) {
+        const api = this._getMwApi();
+        try {
+            const categories = await api.getCategories(title);
+            if (categories === false) {
+                return false;
+            }
+            // Convert mw.Title objects to strings and remove "Category:" prefix
+            return categories.map(cat => {
+                const catStr = cat.toString();
+                return catStr.replace(/^Category:/, '');
+            });
+        } catch (error) {
+            if (typeof Logger !== 'undefined') {
+                Logger.error('Failed to get categories', error);
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
+     *
+     * @param {string} title   - Page title
+     * @param {string} content - New page content (wikitext)
+     * @param {string} summary - Edit summary
+     * @param {Object} [options={}] - Additional edit options (minor, bot, etc.)
+     * @returns {Promise<Object>} API response
+     */
+    async editPage(title, content, summary, options = {}) {
+        const api = this._getMwApi();
+
+        // Use mw.Api.edit() with a transform function
+        return api.edit(title, function () {
+            return {
+                text: content,
+                summary: summary,
+                ...options
+            };
         });
-    } catch (error) {
-      if (typeof Logger !== 'undefined') {
-        Logger.error('Failed to search categories', error);
-      }
-      return [];
     }
-  }
 
-  /**
-   * Get categories that a page belongs to.
-   * @param {string} title - Page title
-   * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
-   */
-  async getCategories(title) {
-    const api = this._getMwApi();
-    try {
-      const categories = await api.getCategories(title);
-      if (categories === false) {
-        return false;
-      }
-      // Convert mw.Title objects to strings and remove "Category:" prefix
-      return categories.map(cat => {
-        const catStr = cat.toString();
-        return catStr.replace(/^Category:/, '');
-      });
-    } catch (error) {
-      if (typeof Logger !== 'undefined') {
-        Logger.error('Failed to get categories', error);
-      }
-      throw error;
+    /* ------------------------------------------------------------------ */
+    /*  Low-level request method                                           */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Make a GET request to the MediaWiki API via mw.Api.get().
+     * @param {Object} params - Query parameters
+     * @returns {Promise<Object>} Parsed JSON response
+     */
+    async makeRequest(params) {
+        const api = this._getMwApi();
+        try {
+            return await api.get(params);
+        } catch (error) {
+            if (typeof Logger !== 'undefined') {
+                Logger.error('API request failed', error);
+            }
+            throw error;
+        }
     }
-  }
-
-  /**
-   * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
-   *
-   * @param {string} title   - Page title
-   * @param {string} content - New page content (wikitext)
-   * @param {string} summary - Edit summary
-   * @param {Object} [options={}] - Additional edit options (minor, bot, etc.)
-   * @returns {Promise<Object>} API response
-   */
-  async editPage(title, content, summary, options = {}) {
-    const api = this._getMwApi();
-
-    // Use mw.Api.edit() with a transform function
-    return api.edit(title, function () {
-      return {
-        text: content,
-        summary: summary,
-        ...options
-      };
-    });
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  Low-level request method                                           */
-  /* ------------------------------------------------------------------ */
-
-  /**
-   * Make a GET request to the MediaWiki API via mw.Api.get().
-   * @param {Object} params - Query parameters
-   * @returns {Promise<Object>} Parsed JSON response
-   */
-  async makeRequest(params) {
-    const api = this._getMwApi();
-    try {
-      return await api.get(params);
-    } catch (error) {
-      if (typeof Logger !== 'undefined') {
-        Logger.error('API request failed', error);
-      }
-      throw error;
-    }
-  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = APIService;
+    module.exports = APIService;
 }

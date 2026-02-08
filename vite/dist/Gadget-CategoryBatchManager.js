@@ -83,6 +83,172 @@ class Validator {
     }
 }
 
+// === src/utils/RateLimiter.js ===
+/**
+ * Rate limiter to prevent API abuse
+ * @class RateLimiter
+ */
+class RateLimiter {
+    /**
+     * Wait for a specified duration
+     * @param {number} ms - Milliseconds to wait
+     * @returns {Promise<void>}
+     */
+    async wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Throttle a function call with a delay
+     * @param {Function} fn - Function to execute
+     * @param {number} delay - Delay in milliseconds
+     * @returns {Promise<*>} Result of the function
+     */
+    static async throttle(fn, delay) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fn();
+    }
+
+    /**
+     * Process items in batches with delay between each
+     * @param {Array} items - Items to process
+     * @param {number} batchSize - Number of items per batch
+     * @param {Function} processor - Async function to process each item
+     * @returns {Promise<Array>} Results of processing
+     */
+    static async batch(items, batchSize, processor) {
+        const results = [];
+        for (let i = 0; i < items.length; i += batchSize) {
+            const batch = items.slice(i, i + batchSize);
+            const batchResults = await Promise.all(batch.map(processor));
+            results.push(...batchResults);
+        }
+        return results;
+    }
+}
+
+// === src/utils/WikitextParser.js ===
+/**
+ * Parse and modify wikitext for category operations
+ * @class WikitextParser
+ */
+class WikitextParser {
+    /**
+     * TODO: use it in the workflow
+     * Extract all categories from wikitext
+     * @param {string} wikitext - The wikitext content
+     * @returns {Array<string>} Array of category names with "Category:" prefix
+     */
+    extractCategories(wikitext) {
+        const categoryRegex = /\[\[Category:([^\]|]+)(?:\|[^\]]*)?\]\]/gi;
+        const matches = [];
+        let match;
+
+        while ((match = categoryRegex.exec(wikitext)) !== null) {
+            matches.push(`Category:${this.normalize(match[1].trim())}`);
+        }
+
+        return matches;
+    }
+    /**
+     * Normalize category name by replacing underscores with spaces and trimming
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    normalize(categoryName) {
+        return categoryName.replace(/_/g, ' ').trim();
+    }
+
+    /**
+     * Check if category exists in wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to check (with or without "Category:" prefix)
+     * @returns {boolean} True if category exists
+     */
+    hasCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
+
+        // Create a pattern that matches both spaces and underscores
+        const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
+        const regex = new RegExp(
+            `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]`,
+            'i'
+        );
+        return regex.test(wikitext);
+    }
+    /**
+     * Add a category to wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to add (with or without "Category:" prefix)
+     * @returns {string} Modified wikitext
+     */
+    addCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
+
+        // Check if category already exists (with normalization)
+        if (this.hasCategory(wikitext, normalizedName)) {
+            return wikitext;
+        }
+
+        const categorySyntax = `[[Category:${normalizedName}]]`;
+
+        // Find last category or end of file
+        const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
+
+        if (lastCategoryMatch) {
+            // Add after last category
+            return wikitext.replace(
+                /(\[\[Category:[^\]]+\]\])\s*$/,
+                `$1\n${categorySyntax}\n`
+            );
+        } else {
+            // Add at end
+            return wikitext.trim() + `\n${categorySyntax}\n`;
+        }
+    }
+    /**
+     * Remove a category from wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to remove (with or without "Category:" prefix)
+     * @returns {string} Modified wikitext
+     */
+    removeCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
+
+        // Create a pattern that matches both spaces and underscores
+        const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
+        const regex = new RegExp(
+            `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
+            'gi'
+        );
+        return wikitext.replace(regex, '');
+    }
+
+    /**
+     * Escape special regex characters in a string
+     * @param {string} string - String to escape
+     * @returns {string} Escaped string
+     */
+    escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Get the proper wikitext syntax for a category
+     * @param {string} categoryName - Category name (with or without "Category:" prefix)
+     * @returns {string} Wikitext category syntax
+     */
+    getCategorySyntax(categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        return `[[Category:${cleanName}]]`;
+    }
+}
+
 // === src/models/FileModel.js ===
 /**
  * File model representing a Wikimedia Commons file
@@ -416,6 +582,278 @@ class APIService {
             console.error('API request failed', error);
             throw error;
         }
+    }
+}
+
+// === vite/src/services/BatchProcessor.js ===
+/**
+ * Batch processor for handling multiple file operations
+ * @class BatchProcessor
+ */
+
+
+
+class BatchProcessor {
+    /**
+     * @param {CategoryService} categoryService - Category service instance
+     */
+    constructor(categoryService) {
+        this.categoryService = categoryService;
+        this.rateLimiter = new RateLimiter();
+    }
+
+    /**
+     * Process a batch of files with category updates
+     * @param {Array} files - Files to process
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @param {Object} [callbacks={}] - Callback functions
+     * @param {Function} [callbacks.onProgress] - Progress callback (percentage, results)
+     * @param {Function} [callbacks.onFileComplete] - File complete callback (file, success)
+     * @param {Function} [callbacks.onError] - Error callback (file, error)
+     * @returns {Promise<Object>} Results with total, processed, successful, failed, errors
+     */
+    async processBatch(files, categoriesToAdd, categoriesToRemove, callbacks = {}) {
+        const {
+            onProgress = () => { },
+            onFileComplete = () => { },
+            onError = () => { }
+        } = callbacks; const results = {
+            total: files.length,
+            processed: 0,
+            successful: 0,
+            skipped: 0,
+            failed: 0,
+            errors: []
+        };
+
+        // Process files sequentially with throttling
+        for (const file of files) {
+            try {
+                // Wait to respect rate limits (1 edit per 2 seconds)
+                await this.rateLimiter.wait(2000);
+
+                // Update categories
+                const result = await this.categoryService.updateCategories(
+                    file.title,
+                    categoriesToAdd,
+                    categoriesToRemove
+                );
+
+                results.processed++;
+                if (result.success) {
+                    if (result.modified) {
+                        results.successful++;
+                        onFileComplete(file, true);
+                    } else {
+                        results.skipped++;
+                        onFileComplete(file, false);
+                    }
+                }
+
+                // Update progress
+                const progress = (results.processed / results.total) * 100;
+                onProgress(progress, results);
+
+            } catch (error) {
+                results.processed++;
+                results.failed++;
+                results.errors.push({
+                    file: file.title,
+                    error: error.message
+                });
+
+                onError(file, error);
+                onProgress((results.processed / results.total) * 100, results);
+            }
+        }
+
+        return results;
+    }
+
+}
+
+// === vite/src/services/CategoryService.js ===
+/**
+ * Service for category operations on files
+ * @class CategoryService
+ */
+
+
+
+class CategoryService {
+    /**
+     * @param {APIService} apiService - API service instance
+     */
+    constructor(apiService) {
+        this.api = apiService;
+        this.parser = typeof WikitextParser !== 'undefined' ? new WikitextParser() : null;
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Add categories to a file
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async addCategoriesToFile(fileTitle, categoriesToAdd) {
+        const wikitext = await this.api.getPageContent(fileTitle);
+
+        let newWikitext = wikitext;
+        for (const category of categoriesToAdd) {
+            if (!this.parser.hasCategory(newWikitext, category)) {
+                newWikitext = this.parser.addCategory(newWikitext, category);
+            }
+        }
+
+        if (newWikitext !== wikitext) {
+            await this.api.editPage(
+                fileTitle,
+                newWikitext,
+                `Adding categories: ${categoriesToAdd.join(', ')}`
+            );
+        }
+
+        return { success: true, modified: newWikitext !== wikitext };
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Remove categories from a file
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async removeCategoriesFromFile(fileTitle, categoriesToRemove) {
+        const wikitext = await this.api.getPageContent(fileTitle);
+
+        let newWikitext = wikitext;
+        for (const category of categoriesToRemove) {
+            newWikitext = this.parser.removeCategory(newWikitext, category);
+        }
+
+        if (newWikitext !== wikitext) {
+            await this.api.editPage(
+                fileTitle,
+                newWikitext,
+                `Removing categories: ${categoriesToRemove.join(', ')}`
+            );
+        }
+
+        return { success: true, modified: newWikitext !== wikitext };
+    }
+
+    /**
+     * Combined add and remove operation
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} toAdd - Categories to add
+     * @param {Array<string>} toRemove - Categories to remove
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async updateCategories(fileTitle, toAdd, toRemove) {
+        const wikitext = await this.api.getPageContent(fileTitle);
+        let newWikitext = wikitext;
+
+        // Remove first
+        for (const category of toRemove) {
+            newWikitext = this.parser.removeCategory(newWikitext, category);
+        }
+
+        // Then add
+        for (const category of toAdd) {
+            if (!this.parser.hasCategory(newWikitext, category)) {
+                newWikitext = this.parser.addCategory(newWikitext, category);
+            }
+        }
+
+        if (newWikitext !== wikitext) {
+            const summary = this.buildEditSummary(toAdd, toRemove);
+            await this.api.editPage(fileTitle, newWikitext, summary);
+        }
+
+        return { success: true, modified: newWikitext !== wikitext };
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Combined add and remove operation using mw.Api.edit() for better conflict handling
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} toAdd - Categories to add
+     * @param {Array<string>} toRemove - Categories to remove
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
+        const api = new mw.Api();
+        const parser = this.parser;
+
+        try {
+            await api.edit(fileTitle, function (revision) {
+                let newWikitext = revision.content;
+
+                // Remove categories first
+                for (const category of toRemove) {
+                    newWikitext = parser.removeCategory(newWikitext, category);
+                }
+
+                // Then add new categories
+                for (const category of toAdd) {
+                    if (!parser.hasCategory(newWikitext, category)) {
+                        newWikitext = parser.addCategory(newWikitext, category);
+                    }
+                }
+
+                // Only save if changed
+                if (newWikitext === revision.content) {
+                    return false; // No changes needed
+                }
+
+                const parts = [];
+                if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
+                if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
+
+                return {
+                    text: newWikitext,
+                    summary: `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`,
+                    minor: false
+                };
+            });
+
+            return { success: true, modified: true };
+        } catch (error) {
+            if (error.message && error.message.includes('no changes')) {
+                return { success: true, modified: false };
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Get current categories for a file using the optimized API method
+     * @param {string} fileTitle - File page title
+     * @returns {Promise<Array<string>>} Array of category names
+     */
+    async getCurrentCategories(fileTitle) {
+        const categories = await this.api.getCategories(fileTitle);
+        if (categories === false) {
+            return [];
+        }
+        return categories;
+    }
+
+    /**
+     * TODO: use it in the workflow or move it to a utility module
+     * Build an edit summary from add/remove lists
+     * @param {Array<string>} toAdd - Categories added
+     * @param {Array<string>} toRemove - Categories removed
+     * @returns {string} Edit summary
+     */
+    buildEditSummary(toAdd, toRemove) {
+        const parts = [];
+        if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
+        if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
+        return `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`;
     }
 }
 
@@ -863,7 +1301,9 @@ class ProgressBar {
 class ExecuteHandler {
     /**
      */
-    constructor() {
+    constructor(mwApi) {
+        this.categoryService = new CategoryService(mwApi)
+        this.batchProcessor = new BatchProcessor(this.categoryService)
     }
 
     /**
@@ -959,7 +1399,7 @@ class PreviewHandler {
     }
     createElement() {
         return `
-        <cdx-button @click="previewTheChanges" action="default" weight="normal"
+        <cdx-button @click="handlePreview" action="default" weight="normal"
             :disabled="isProcessing">
             Preview Changes
         </cdx-button>
@@ -1005,6 +1445,18 @@ class PreviewHandler {
     async handlePreview(self) {
         console.log('[CBM-P] Preview button clicked');
 
+        const selectedCount = self.selectedCount;
+
+        if (selectedCount === 0) {
+            self.showWarningMessage('Please select at least one file.');
+            return;
+        }
+
+        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+            self.showWarningMessage('Please specify categories to add or remove.');
+            return;
+        }
+
         // Use ValidationHelper for common validation
         const validation = this.validator.validateBatchOperation(self);
         if (!validation) return;
@@ -1014,7 +1466,7 @@ class PreviewHandler {
         // Generate preview without affecting file list - no loading indicator
         try {
             console.log('[CBM-P] Calling batchProcessor.previewChanges');
-            const preview = await self.batchProcessor.previewChanges(
+            const preview = await this.previewChanges(
                 selectedFiles,
                 toAdd,
                 toRemove
@@ -1085,6 +1537,73 @@ class PreviewHandler {
     hidePreviewModal() {
         const modal = document.getElementById('cbm-preview-modal');
         modal.classList.add('hidden');
+    }
+
+    /**
+     * Check if a category exists in a list (with normalization)
+     * @param {string} category - Category to find
+     * @param {Array<string>} categoryList - List to search in
+     * @returns {number} Index of the category in the list, or -1 if not found
+     */
+    findCategoryIndex(category, categoryList) {
+        const normalized = this.validator.normalizeCategoryName(category);
+        return categoryList.findIndex(cat => {
+            return this.validator.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
+        });
+    }
+    /**
+     * Check if category exists in a list (with normalization)
+     * @param {string} category - Category to check
+     * @param {Array<string>} categoryList - List to search in
+     * @returns {boolean} True if category exists in the list
+     */
+    categoryExists(category, categoryList) {
+        return this.findCategoryIndex(category, categoryList) !== -1;
+    }
+
+    /**
+     * Preview changes without actually editing
+     * @param {Array} files - Files to preview
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @returns {Promise<Array>} Preview of changes
+     */
+    async previewChanges(files, categoriesToAdd, categoriesToRemove) {
+        const previews = [];
+
+        for (const file of files) {
+            const current = file.currentCategories || [];
+
+            // Check if trying to add categories that already exist (with normalization)
+            if (categoriesToAdd.length > 0) {
+                const duplicateCategories = categoriesToAdd.filter(cat => this.categoryExists(cat, current));
+                if (duplicateCategories.length > 0) {
+                    throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+                }
+            }
+
+            const after = [...current];
+
+            // Simulate removal (with normalization for matching)
+            categoriesToRemove.forEach(cat => {
+                const index = this.findCategoryIndex(cat, after);
+                if (index > -1) after.splice(index, 1);
+            });
+
+            // Simulate addition (with normalization for checking duplicates)
+            categoriesToAdd.forEach(cat => {
+                if (!this.categoryExists(cat, after)) after.push(cat);
+            });
+
+            previews.push({
+                file: file.title,
+                currentCategories: current,
+                newCategories: after,
+                willChange: JSON.stringify(current) !== JSON.stringify(after)
+            });
+        }
+
+        return previews;
     }
 }
 
@@ -1440,15 +1959,9 @@ function BatchManager() {
                 }
             },
 
-            /* *************************
-            **      BatchProcessor
-            ** *************************
-            */
-
-            // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
-            previewTheChanges: function () {
-                return this.preview_handler.previewTheChanges(this);
+            handlePreview: function () {
+                return this.preview_handler.handlePreview(this);
             },
 
             /* *************************

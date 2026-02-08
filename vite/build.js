@@ -10,11 +10,12 @@ const path = require('path');
 const SOURCE_FILES = [
     'src/utils/Validator.js',
     'src/utils/RateLimiter.js',
-    // 'src/utils/WikitextParser.js',
+    'src/utils/WikitextParser.js',
     'src/models/FileModel.js',
     'src/models/CategoryOperation.js',
     'vite/src/services/APIService.js',
-    // 'vite/src/services/CategoryService.js',
+    'vite/src/services/BatchProcessor.js',
+    'vite/src/services/CategoryService.js',
     'vite/src/services/FileService.js',
 
     'vite/src/ui/components/CategoryInputs.js',

@@ -24,10 +24,19 @@ class CategoryInputs {
                 <span class="cbm-help-text">
                     e.g., Category:Belarus, Category:Europe
                 </span>
-                <cdx-multiselect-lookup v-model:input-chips="addCategoryChips" v-model:selected="addCategories"
-                    :menu-items="addCategoryMenuItems" :menu-config="addCategoryMenuConfig"
-                    aria-label="Add categories" placeholder="Type to search categories" @input="onAddCategoryInput"
-                    @update:input-chips="handleAddCategoryChipChange">
+                <cdx-multiselect-lookup
+                    id="cdx-category-add"
+                    v-model:input-chips="addCategoryChips"
+                    v-model:selected="addCategories"
+		            v-model:input-value="addInputValue"
+                    :menu-items="addCategoryMenuItems"
+                    :menu-config="addCategoryMenuConfig"
+                    aria-label="Add categories"
+                    placeholder="Type to search categories"
+                    @input="onAddCategoryInput"
+                    @update:input-value="onUpdateInputValue"
+		            @load-more="addOnLoadMore"
+                >
                     <template #no-results>
                         Type at least 2 characters to search
                     </template>
@@ -38,11 +47,17 @@ class CategoryInputs {
                 <cdx-label input-id="cbm-remove-cats" class="cbm-label">
                     Remove Categories
                 </cdx-label>
-                <cdx-multiselect-lookup v-model:input-chips="removeCategoryChips"
-                    v-model:selected="removeCategories" :menu-items="removeCategoryMenuItems"
-                    :menu-config="removeCategoryMenuConfig" aria-label="Remove categories"
-                    placeholder="Type to search categories" @input="onRemoveCategoryInput"
-                    @update:input-chips="handleRemoveCategoryChipChange">
+                <cdx-multiselect-lookup
+                    id="cdx-category-remove"
+                    v-model:input-chips="removeCategoryChips"
+                    v-model:selected="removeCategories"
+                    :menu-items="removeCategoryMenuItems"
+                    :menu-config="removeCategoryMenuConfig"
+                    aria-label="Remove categories"
+                    placeholder="Type to search categories"
+                    @input="onRemoveCategoryInput"
+                    @update:input-value="handleRemoveCategoryChipChange"
+                    >
                     <template #no-results>
                         Type at least 2 characters to search
                     </template>
@@ -50,7 +65,6 @@ class CategoryInputs {
             </div>
     `;
     }
-    // handleAddCategoryChipChange, onAddCategoryInput, onRemoveCategoryInput, handleRemoveCategoryChipChange
     /**
      * Handle add category input with debounce.
      * @param {string} value - The input value to search for
@@ -103,7 +117,7 @@ class CategoryInputs {
      * Handle chip changes for add categories.
      * @param {Array} newChips - The new chips array
      */
-    handleAddCategoryChipChange(self, newChips) {
+    onUpdateInputValue(self, newChips) {
         self.addCategoryChips = newChips;
         self.addCategories = newChips.map(chip => chip.value);
     }

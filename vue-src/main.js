@@ -22,7 +22,7 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
         .component('cdx-dialog', Codex.CdxDialog)
         .component('cdx-label', Codex.CdxLabel)
         .component('cdx-multiselect-lookup', Codex.CdxMultiselectLookup)
-        .mount('#category-batch-manager');
+        .mount('#category-batch-manager2');
 });
 
 // </nowiki>

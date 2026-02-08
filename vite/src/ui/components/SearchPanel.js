@@ -20,7 +20,7 @@ class SearchPanel {
                     Source Category
                 </cdx-label>
                 <cdx-text-input id="cbm-source-category" v-model="sourceCategory"
-                    placeholder="Category:Economic Data" />
+                    placeholder="Category:Our World in Data graphs of Austria" />
             </div>
 
             <div class="cbm-input-group">

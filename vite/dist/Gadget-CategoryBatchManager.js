@@ -347,7 +347,7 @@ class SearchPanel {
     }
 
     /**
-     * searchFiles() {} to be moved from createCategoryBatchManager.js to here.
+     * searchFiles() {} to be moved from BatchManager.js to here.
      */
 
 }
@@ -587,7 +587,7 @@ class ProgressSection {
     }
 }
 
-// === vite/src/createCategoryBatchManager.js ===
+// === vite/src/BatchManager.js ===
 /**
  * Creates the Vue app definition for the Category Batch Manager tool.
  * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
@@ -595,7 +595,7 @@ class ProgressSection {
  */
 
 
-function createCategoryBatchManager(api) {
+function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
     const category_inputs = new CategoryInputs(mwApi);
@@ -966,7 +966,7 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
 
-    const app = createCategoryBatchManager(categoryBatchManager.api);
+    const app = BatchManager(categoryBatchManager.api);
 
     Vue.createMwApp(app)
         .component('cdx-text-input', Codex.CdxTextInput)

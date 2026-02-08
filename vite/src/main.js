@@ -13,7 +13,7 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
 
-    const app = createCategoryBatchManager(categoryBatchManager.api);
+    const app = BatchManager(categoryBatchManager.api);
 
     Vue.createMwApp(app)
         .component('cdx-text-input', Codex.CdxTextInput)

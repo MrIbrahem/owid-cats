@@ -5,7 +5,7 @@
  */
 /* global APIService, SearchPanel, CategoryInputs, FilesList, ProgressSection */
 
-function createCategoryBatchManager(api) {
+function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
     const category_inputs = new CategoryInputs(mwApi);
@@ -361,5 +361,5 @@ function createCategoryBatchManager(api) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = createCategoryBatchManager;
+    module.exports = BatchManager;
 }

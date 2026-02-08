@@ -14,7 +14,7 @@ const SOURCE_FILES = [
     'vite/src/ui/components/CategoryInputs.js',
     'vite/src/ui/components/FilesList.js',
     'vite/src/ui/components/ProgressSection.js',
-    'vite/src/createCategoryBatchManager.js',
+    'vite/src/BatchManager.js',
     'vite/src/main.js',
 ];
 
@@ -38,7 +38,7 @@ function stripModuleExports(code) {
     );
     // Remove blocks like:
     // module.exports = {
-    //     createCategoryBatchManager
+    //     BatchManager
     // };
     code = code.replace(/module\.exports = \{[\s\S]*?\};\n?/g, '');
     return code;

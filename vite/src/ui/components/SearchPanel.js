@@ -44,7 +44,7 @@ class SearchPanel {
     }
 
     /**
-     * searchFiles() {} to be moved from createCategoryBatchManager.js to here.
+     * searchFiles() {} to be moved from BatchManager.js to here.
      */
 
 }

@@ -18,8 +18,8 @@ const SOURCE_FILES = [
     'vite/src/main.js',
 ];
 
-const DIST_DIR = 'dist';
-const OUTPUT_JS = 'dist/Gadget-CategoryBatchManager.js';
+const DIST_DIR = 'vite/dist';
+const OUTPUT_JS = 'vite/dist/Gadget-CategoryBatchManager.js';
 
 /**
  * Strip module.exports blocks from JavaScript code

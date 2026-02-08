@@ -11,7 +11,7 @@
  */
 // <nowiki>
 
-// === src/services/APIService.js ===
+// === vite/src/services/APIService.js ===
 /**
  * Service for interacting with the MediaWiki API
  *
@@ -300,7 +300,7 @@ class APIService {
     }
 }
 
-// === src/ui/components/SearchPanel.js ===
+// === vite/src/ui/components/SearchPanel.js ===
 /**
  * Search panel UI component using Codex CSS-only classes.
  * @see https://doc.wikimedia.org/codex/latest/
@@ -352,7 +352,7 @@ class SearchPanel {
 
 }
 
-// === src/ui/components/CategoryInputs.js ===
+// === vite/src/ui/components/CategoryInputs.js ===
 /**
  * Category inputs UI component using Codex CSS-only classes.
  * Manages the add categories, remove categories inputs with autocomplete.
@@ -473,7 +473,7 @@ class CategoryInputs {
     }
 }
 
-// === src/ui/components/FilesList.js ===
+// === vite/src/ui/components/FilesList.js ===
 /**
  * @class FilesList
  */
@@ -550,7 +550,7 @@ class FilesList {
     }
 }
 
-// === src/ui/components/ProgressSection.js ===
+// === vite/src/ui/components/ProgressSection.js ===
 /**
  * @class ProgressSection
  */
@@ -587,7 +587,7 @@ class ProgressSection {
     }
 }
 
-// === src/createCategoryBatchManager.js ===
+// === vite/src/createCategoryBatchManager.js ===
 /**
  * Creates the Vue app definition for the Category Batch Manager tool.
  * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
@@ -950,7 +950,7 @@ function createCategoryBatchManager(api) {
     return app;
 }
 
-// === src/main.js ===
+// === vite/src/main.js ===
 // <nowiki>
 
 if (typeof categoryBatchManager === 'undefined') {

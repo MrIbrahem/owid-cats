@@ -13,10 +13,15 @@ const SOURCE_FILES = [
     'vite/src/services/APIService.js',
     // 'vite/src/services/CategoryService.js',
     'vite/src/services/FileService.js',
-    'vite/src/ui/components/SearchHandler.js',
     'vite/src/ui/components/CategoryInputs.js',
     'vite/src/ui/components/FilesList.js',
     'vite/src/ui/components/ProgressBar.js',
+    'vite/src/ui/helpers/ValidationHelper.js',
+
+    'vite/src/ui/handlers/ExecuteHandler.js',
+    'vite/src/ui/handlers/PreviewHandler.js',
+    'vite/src/ui/handlers/SearchHandler.js',
+
     'vite/src/BatchManager.js',
     'vite/src/gadget-entry.js',
 ];

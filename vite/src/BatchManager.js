@@ -12,11 +12,15 @@ function BatchManager(api) {
     const files_list = new FilesList(mwApi);
     const progress_section = new ProgressBar();
     const file_service = new FileService(mwApi);
+    const execute_handler = new ExecuteHandler(mwApi);
+    const preview_handler = new PreviewHandler();
 
     const Search_SectionHtml = search_handler.createElement();
     const CategoryInputPanelHtml = category_inputs.createElement();
     const FilesListHtml = files_list.createElement();
     const ProgressSectionHtml = progress_section.createElement();
+    const ExecuteSectionHtml = execute_handler.createElement();
+    const PreviewChangesHtml = preview_handler.createElement();
 
     const template = `
         <div class="cbm-container">
@@ -52,16 +56,8 @@ function BatchManager(api) {
                     </div>
 
                     <div class="cbm-button-group">
-                        <cdx-button @click="previewChanges" action="default" weight="normal"
-                            :disabled="isProcessing">
-                            Preview Changes
-                        </cdx-button>
-                        <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary">
-                            GO
-                        </cdx-button>
-                        <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary">
-                            Stop Process
-                        </cdx-button>
+                        ${PreviewChangesHtml}
+                        ${ExecuteSectionHtml}
                     </div>
                 </div>
                 <!-- Progress Section -->
@@ -191,29 +187,8 @@ function BatchManager(api) {
 
             // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
-            previewChanges: function () {
-                const selectedCount = this.selectedCount;
-
-                if (selectedCount === 0) {
-                    this.showWarningMessage('Please select at least one file.');
-                    return;
-                }
-
-                if (this.addCategories.length === 0 && this.removeCategories.length === 0) {
-                    this.showWarningMessage('Please specify categories to add or remove.');
-                    return;
-                }
-
-                // Placeholder - implement preview logic
-                let previewMessage = `Preview for ${selectedCount} file(s):\n`;
-                if (this.addCategories.length > 0) {
-                    previewMessage += `\nAdding: ${this.addCategories.join(', ')}`;
-                }
-                if (this.removeCategories.length > 0) {
-                    previewMessage += `\nRemoving: ${this.removeCategories.join(', ')}`;
-                }
-
-                alert(previewMessage);
+            previewTheChanges: function () {
+                return this.preview_handler.previewTheChanges(this);
             },
 
             /* *************************
@@ -221,60 +196,19 @@ function BatchManager(api) {
             ** *************************
             */
 
-            // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
             // Execute batch operation
             executeOperation: function () {
-                const selectedCount = this.selectedCount;
-
-                if (selectedCount === 0) {
-                    this.showWarningMessage('Please select at least one file.');
-                    return;
-                }
-
-                if (this.addCategories.length === 0 && this.removeCategories.length === 0) {
-                    this.showWarningMessage('Please specify categories to add or remove.');
-                    return;
-                }
-
-                if (!confirm(`Are you sure you want to process ${selectedCount} file(s)?`)) {
-                    return;
-                }
-
-                this.isProcessing = true;
-                this.shouldStopProgress = false;
-                this.showProgress = true;
-
-                // Placeholder - implement actual batch processing
-                const selectedFilesToProcess = this.selectedFiles.filter(f => f.selected);
-                this.processBatch(selectedFilesToProcess, 0);
+                return this.execute_handler.executeOperation(this);
             },
 
             // Process files sequentially
             processBatch: function (files, index) {
-                if (this.shouldStopProgress || index >= files.length) {
-                    this.isProcessing = false;
-                    this.showProgress = false;
-                    if (!this.shouldStopProgress) {
-                        this.showSuccessMessage('Batch operation completed successfully!');
-                    } else {
-                        this.showWarningMessage('Operation stopped by user.');
-                    }
-                    return;
-                }
-
-                this.progressPercent = ((index + 1) / files.length) * 100;
-                this.progressText = `Processing ${index + 1} of ${files.length}...`;
-
-                // Placeholder - implement actual file processing
-                setTimeout(() => {
-                    console.log('Processing:', files[index].title);
-                    this.processBatch(files, index + 1);
-                }, 500);
+                return this.execute_handler.processBatch(this, files, index);
             },
 
             // Stop ongoing operation
             stopOperation: function () {
-                this.shouldStopProgress = true;
+                return this.execute_handler.stopOperation(this);
             },
 
             /* *************************

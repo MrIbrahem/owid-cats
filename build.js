@@ -8,7 +8,6 @@ const path = require('path');
 
 // File order according to dependency requirements
 const SOURCE_FILES = [
-  'src/utils/Logger.js',
   'src/utils/RateLimiter.js',
   'src/utils/Validator.js',
   'src/utils/WikitextParser.js',

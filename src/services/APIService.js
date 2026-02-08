@@ -10,7 +10,7 @@
  * @class APIService
  */
 
-/* global Logger, mw */
+/* global mw */
 
 class APIService {
     constructor() {
@@ -132,9 +132,7 @@ class APIService {
                     return title;
                 });
         } catch (error) {
-            if (typeof Logger !== 'undefined') {
-                Logger.error('Failed to search categories', error);
-            }
+            console.error('Failed to search categories', error);
             return [];
         }
     }
@@ -184,9 +182,7 @@ class APIService {
                 return catStr.replace(/^Category:/, '');
             });
         } catch (error) {
-            if (typeof Logger !== 'undefined') {
-                Logger.error('Failed to get categories', error);
-            }
+            console.error('Failed to get categories', error);
             throw error;
         }
     }
@@ -281,9 +277,8 @@ class APIService {
         try {
             return await this.mwApi.get(params);
         } catch (error) {
-            if (typeof Logger !== 'undefined') {
-                Logger.error('API request failed', error);
-            }
+            console.error('API request failed', error);
+
             throw error;
         }
     }

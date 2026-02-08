@@ -11,6 +11,78 @@
  */
 // <nowiki>
 
+// === src/utils/Validator.js ===
+/**
+ * Input validation utility
+ * @class Validator
+ */
+class Validator {
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Check if a category name is valid
+     * @param {string} name - Category name to validate
+     * @returns {boolean} True if valid
+     */
+    static isValidCategoryName(name) {
+        if (!name || typeof name !== 'string') return false;
+        const trimmed = name.trim();
+        if (trimmed.length === 0) return false;
+        // Category names must not contain certain characters
+        const invalidChars = /[#<>\[\]{|}]/;
+        const cleanName = trimmed.replace(/^Category:/i, '');
+        return cleanName.length > 0 && !invalidChars.test(cleanName);
+    }
+
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Check if a search pattern is valid
+     * @param {string} pattern - Search pattern to validate
+     * @returns {boolean} True if valid
+     */
+    static isValidSearchPattern(pattern) {
+        if (!pattern || typeof pattern !== 'string') return false;
+        return pattern.trim().length > 0;
+    }
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Sanitize user input to prevent injection
+     * @param {string} input - Raw user input
+     * @returns {string} Sanitized input
+     */
+    static sanitizeInput(input) {
+        if (!input || typeof input !== 'string') return '';
+        return input.trim();
+    }
+
+    /**
+     * Normalize category name for comparison (remove prefix, convert underscores to spaces)
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    static normalizeCategoryName(categoryName) {
+        if (!categoryName || typeof categoryName !== 'string') return '';
+        return categoryName
+            .replace(/^Category:/i, '')
+            .replace(/_/g, ' ')
+            .trim();
+    }
+
+    /**
+     * Check if a category is trying to add itself (circular reference)
+     * @param {string} currentCategory - The category being edited
+     * @param {string} categoryToAdd - The category to be added
+     * @returns {boolean} True if circular reference detected
+     */
+    static isCircularCategory(currentCategory, categoryToAdd) {
+        if (!currentCategory || !categoryToAdd) return false;
+
+        const normalizedCurrent = this.normalizeCategoryName(currentCategory);
+        const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
+
+        return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
+    }
+}
+
 // === src/models/FileModel.js ===
 /**
  * File model representing a Wikimedia Commons file
@@ -529,16 +601,34 @@ class CategoryInputs {
                     </template>
                 </cdx-multiselect-lookup>
             </div>
+            <!-- Category Remove Message -->
+            <div v-if="showRemoveCategoryMessage" class="margin-bottom-20">
+                <cdx-message type="{{ removeCategoryMessageType }}" :inline="false">
+                    {{ removeCategoryMessageText }}
+                </cdx-message>
+            </div>
     `;
     }
-    displayAddCategoryMessage(self, text, type = 'error') {
-        self.showAddCategoryMessage = true;
-        self.addCategoryMessageType = type;
-        self.addCategoryMessageText = text;
+    displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
+        if (msg_type === 'add') {
+            self.showAddCategoryMessage = true;
+            self.addCategoryMessageType = type;
+            self.addCategoryMessageText = text;
+        } else if (msg_type === 'remove') {
+            self.showRemoveCategoryMessage = true;
+            self.removeCategoryMessageType = type;
+            self.removeCategoryMessageText = text;
+        }
     }
-    hideAddCategoryMessage(self) {
-        self.showAddCategoryMessage = false;
-        self.addCategoryMessageText = '';
+
+    hideCategoryMessage(self, msg_type = 'add') {
+        if (msg_type === 'add') {
+            self.showAddCategoryMessage = false;
+            self.addCategoryMessageText = '';
+        } else if (msg_type === 'remove') {
+            self.showRemoveCategoryMessage = false;
+            self.removeCategoryMessageText = '';
+        }
     }
     deduplicateResults(items1, results) {
         const seen = new Set(items1.map((result) => result.value));
@@ -550,6 +640,8 @@ class CategoryInputs {
      * @param {string} value - The input value to search for
      */
     async onAddCategoryInput(self, value) {
+        this.hideCategoryMessage(self, 'add');
+
         // Clear menu items if the input was cleared.
         if (!value) {
             console.warn('Add category input cleared, clearing menu items.');
@@ -588,6 +680,7 @@ class CategoryInputs {
      * @param {string} value - The input value to search for
      */
     async onRemoveCategoryInput(self, value) {
+        this.hideCategoryMessage(self, 'remove');
         // Clear menu items if the input was cleared.
         if (!value) {
             console.warn('Remove category input cleared, clearing menu items.');
@@ -982,7 +1075,7 @@ class PreviewHandler {
 
         if (changesCount === 0) {
             console.log('[CBM] No changes detected');
-            self.displayAddCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
+            self.displayCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice', 'add');
             return;
         }
 
@@ -1075,6 +1168,7 @@ class SearchHandler {
         self.selectedFiles = [...self.searchResults];
         self.showProgress = false;
         self.showResultsMessage = true;
+        self.isSearching = false;
         self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
 
@@ -1125,9 +1219,10 @@ class ValidationHelper {
 
         // If all categories are circular, show error
         if (circularCategories.length > 0 && validCategories.length === 0) {
-            self.displayAddCategoryMessage(
+            self.displayCategoryMessage(
                 `❌ Cannot add: all categorie(s) are circular references to the current page. Cannot add "${circularCategories.join(', ')}" to itself.`,
-                'error'
+                'error',
+                'add'
             );
             return null;
         }
@@ -1151,7 +1246,7 @@ class ValidationHelper {
         // Check if there are any valid operations remaining
         if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
-            self.displayAddCategoryMessage('No valid categories to add or remove.', 'warning');
+            self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
             return null;
         }
 
@@ -1271,7 +1366,12 @@ function BatchManager() {
                 shouldStopSearch: false,
 
                 showAddCategoryMessage: false,
+                addCategoryMessageType: '',
                 addCategoryMessageText: '',
+
+                showRemoveCategoryMessage: false,
+                removeCategoryMessageType: '',
+                removeCategoryMessageText: '',
 
                 showResultsMessage: false,
                 resultsMessageText: '',
@@ -1381,11 +1481,11 @@ function BatchManager() {
             **      CategoryInputs
             ** *************************
             */
-            displayAddCategoryMessage: function (text, type) {
-                return this.category_inputs.displayAddCategoryMessage(this, text, type);
+            displayCategoryMessage: function (text, type, msg_type = 'add') {
+                return this.category_inputs.displayCategoryMessage(this, text, type, msg_type);
             },
-            hideAddCategoryMessage: function () {
-                return this.category_inputs.hideAddCategoryMessage(this);
+            hideCategoryMessage: function (msg_type = 'add') {
+                return this.category_inputs.hideCategoryMessage(this, msg_type);
             },
             onAddCategoryInput: function (value) {
                 return this.category_inputs.onAddCategoryInput(this, value);

@@ -128,7 +128,7 @@ class PreviewHandler {
 
         if (changesCount === 0) {
             console.log('[CBM] No changes detected');
-            self.displayAddCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
+            self.displayCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice', 'add');
             return;
         }
 

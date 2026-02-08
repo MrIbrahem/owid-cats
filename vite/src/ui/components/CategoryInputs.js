@@ -70,16 +70,34 @@ class CategoryInputs {
                     </template>
                 </cdx-multiselect-lookup>
             </div>
+            <!-- Category Remove Message -->
+            <div v-if="showRemoveCategoryMessage" class="margin-bottom-20">
+                <cdx-message type="{{ removeCategoryMessageType }}" :inline="false">
+                    {{ removeCategoryMessageText }}
+                </cdx-message>
+            </div>
     `;
     }
-    displayAddCategoryMessage(self, text, type = 'error') {
-        self.showAddCategoryMessage = true;
-        self.addCategoryMessageType = type;
-        self.addCategoryMessageText = text;
+    displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
+        if (msg_type === 'add') {
+            self.showAddCategoryMessage = true;
+            self.addCategoryMessageType = type;
+            self.addCategoryMessageText = text;
+        } else if (msg_type === 'remove') {
+            self.showRemoveCategoryMessage = true;
+            self.removeCategoryMessageType = type;
+            self.removeCategoryMessageText = text;
+        }
     }
-    hideAddCategoryMessage(self) {
-        self.showAddCategoryMessage = false;
-        self.addCategoryMessageText = '';
+
+    hideCategoryMessage(self, msg_type = 'add') {
+        if (msg_type === 'add') {
+            self.showAddCategoryMessage = false;
+            self.addCategoryMessageText = '';
+        } else if (msg_type === 'remove') {
+            self.showRemoveCategoryMessage = false;
+            self.removeCategoryMessageText = '';
+        }
     }
     deduplicateResults(items1, results) {
         const seen = new Set(items1.map((result) => result.value));
@@ -91,6 +109,8 @@ class CategoryInputs {
      * @param {string} value - The input value to search for
      */
     async onAddCategoryInput(self, value) {
+        this.hideCategoryMessage(self, 'add');
+
         // Clear menu items if the input was cleared.
         if (!value) {
             console.warn('Add category input cleared, clearing menu items.');
@@ -129,6 +149,7 @@ class CategoryInputs {
      * @param {string} value - The input value to search for
      */
     async onRemoveCategoryInput(self, value) {
+        this.hideCategoryMessage(self, 'remove');
         // Clear menu items if the input was cleared.
         if (!value) {
             console.warn('Remove category input cleared, clearing menu items.');

@@ -36,9 +36,10 @@ class ValidationHelper {
 
         // If all categories are circular, show error
         if (circularCategories.length > 0 && validCategories.length === 0) {
-            self.displayAddCategoryMessage(
+            self.displayCategoryMessage(
                 `❌ Cannot add: all categorie(s) are circular references to the current page. Cannot add "${circularCategories.join(', ')}" to itself.`,
-                'error'
+                'error',
+                'add'
             );
             return null;
         }
@@ -62,7 +63,7 @@ class ValidationHelper {
         // Check if there are any valid operations remaining
         if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
-            self.displayAddCategoryMessage('No valid categories to add or remove.', 'warning');
+            self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
             return null;
         }
 

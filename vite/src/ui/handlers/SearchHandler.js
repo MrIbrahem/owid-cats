@@ -71,6 +71,7 @@ class SearchHandler {
         self.selectedFiles = [...self.searchResults];
         self.showProgress = false;
         self.showResultsMessage = true;
+        self.isSearching = false;
         self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
 

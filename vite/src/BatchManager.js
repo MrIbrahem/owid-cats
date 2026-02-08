@@ -105,7 +105,12 @@ function BatchManager() {
                 shouldStopSearch: false,
 
                 showAddCategoryMessage: false,
+                addCategoryMessageType: '',
                 addCategoryMessageText: '',
+
+                showRemoveCategoryMessage: false,
+                removeCategoryMessageType: '',
+                removeCategoryMessageText: '',
 
                 showResultsMessage: false,
                 resultsMessageText: '',
@@ -215,11 +220,11 @@ function BatchManager() {
             **      CategoryInputs
             ** *************************
             */
-            displayAddCategoryMessage: function (text, type) {
-                return this.category_inputs.displayAddCategoryMessage(this, text, type);
+            displayCategoryMessage: function (text, type, msg_type = 'add') {
+                return this.category_inputs.displayCategoryMessage(this, text, type, msg_type);
             },
-            hideAddCategoryMessage: function () {
-                return this.category_inputs.hideAddCategoryMessage(this);
+            hideCategoryMessage: function (msg_type = 'add') {
+                return this.category_inputs.hideCategoryMessage(this, msg_type);
             },
             onAddCategoryInput: function (value) {
                 return this.category_inputs.onAddCategoryInput(this, value);

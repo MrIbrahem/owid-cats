@@ -8,6 +8,8 @@ const path = require('path');
 
 // File order according to dependency requirements
 const SOURCE_FILES = [
+    'src/utils/Validator.js',
+    // 'src/utils/WikitextParser.js',
     'src/models/FileModel.js',
     'src/models/CategoryOperation.js',
     'vite/src/services/APIService.js',

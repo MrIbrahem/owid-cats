@@ -2483,7 +2483,8 @@ class CategoryBatchManagerUI {
                         </div>
                     </div>
                 </div>
-            </div>            <div id="cbm-preview-modal" class="cbm-modal hidden">
+            </div>
+            <div id="cbm-preview-modal" class="cbm-modal hidden">
                 <div class="cbm-modal-content">
                     <h3>Preview Changes</h3>
                     <div id="cbm-preview-content"></div>

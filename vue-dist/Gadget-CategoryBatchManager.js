@@ -360,30 +360,10 @@ class SearchPanel {
  */
 class CategoryInputs {
     /**
-     * @param {mw.Api} apiService - API service for category search
+     * @param {APIService} apiService - API service for category search
      */
     constructor(apiService) {
         this.apiService = apiService;
-
-        // For multiselect lookup - Add Categories
-        this.addCategoryChips = [];
-        this.addCategoryMenuItems = [];
-        this.addCategoryMenuConfig = {
-            boldLabel: true,
-            visibleItemLimit: 10
-        };
-
-        // For multiselect lookup - Remove Categories
-        this.removeCategoryChips = [];
-        this.removeCategoryMenuItems = [];
-        this.removeCategoryMenuConfig = {
-            boldLabel: true,
-            visibleItemLimit: 10
-        };
-
-        // Debounce timers
-        this.addCategoryDebounce = null;
-        this.removeCategoryDebounce = null;
     }
 
     /**
@@ -426,9 +406,69 @@ class CategoryInputs {
     }
     // handleAddCategoryChipChange, onAddCategoryInput, onRemoveCategoryInput, handleRemoveCategoryChipChange
     /**
-     * Attach event listeners for category inputs including autocomplete
+     * Handle add category input with debounce.
+     * @param {string} value - The input value to search for
      */
-    attachListeners() {
+    onAddCategoryInput(self, value) {
+        // Clear previous timeout
+        if (self.addCategoryDebounce) {
+            clearTimeout(self.addCategoryDebounce);
+        }
+
+        // If empty, clear menu items
+        if (!value || value.trim().length < 2) {
+            self.addCategoryMenuItems = [];
+            return;
+        }
+
+        // Debounce API call
+        self.addCategoryDebounce = setTimeout(() => {
+            this.apiService.fetchCategories(value).then((items) => {
+                self.addCategoryMenuItems = items;
+            });
+        }, 300); // 300ms debounce
+    }
+
+    /**
+     * Handle remove category input with debounce.
+     * @param {string} value - The input value to search for
+     */
+    onRemoveCategoryInput(self, value) {
+        // Clear previous timeout
+        if (self.removeCategoryDebounce) {
+            clearTimeout(self.removeCategoryDebounce);
+        }
+
+        // If empty, clear menu items
+        if (!value || value.trim().length < 2) {
+            self.removeCategoryMenuItems = [];
+            return;
+        }
+
+        // Debounce API call
+        self.removeCategoryDebounce = setTimeout(() => {
+            this.apiService.fetchCategories(value).then((items) => {
+                self.removeCategoryMenuItems = items;
+            });
+        }, 300); // 300ms debounce
+    }
+
+    /**
+     * Handle chip changes for add categories.
+     * @param {Array} newChips - The new chips array
+     */
+    handleAddCategoryChipChange(self, newChips) {
+        self.addCategoryChips = newChips;
+        self.addCategories = newChips.map(chip => chip.value);
+    }
+
+    /**
+     * Handle chip changes for remove categories.
+     * @param {Array} newChips - The new chips array
+     */
+    handleRemoveCategoryChipChange(self, newChips) {
+        self.removeCategoryChips = newChips;
+        self.removeCategories = newChips.map(chip => chip.value);
     }
 }
 
@@ -557,7 +597,7 @@ class ProgressSection {
 function createCategoryBatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
-    const category_inputs = new CategoryInputs(api);
+    const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList();
     const progress_section = new ProgressSection();
 
@@ -693,6 +733,11 @@ function createCategoryBatchManager(api) {
             }
         },
         methods: {
+            /* *************************
+            **      FileService
+            ** *************************
+            */
+
             // should be moved to services/FileService.js
             searchFiles: function () {
                 this.resetMessageState();
@@ -725,6 +770,11 @@ function createCategoryBatchManager(api) {
                 }, 1000);
             },
 
+            /* *************************
+            **      FilesList
+            ** *************************
+            */
+
             // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Select all files
             selectAll: function () {
@@ -745,6 +795,11 @@ function createCategoryBatchManager(api) {
                     this.showResultsMessage = false;
                 }
             },
+
+            /* *************************
+            **      BatchProcessor
+            ** *************************
+            */
 
             // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
@@ -772,6 +827,11 @@ function createCategoryBatchManager(api) {
 
                 alert(previewMessage);
             },
+
+            /* *************************
+            **      ExecuteHandler
+            ** *************************
+            */
 
             // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
             // Execute batch operation
@@ -829,63 +889,31 @@ function createCategoryBatchManager(api) {
                 this.shouldStop = true;
             },
 
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle add category input with debounce
-            onAddCategoryInput: function (value) {
-                // Clear previous timeout
-                if (this.addCategoryDebounce) {
-                    clearTimeout(this.addCategoryDebounce);
-                }
+            /* *************************
+            **      CategoryInputs
+            ** *************************
+            */
 
-                // If empty, clear menu items
-                if (!value || value.trim().length < 2) {
-                    this.addCategoryMenuItems = [];
-                    return;
-                }
-
-                // Debounce API call
-                this.addCategoryDebounce = setTimeout(() => {
-                    this.mwApi.fetchCategories(value).then((items) => {
-                        this.addCategoryMenuItems = items;
-                    });
-                }, 300); // 300ms debounce
-            },
-
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle remove category input with debounce
-            onRemoveCategoryInput: function (value) {
-                // Clear previous timeout
-                if (this.removeCategoryDebounce) {
-                    clearTimeout(this.removeCategoryDebounce);
-                }
-
-                // If empty, clear menu items
-                if (!value || value.trim().length < 2) {
-                    this.removeCategoryMenuItems = [];
-                    return;
-                }
-
-                // Debounce API call
-                this.removeCategoryDebounce = setTimeout(() => {
-                    this.mwApi.fetchCategories(value).then((items) => {
-                        this.removeCategoryMenuItems = items;
-                    });
-                }, 300); // 300ms debounce
-            },
-
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle chip changes for add categories
             handleAddCategoryChipChange: function (newChips) {
-                this.addCategoryChips = newChips;
-                this.addCategories = newChips.map(chip => chip.value);
+                return this.category_inputs.handleAddCategoryChipChange(this, newChips);
             },
 
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle chip changes for remove categories
-            handleRemoveCategoryChipChange: function (newChips) {
-                this.removeCategoryChips = newChips;
-                this.removeCategories = newChips.map(chip => chip.value);
+            onAddCategoryInput: function (value) {
+                return this.category_inputs.onAddCategoryInput(this, value);
             },
+
+            onRemoveCategoryInput: function (value) {
+                return this.category_inputs.onRemoveCategoryInput(this, value);
+            },
+
+            handleRemoveCategoryChipChange: function (newChips) {
+                return this.category_inputs.handleRemoveCategoryChipChange(this, newChips);
+            },
+
+            /* *************************
+            **      Message Handlers
+            ** *************************
+            */
 
             // Message handlers
             resetMessageState: function () {

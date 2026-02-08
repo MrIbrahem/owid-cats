@@ -10,26 +10,6 @@ class CategoryInputs {
      */
     constructor(apiService) {
         this.apiService = apiService;
-
-        // For multiselect lookup - Add Categories
-        this.addCategoryChips = [];
-        this.addCategoryMenuItems = [];
-        this.addCategoryMenuConfig = {
-            boldLabel: true,
-            visibleItemLimit: 10
-        };
-
-        // For multiselect lookup - Remove Categories
-        this.removeCategoryChips = [];
-        this.removeCategoryMenuItems = [];
-        this.removeCategoryMenuConfig = {
-            boldLabel: true,
-            visibleItemLimit: 10
-        };
-
-        // Debounce timers
-        this.addCategoryDebounce = null;
-        this.removeCategoryDebounce = null;
     }
 
     /**
@@ -75,22 +55,22 @@ class CategoryInputs {
      * Handle add category input with debounce.
      * @param {string} value - The input value to search for
      */
-    onAddCategoryInput(value) {
+    onAddCategoryInput(self, value) {
         // Clear previous timeout
-        if (this.addCategoryDebounce) {
-            clearTimeout(this.addCategoryDebounce);
+        if (self.addCategoryDebounce) {
+            clearTimeout(self.addCategoryDebounce);
         }
 
         // If empty, clear menu items
         if (!value || value.trim().length < 2) {
-            this.addCategoryMenuItems = [];
+            self.addCategoryMenuItems = [];
             return;
         }
 
         // Debounce API call
-        this.addCategoryDebounce = setTimeout(() => {
+        self.addCategoryDebounce = setTimeout(() => {
             this.apiService.fetchCategories(value).then((items) => {
-                this.addCategoryMenuItems = items;
+                self.addCategoryMenuItems = items;
             });
         }, 300); // 300ms debounce
     }
@@ -99,22 +79,22 @@ class CategoryInputs {
      * Handle remove category input with debounce.
      * @param {string} value - The input value to search for
      */
-    onRemoveCategoryInput(value) {
+    onRemoveCategoryInput(self, value) {
         // Clear previous timeout
-        if (this.removeCategoryDebounce) {
-            clearTimeout(this.removeCategoryDebounce);
+        if (self.removeCategoryDebounce) {
+            clearTimeout(self.removeCategoryDebounce);
         }
 
         // If empty, clear menu items
         if (!value || value.trim().length < 2) {
-            this.removeCategoryMenuItems = [];
+            self.removeCategoryMenuItems = [];
             return;
         }
 
         // Debounce API call
-        this.removeCategoryDebounce = setTimeout(() => {
+        self.removeCategoryDebounce = setTimeout(() => {
             this.apiService.fetchCategories(value).then((items) => {
-                this.removeCategoryMenuItems = items;
+                self.removeCategoryMenuItems = items;
             });
         }, 300); // 300ms debounce
     }
@@ -123,18 +103,18 @@ class CategoryInputs {
      * Handle chip changes for add categories.
      * @param {Array} newChips - The new chips array
      */
-    handleAddCategoryChipChange(newChips) {
-        this.addCategoryChips = newChips;
-        this.addCategories = newChips.map(chip => chip.value);
+    handleAddCategoryChipChange(self, newChips) {
+        self.addCategoryChips = newChips;
+        self.addCategories = newChips.map(chip => chip.value);
     }
 
     /**
      * Handle chip changes for remove categories.
      * @param {Array} newChips - The new chips array
      */
-    handleRemoveCategoryChipChange(newChips) {
-        this.removeCategoryChips = newChips;
-        this.removeCategories = newChips.map(chip => chip.value);
+    handleRemoveCategoryChipChange(self, newChips) {
+        self.removeCategoryChips = newChips;
+        self.removeCategories = newChips.map(chip => chip.value);
     }
 }
 if (typeof module !== 'undefined' && module.exports) {

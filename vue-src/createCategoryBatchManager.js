@@ -306,19 +306,19 @@ function createCategoryBatchManager(api) {
             */
 
             handleAddCategoryChipChange: function (newChips) {
-                return this.category_inputs.handleAddCategoryChipChange(newChips);
+                return this.category_inputs.handleAddCategoryChipChange(this, newChips);
             },
 
             onAddCategoryInput: function (value) {
-                return this.category_inputs.onAddCategoryInput(value);
+                return this.category_inputs.onAddCategoryInput(this, value);
             },
 
             onRemoveCategoryInput: function (value) {
-                return this.category_inputs.onRemoveCategoryInput(value);
+                return this.category_inputs.onRemoveCategoryInput(this, value);
             },
 
             handleRemoveCategoryChipChange: function (newChips) {
-                return this.category_inputs.handleRemoveCategoryChipChange(newChips);
+                return this.category_inputs.handleRemoveCategoryChipChange(this, newChips);
             },
 
             /* *************************

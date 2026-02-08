@@ -89,6 +89,7 @@ function createCategoryBatchManager(api) {
     const app = {
         data: function () {
             return {
+                files_list: files_list, // Reference to FilesList component instance
                 sourceCategory: 'Category:Economic Data',
                 searchPattern: '',
                 addCategories: [],

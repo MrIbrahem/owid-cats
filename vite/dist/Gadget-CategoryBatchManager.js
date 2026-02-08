@@ -1546,9 +1546,9 @@ class PreviewHandler {
      * @returns {number} Index of the category in the list, or -1 if not found
      */
     findCategoryIndex(category, categoryList) {
-        const normalized = this.validator.normalizeCategoryName(category);
+        const normalized = Validator.normalizeCategoryName(category);
         return categoryList.findIndex(cat => {
-            return this.validator.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
+            return Validator.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
         });
     }
     /**

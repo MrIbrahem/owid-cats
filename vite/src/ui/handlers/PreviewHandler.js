@@ -25,15 +25,22 @@ class PreviewHandler {
 
         <cdx-dialog
             v-model:open="openPreviewHandler"
-            title="Save changes"
+            title="Preview Changes"
             :use-close-button="true"
             :primary-action="primaryAction"
             :default-action="defaultAction"
             @primary="onPrimaryAction"
             @default="openPreviewHandler = false"
         >
+        <table v-if="previewFiles.length > 0" class="cbm-preview-table">
+            <tr>
+                <th>File</th>
+                <th>Current Categories</th>
+                <th>New Categories</th>
+            </tr>
             {{ previewHtml }}
-
+        </table>
+            <p> {{ changesCount }} files will be modified </p>
             <template #footer-text>
             </template>
         </cdx-dialog>
@@ -124,35 +131,30 @@ class PreviewHandler {
      * @param {Array} preview - Array of preview items
      */
     showPreviewModal(self, preview) {
-        let html = '<table class="cbm-preview-table">';
-        html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
+        let html = '';
 
-        preview.forEach(item => {
+        self.previewFiles = preview;
+        self.openPreviewHandler = true;
+
+        self.previewFiles.forEach(item => {
             if (item.willChange) {
                 html += `
-          <tr>
-            <td>${item.file}</td>
-            <td>${item.currentCategories.join('<br>')}</td>
-            <td>${item.newCategories.join('<br>')}</td>
-          </tr>
-        `;
+                    <tr>
+                        <td>${item.file}</td>
+                        <td>${item.currentCategories.join('<br>')}</td>
+                        <td>${item.newCategories.join('<br>')}</td>
+                    </tr>
+                `;
             }
         });
 
-        html += '</table>';
+        self.changesCount = preview.filter(p => p.willChange).length;
 
-        const changesCount = preview.filter(p => p.willChange).length;
-
-        if (changesCount === 0) {
+        if (self.changesCount === 0) {
             console.log('[CBM] No changes detected');
             self.displayCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice', 'add');
             return;
         }
-
-        html = `<p>${changesCount} files will be modified</p>` + html;
-
-        self.previewHtml = html;
-        self.openPreviewHandler = true;
     }
     /**
      * Check if a category exists in a list (with normalization)

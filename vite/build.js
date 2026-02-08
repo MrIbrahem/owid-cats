@@ -21,6 +21,9 @@ const SOURCE_FILES = [
 const DIST_DIR = 'vite/dist';
 const OUTPUT_JS = 'vite/dist/Gadget-CategoryBatchManager.js';
 
+const CSS_SOURCE = 'vite/src/ui/styles/main.css';
+const OUTPUT_CSS = 'vite/dist/Gadget-CategoryBatchManager.css';
+
 /**
  * Strip module.exports blocks from JavaScript code
  * @param {string} code - The JavaScript code
@@ -136,6 +139,17 @@ function buildJS() {
 }
 
 /**
+ * Copy CSS file to dist
+ */
+function buildCSS() {
+    console.log('Copying CSS file...');
+
+    const cssContent = fs.readFileSync(CSS_SOURCE, 'utf8');
+    fs.writeFileSync(OUTPUT_CSS, cssContent, 'utf8');
+    console.log(`✓ Created ${OUTPUT_CSS}`);
+}
+
+/**
  * Main build function
  */
 function build() {
@@ -147,6 +161,7 @@ function build() {
 
     // Build JS
     buildJS();
+    buildCSS();
 
     console.log('\nVue build completed successfully!');
 }

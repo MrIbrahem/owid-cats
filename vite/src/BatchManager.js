@@ -3,17 +3,17 @@
  * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
  * @returns {Object} Vue app definition object.
  */
-/* global APIService, SearchPanel, CategoryInputs, FilesList, ProgressBar */
+/* global APIService, SearchHandler, CategoryInputs, FilesList, ProgressBar */
 
 function BatchManager(api) {
     const mwApi = new APIService();
-    const search_panel = new SearchPanel();
+    const search_handler = new SearchHandler();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
     const progress_section = new ProgressBar();
     const file_service = new FileService(mwApi);
 
-    const Search_SectionHtml = search_panel.createElement();
+    const Search_SectionHtml = search_handler.createElement();
     const CategoryInputPanelHtml = category_inputs.createElement();
     const FilesListHtml = files_list.createElement();
     const ProgressSectionHtml = progress_section.createElement();
@@ -87,7 +87,7 @@ function BatchManager(api) {
     const app = {
         data: function () {
             return {
-                search_panel: search_panel,
+                search_handler: search_handler,
                 file_service: file_service,
                 mwApi: mwApi, // Reference to API service instance
                 files_list: files_list, // Reference to FilesList component instance
@@ -152,10 +152,10 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                return this.search_panel.searchFiles(this);
+                return this.search_handler.searchFiles(this);
             },
             stopSearch: function () {
-                return this.search_panel.stopSearch(this);
+                return this.search_handler.stopSearch(this);
             },
 
             /* *************************

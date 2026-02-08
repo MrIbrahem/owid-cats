@@ -1,9 +1,9 @@
 /**
  * Search panel UI component using Codex CSS-only classes.
  * @see https://doc.wikimedia.org/codex/latest/
- * @class SearchPanel
+ * @class SearchHandler
  */
-class SearchPanel {
+class SearchHandler {
     /**
      */
     constructor() {
@@ -58,5 +58,5 @@ class SearchPanel {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SearchPanel;
+    module.exports = SearchHandler;
 }

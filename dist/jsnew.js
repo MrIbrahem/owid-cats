@@ -544,13 +544,16 @@ class APIService {
         if (!searchTerm || searchTerm.length < 2) {
             return Promise.resolve([]);
         }
-
-        const data = await this.makeRequest({
+        const params = {
             action: 'opensearch',
             search: searchTerm,
             namespace: 14, // Category namespace
             limit: limit
-        });
+        };
+        if (options.offset) {
+            params.continue = String(options.offset);
+        }
+        const data = await this.makeRequest(params);
         // data[1] contains the category titles
         if (data && data[1]) {
             return data[1].map(function (title) {
@@ -700,6 +703,36 @@ class FileService {
      */
     constructor(apiService) {
         this.api = apiService;
+    }
+
+    async executeFileSearch(self) {
+        self.resetMessageState();
+
+        if (self.sourceCategory.trim() === '') {
+            self.showWarningMessage('Please enter a source category.');
+            return;
+        }
+
+        self.showProgress = true;
+        self.progressText = 'Searching for files...';
+
+        // Placeholder - implement actual search logic
+        // Mock results for demonstration
+        self.searchResults = await this.searchFiles(self.sourceCategory, self.searchPattern);
+        const searchResults_demo = [
+            { title: 'File:GDP-per-capita,BLR.svg', selected: false },
+            { title: 'File:Life-expectancy,BLR.svg', selected: false },
+            { title: 'File:Population,BLR.svg', selected: false },
+            { title: 'File:Unemployment-rate,BLR.svg', selected: false },
+            { title: 'File:Literacy-rate,BLR.svg', selected: false },
+            { title: 'File:Infant-mortality,BLR.svg', selected: false },
+            { title: 'File:CO2-emissions,BLR.svg', selected: false },
+            { title: 'File:Energy-consumption,BLR.svg', selected: false }
+        ];
+        self.selectedFiles = [...self.searchResults];
+        self.showProgress = false;
+        self.showResultsMessage = true;
+        self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
     /**
      * Search files by pattern within a category
@@ -1247,22 +1280,22 @@ class BatchProcessor {
  * @class SearchPanel
  */
 class SearchPanel {
-  /**
-   * @param {Function} onSearch - Callback when search is triggered
-   */
-  constructor(onSearch) {
-    this.onSearch = onSearch;
-  }
+    /**
+     * @param {Function} onSearch - Callback when search is triggered
+     */
+    constructor(onSearch) {
+        this.onSearch = onSearch;
+    }
 
-  /**
-   * Create the search panel HTML element with Codex components.
-   * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
-   * @returns {HTMLElement} The search panel element
-   */
-  createElement(sourceCategory) {
-    const div = document.createElement('div');
-    div.className = 'cbm-search';
-    div.innerHTML = `
+    /**
+     * Create the search panel HTML element with Codex components.
+     * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
+     * @returns {HTMLElement} The search panel element
+     */
+    createElement(sourceCategory) {
+        const div = document.createElement('div');
+        div.className = 'cbm-search';
+        div.innerHTML = `
       <div class="cdx-field">
         <div class="cdx-label">
           <label class="cdx-label__label" for="cbm-source-category">
@@ -1299,23 +1332,23 @@ class SearchPanel {
         </div>
       </div>
     `;
-    return div;
-  }
+        return div;
+    }
 
-  /**
-   * Attach event listeners
-   */
-  attachListeners() {
-    document.getElementById('cbm-search-btn').addEventListener('click', () => {
-      this.onSearch();
-    });
+    /**
+     * Attach event listeners
+     */
+    attachListeners() {
+        document.getElementById('cbm-search-btn').addEventListener('click', () => {
+            this.onSearch();
+        });
 
-    document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.onSearch();
-      }
-    });
-  }
+        document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.onSearch();
+            }
+        });
+    }
 }
 
 // === src/ui/components/FilesList.js ===

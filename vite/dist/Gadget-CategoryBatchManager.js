@@ -520,8 +520,11 @@ class SearchPanel {
                 </span>
                 <div class="cbm-input-button-group">
                     <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg" />
-                    <cdx-button @click="searchFiles" action="progressive" weight="primary">
+                    <cdx-button v-if="!isSearching" @click="searchFiles" action="progressive" weight="primary">
                         Search
+                    </cdx-button>
+                    <cdx-button v-if="isSearching" @click="stopSearch" action="destructive" weight="primary">
+                        Stop Process
                     </cdx-button>
                 </div>
             </div>
@@ -529,9 +532,6 @@ class SearchPanel {
         `;
     }
 
-    /**
-     * searchFiles() {} to be moved from BatchManager.js to here.
-     */
 
 }
 
@@ -725,6 +725,8 @@ class CategoryInputs {
 
 // === vite/src/ui/components/FilesList.js ===
 /**
+ * File list UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class FilesList
  */
 class FilesList {
@@ -794,6 +796,8 @@ class FilesList {
 
 // === vite/src/ui/components/ProgressBar.js ===
 /**
+ * Progress bar UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class ProgressBar
  */
 class ProgressBar {
@@ -838,6 +842,7 @@ class ProgressBar {
 function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
+    // const search_handler = new SearchHandler();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
     const progress_section = new ProgressBar();
@@ -936,8 +941,10 @@ function BatchManager(api) {
                 showProgress: false,
                 progressPercent: 0,
                 progressText: 'Processing...',
+                isSearching: false,
                 isProcessing: false,
-                shouldStop: false,
+                shouldStopProgress: false,
+                shouldStopSearch: false,
                 showResultsMessage: false,
                 resultsMessageText: '',
 
@@ -979,7 +986,13 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                return this.file_service.executeFileSearch(this)
+                this.isSearching = true;
+                this.file_service.executeFileSearch(this)
+            },
+            stopSearch: function () {
+                this.isSearching = false;
+                this.shouldStopSearch = true;
+                // Implement logic to stop ongoing search if possible
             },
 
             /* *************************
@@ -1065,7 +1078,7 @@ function BatchManager(api) {
                 }
 
                 this.isProcessing = true;
-                this.shouldStop = false;
+                this.shouldStopProgress = false;
                 this.showProgress = true;
 
                 // Placeholder - implement actual batch processing
@@ -1075,10 +1088,10 @@ function BatchManager(api) {
 
             // Process files sequentially
             processBatch: function (files, index) {
-                if (this.shouldStop || index >= files.length) {
+                if (this.shouldStopProgress || index >= files.length) {
                     this.isProcessing = false;
                     this.showProgress = false;
-                    if (!this.shouldStop) {
+                    if (!this.shouldStopProgress) {
                         this.showSuccessMessage('Batch operation completed successfully!');
                     } else {
                         this.showWarningMessage('Operation stopped by user.');
@@ -1098,7 +1111,7 @@ function BatchManager(api) {
 
             // Stop ongoing operation
             stopOperation: function () {
-                this.shouldStop = true;
+                this.shouldStopProgress = true;
             },
 
             /* *************************

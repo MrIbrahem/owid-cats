@@ -8,7 +8,6 @@
 function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
-    // const search_handler = new SearchHandler();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
     const progress_section = new ProgressBar();
@@ -88,6 +87,7 @@ function BatchManager(api) {
     const app = {
         data: function () {
             return {
+                search_panel: search_panel,
                 file_service: file_service,
                 mwApi: mwApi, // Reference to API service instance
                 files_list: files_list, // Reference to FilesList component instance
@@ -152,13 +152,10 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                this.isSearching = true;
-                this.file_service.executeFileSearch(this)
+                return this.search_panel.searchFiles(this);
             },
             stopSearch: function () {
-                this.isSearching = false;
-                this.shouldStopSearch = true;
-                // Implement logic to stop ongoing search if possible
+                return this.search_panel.stopSearch(this);
             },
 
             /* *************************

@@ -44,6 +44,16 @@ class SearchPanel {
         `;
     }
 
+    searchFiles(self) {
+        self.isSearching = true;
+        self.file_service.executeFileSearch(self)
+    }
+
+    stopSearch(self) {
+        self.isSearching = false;
+        self.shouldStopSearch = true;
+        // Implement logic to stop ongoing search if possible
+    }
 
 }
 

@@ -15,16 +15,13 @@ class FilesList {
      */
     createElement() {
         return `
-        <div v-if="selectedFiles.length > 0"
-            style="background-color: #ffffff; padding: 20px; border-radius: 4px; border: 1px solid #c8ccd1; height: fit-content;">
+        <div v-if="selectedFiles.length > 0" class="cbm-files-list">
             <!-- Results Header -->
-            <div
-                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #c8ccd1;">
-                <div
-                    style="background-color: #eaf3ff; color: #36c; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.9em;">
+            <div class="cbm-files-header">
+                <div class="cbm-count-badge">
                     Found <strong>{{ totalFilesCount }}</strong> files
                 </div>
-                <div style="display: flex; gap: 8px;">
+                <div class="cbm-header-buttons">
                     <cdx-button @click="selectAll" action="default" weight="quiet" size="medium">
                         Select All
                     </cdx-button>
@@ -35,16 +32,13 @@ class FilesList {
             </div>
 
             <!-- File List -->
-            <div style="max-height: 500px; overflow-y: auto;">
-                <div v-for="(file, index) in selectedFiles" :key="index"
-                    style="display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eaecf0; gap: 10px;">
-                    <cdx-checkbox v-model="file.selected" :input-id="'file-' + index" style="flex-shrink: 0;" />
-                    <label :for="'file-' + index" style="flex: 1; cursor: pointer; font-size: 0.9em;">
+            <div class="cbm-files-scrollable">
+                <div v-for="(file, index) in selectedFiles" :key="index" class="cbm-file-row">
+                    <cdx-checkbox v-model="file.selected" :input-id="'file-' + index" />
+                    <label :for="'file-' + index">
                         {{ file.title }}
                     </label>
-                    <button @click="removeFile(index)"
-                        style="flex-shrink: 0; background: none; border: none; color: #d33; font-size: 1.5em; cursor: pointer; padding: 0 8px; line-height: 1;"
-                        title="Remove from list">
+                    <button @click="removeFile(index)" class="cbm-file-remove-btn" title="Remove from list">
                         ×
                     </button>
                 </div>
@@ -52,9 +46,8 @@ class FilesList {
         </div>
 
         <!-- Empty State -->
-        <div v-else
-            style="background-color: #ffffff; padding: 40px; border-radius: 4px; border: 1px solid #c8ccd1; text-align: center; color: #72777d;">
-            <p style="margin: 0; font-size: 1.1em;">No files found. Use the search to find files.</p>
+        <div v-else class="cbm-empty-state">
+            <p>No files found. Use the search to find files.</p>
         </div>
     `;
     }

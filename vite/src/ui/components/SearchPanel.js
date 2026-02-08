@@ -14,26 +14,24 @@ class SearchPanel {
      */
     createElement() {
         return `
-        <div style="margin-bottom: 25px;">
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-source-category"
-                    style="font-weight: 600; margin-bottom: 5px; display: block;">
+        <div class="cbm-search-panel">
+            <div class="cbm-input-group">
+                <cdx-label input-id="cbm-source-category" class="cbm-label">
                     Source Category
                 </cdx-label>
                 <cdx-text-input id="cbm-source-category" v-model="sourceCategory"
                     placeholder="Category:Economic Data" />
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-pattern" style="font-weight: 600; margin-bottom: 5px; display: block;">
+            <div class="cbm-input-group">
+                <cdx-label input-id="cbm-pattern" class="cbm-label">
                     Search Pattern
                 </cdx-label>
-                <span style="display: block; color: #54595d; font-size: 0.875em; margin-bottom: 5px;">
+                <span class="cbm-help-text">
                     Enter a pattern to filter files (e.g., ,BLR.svg)
                 </span>
-                <div style="display: flex; gap: 10px;">
-                    <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg"
-                        style="flex: 1;" />
+                <div class="cbm-input-button-group">
+                    <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg" />
                     <cdx-button @click="searchFiles" action="progressive" weight="primary">
                         Search
                     </cdx-button>

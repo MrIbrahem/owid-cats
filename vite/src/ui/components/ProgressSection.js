@@ -12,15 +12,13 @@ class ProgressSection {
      */
     createElement() {
         return `
-        <div v-if="showProgress"
-            style="margin-top: 20px; padding: 15px; background-color: #ffffff; border: 1px solid #c8ccd1; border-radius: 4px;">
-            <div
-                style="width: 100%; background-color: #eaecf0; border-radius: 2px; height: 20px; overflow: hidden; margin-bottom: 10px;">
-                <div
-                    :style="{ width: progressPercent + '%', height: '100%', backgroundColor: '#36c', transition: 'width 0.3s ease' }">
+        <div v-if="showProgress" class="cbm-progress-section">
+            <div class="cbm-progress-bar-bg">
+                <div class="cbm-progress-bar-fill"
+                    :style="{ width: progressPercent + '%' }">
                 </div>
             </div>
-            <div style="text-align: center; color: #202122; font-weight: 500;">
+            <div class="cbm-progress-text">
                 {{ progressText }}
             </div>
         </div>

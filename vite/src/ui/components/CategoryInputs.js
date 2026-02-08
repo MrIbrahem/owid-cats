@@ -17,11 +17,11 @@ class CategoryInputs {
      */
     createElement() {
         return `
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-add-cats" style="font-weight: 600; margin-bottom: 5px; display: block;">
+            <div class="cbm-category-input-group">
+                <cdx-label input-id="cbm-add-cats" class="cbm-label">
                     Add Categories
                 </cdx-label>
-                <span style="display: block; color: #54595d; font-size: 0.875em; margin-bottom: 5px;">
+                <span class="cbm-help-text">
                     e.g., Category:Belarus, Category:Europe
                 </span>
                 <cdx-multiselect-lookup v-model:input-chips="addCategoryChips" v-model:selected="addCategories"
@@ -34,8 +34,8 @@ class CategoryInputs {
                 </cdx-multiselect-lookup>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-remove-cats" style="font-weight: 600; margin-bottom: 5px; display: block;">
+            <div class="cbm-category-input-group">
+                <cdx-label input-id="cbm-remove-cats" class="cbm-label">
                     Remove Categories
                 </cdx-label>
                 <cdx-multiselect-lookup v-model:input-chips="removeCategoryChips"

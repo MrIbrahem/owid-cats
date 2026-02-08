@@ -1,4 +1,6 @@
 /**
+ * Progress bar UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class ProgressBar
  */
 class ProgressBar {

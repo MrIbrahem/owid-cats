@@ -144,13 +144,16 @@ class APIService {
         if (!searchTerm || searchTerm.length < 2) {
             return Promise.resolve([]);
         }
-
-        const data = await this.makeRequest({
+        const params = {
             action: 'opensearch',
             search: searchTerm,
             namespace: 14, // Category namespace
             limit: limit
-        });
+        };
+        if (options.offset) {
+            params.continue = String(options.offset);
+        }
+        const data = await this.makeRequest(params);
         // data[1] contains the category titles
         if (data && data[1]) {
             return data[1].map(function (title) {

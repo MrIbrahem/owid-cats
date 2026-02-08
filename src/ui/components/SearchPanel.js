@@ -4,22 +4,22 @@
  * @class SearchPanel
  */
 class SearchPanel {
-  /**
-   * @param {Function} onSearch - Callback when search is triggered
-   */
-  constructor(onSearch) {
-    this.onSearch = onSearch;
-  }
+    /**
+     * @param {Function} onSearch - Callback when search is triggered
+     */
+    constructor(onSearch) {
+        this.onSearch = onSearch;
+    }
 
-  /**
-   * Create the search panel HTML element with Codex components.
-   * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
-   * @returns {HTMLElement} The search panel element
-   */
-  createElement(sourceCategory) {
-    const div = document.createElement('div');
-    div.className = 'cbm-search';
-    div.innerHTML = `
+    /**
+     * Create the search panel HTML element with Codex components.
+     * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
+     * @returns {HTMLElement} The search panel element
+     */
+    createElement(sourceCategory) {
+        const div = document.createElement('div');
+        div.className = 'cbm-search';
+        div.innerHTML = `
       <div class="cdx-field">
         <div class="cdx-label">
           <label class="cdx-label__label" for="cbm-source-category">
@@ -56,25 +56,25 @@ class SearchPanel {
         </div>
       </div>
     `;
-    return div;
-  }
+        return div;
+    }
 
-  /**
-   * Attach event listeners
-   */
-  attachListeners() {
-    document.getElementById('cbm-search-btn').addEventListener('click', () => {
-      this.onSearch();
-    });
+    /**
+     * Attach event listeners
+     */
+    attachListeners() {
+        document.getElementById('cbm-search-btn').addEventListener('click', () => {
+            this.onSearch();
+        });
 
-    document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.onSearch();
-      }
-    });
-  }
+        document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.onSearch();
+            }
+        });
+    }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = SearchPanel;
+    module.exports = SearchPanel;
 }

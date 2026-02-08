@@ -1,4 +1,6 @@
 /**
+ * File list UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
  * @class FilesList
  */
 class FilesList {

@@ -76,6 +76,7 @@ class RateLimiter {
     }
 
     /**
+     * TODO: use it in the workflow
      * Throttle a function call with a delay
      * @param {Function} fn - Function to execute
      * @param {number} delay - Delay in milliseconds
@@ -111,6 +112,7 @@ class RateLimiter {
  */
 class Validator {
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Check if a category name is valid
      * @param {string} name - Category name to validate
      * @returns {boolean} True if valid
@@ -126,6 +128,7 @@ class Validator {
     }
 
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Check if a search pattern is valid
      * @param {string} pattern - Search pattern to validate
      * @returns {boolean} True if valid
@@ -135,6 +138,7 @@ class Validator {
         return pattern.trim().length > 0;
     }
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Sanitize user input to prevent injection
      * @param {string} input - Raw user input
      * @returns {string} Sanitized input
@@ -180,6 +184,7 @@ class Validator {
  */
 class WikitextParser {
     /**
+     * TODO: use it in the workflow
      * Extract all categories from wikitext
      * @param {string} wikitext - The wikitext content
      * @returns {Array<string>} Array of category names with "Category:" prefix
@@ -282,6 +287,7 @@ class WikitextParser {
     }
 
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Get the proper wikitext syntax for a category
      * @param {string} categoryName - Category name (with or without "Category:" prefix)
      * @returns {string} Wikitext category syntax
@@ -321,6 +327,7 @@ class UsageLogger {
     }
 
     /**
+     * TODO: use it in the workflow
      * Log an error
      * @param {string} context - Where the error occurred
      * @param {Error} error - The error object
@@ -330,6 +337,7 @@ class UsageLogger {
     }
 
     /**
+     * TODO: use it in the workflow
      * Log performance metrics
      * @param {string} operation - Operation name
      * @param {number} duration - Duration in milliseconds
@@ -417,6 +425,7 @@ class APIService {
     /* ------------------------------------------------------------------ */
 
     /**
+     * TODO: remove it and related tests
      * Fetch files from a category with pagination support.
      * @param {string} categoryName - Full category name including "Category:" prefix
      * @param {Object} [options={}] - Query options
@@ -526,6 +535,31 @@ class APIService {
             if (typeof Logger !== 'undefined') {
                 Logger.error('Failed to search categories', error);
             }
+            return [];
+        }
+    }
+
+    async fetchCategories(searchTerm, options = {}) {
+        const limit = options.limit || 10;
+        if (!searchTerm || searchTerm.length < 2) {
+            return Promise.resolve([]);
+        }
+
+        const data = await this.makeRequest({
+            action: 'opensearch',
+            search: searchTerm,
+            namespace: 14, // Category namespace
+            limit: limit
+        });
+        // data[1] contains the category titles
+        if (data && data[1]) {
+            return data[1].map(function (title) {
+                return {
+                    value: title,
+                    label: title
+                };
+            });
+        } else {
             return [];
         }
     }
@@ -772,12 +806,13 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Add categories to a file
      * @param {string} fileTitle - File page title
      * @param {Array<string>} categoriesToAdd - Categories to add
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
-    async addCategories(fileTitle, categoriesToAdd) {
+    async addCategoriesToFile(fileTitle, categoriesToAdd) {
         const wikitext = await this.api.getPageContent(fileTitle);
 
         let newWikitext = wikitext;
@@ -799,12 +834,13 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Remove categories from a file
      * @param {string} fileTitle - File page title
      * @param {Array<string>} categoriesToRemove - Categories to remove
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
-    async removeCategories(fileTitle, categoriesToRemove) {
+    async removeCategoriesFromFile(fileTitle, categoriesToRemove) {
         const wikitext = await this.api.getPageContent(fileTitle);
 
         let newWikitext = wikitext;
@@ -855,6 +891,7 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Combined add and remove operation using mw.Api.edit() for better conflict handling
      * @param {string} fileTitle - File page title
      * @param {Array<string>} toAdd - Categories to add
@@ -907,6 +944,7 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Get current categories for a file using the optimized API method
      * @param {string} fileTitle - File page title
      * @returns {Promise<Array<string>>} Array of category names
@@ -920,6 +958,7 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow or move it to a utility module
      * Build an edit summary from add/remove lists
      * @param {Array<string>} toAdd - Categories added
      * @param {Array<string>} toRemove - Categories removed
@@ -935,6 +974,7 @@ class CategoryService {
 
 // === src/services/ErrorRecovery.js ===
 /**
+ * TODO: use it in the workflow
  * Error recovery system for failed operations
  * @class ErrorRecovery
  */
@@ -959,6 +999,7 @@ class ErrorRecovery {
     }
 
     /**
+     * TODO: use it in the workflow
      * Retry all failed operations that haven't exceeded max attempts
      * @param {Function} executeOperation - Function to retry an operation
      * @returns {Promise<Object>} Results of retry attempts
@@ -1026,6 +1067,7 @@ class ErrorRecovery {
     }
 
     /**
+     * TODO: use it in the workflow
      * Clear all failed operations
      */
     clearAll() {

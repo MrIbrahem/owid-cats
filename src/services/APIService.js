@@ -139,6 +139,31 @@ class APIService {
         }
     }
 
+    async fetchCategories(searchTerm, options = {}) {
+        const limit = options.limit || 10;
+        if (!searchTerm || searchTerm.length < 2) {
+            return Promise.resolve([]);
+        }
+
+        const data = await this.makeRequest({
+            action: 'opensearch',
+            search: searchTerm,
+            namespace: 14, // Category namespace
+            limit: limit
+        });
+        // data[1] contains the category titles
+        if (data && data[1]) {
+            return data[1].map(function (title) {
+                return {
+                    value: title,
+                    label: title
+                };
+            });
+        } else {
+            return [];
+        }
+    }
+
     /**
      * Get categories that a page belongs to.
      * @param {string} title - Page title

@@ -30,7 +30,7 @@ function BatchManager(api) {
                 <!-- Search Section -->
                 ${Search_SectionHtml}
                 <!-- Results Message -->
-                <div v-if="showResultsMessage" style="margin-bottom: 20px;">
+                <div v-if="showResultsMessage" class="margin-bottom-20">
                     <cdx-message type="success" :inline="false">
                         {{ resultsMessageText }}
                     </cdx-message>
@@ -40,7 +40,7 @@ function BatchManager(api) {
                 <div>
                     ${CategoryInputPanelHtml}
 
-                    <div style="margin-bottom: 20px;">
+                    <div class="margin-bottom-20">
                         <cdx-label input-id="cbm-summary" style="font-weight: 600; margin-bottom: 5px; display: block;">
                             Edit Summary
                         </cdx-label>

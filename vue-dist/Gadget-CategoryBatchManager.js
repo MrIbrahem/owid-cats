@@ -628,11 +628,6 @@ function createCategoryBatchManager(api) {
     return app;
 }
 
-
-module.exports = {
-    createCategoryBatchManager
-};
-
 // === vue-src/main.js ===
 // <nowiki>
 
@@ -644,8 +639,6 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     categoryBatchManager.api = new mw.Api();
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
-
-    const { createCategoryBatchManager } = require('./createCategoryBatchManager');
 
     const app = createCategoryBatchManager(categoryBatchManager.api);
 

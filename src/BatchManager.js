@@ -62,10 +62,10 @@ class BatchManager {
         reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
-        // SearchPanel element
-        const searchPanelElement = this.searchHandler.createElement(this.state.sourceCategory);
+        // Searchelement
+        const searchElement = this.searchHandler.createElement(this.state.sourceCategory);
         // Create main container
-        const container = this.buildContainer(searchPanelElement);
+        const container = this.buildContainer(searchElement);
         document.body.appendChild(container);
 
         // Add reopen button listener
@@ -74,7 +74,7 @@ class BatchManager {
         });
     }
 
-    buildContainer(searchPanelElement) {
+    buildContainer(searchElement) {
         const categoryInputsElement = this.categoryInputs.createElement();
         const ProgressBarElement = this.progressBarHandler.createElement();
 
@@ -98,7 +98,7 @@ class BatchManager {
                 <div class="cbm-main-layout">
                     <!-- Left Panel: Search and Actions -->
                     <div class="cbm-left-panel">
-                        ${searchPanelElement.outerHTML}
+                        ${searchElement.outerHTML}
                         <div id="cbm-results-message" class="hidden"></div>
 
                         <div class="cbm-actions">
@@ -179,7 +179,7 @@ class BatchManager {
 
     attachEventListeners() {
         // Search panel listeners
-        this.searchPanel.attachListeners();
+        this.searchHandler.attachListeners();
 
         // Category inputs listeners
         this.categoryInputs.attachListeners();

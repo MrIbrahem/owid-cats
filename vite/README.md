@@ -14,7 +14,6 @@
 - [x] CategoryInputs
 - [x] FilesList
 - [x] ProgressBar
-- [x] SearchPanel
 
 ## UI/handlers
 - [ ] ExecuteHandler

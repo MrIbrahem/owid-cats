@@ -59,7 +59,6 @@ category-batch-manager/
 ├── src/
 │   ├── ui/
 │   │   ├── components/
-│   │   │   ├── SearchPanel.js
 │   │   │   ├── FileList.js
 │   │   │   ├── CategoryInputs.js
 │   │   │   └── ProgressBar.js

@@ -9,8 +9,9 @@ function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
     const category_inputs = new CategoryInputs(mwApi);
-    const files_list = new FilesList();
+    const files_list = new FilesList(mwApi);
     const progress_section = new ProgressSection();
+    const file_service = new FileService(mwApi);
 
     const Search_SectionHtml = search_panel.createElement();
     const CategoryInputPanelHtml = category_inputs.createElement();
@@ -86,6 +87,7 @@ function BatchManager(api) {
     const app = {
         data: function () {
             return {
+                file_service: file_service,
                 mwApi: mwApi, // Reference to API service instance
                 files_list: files_list, // Reference to FilesList component instance
                 category_inputs: category_inputs, // Reference to CategoryInputs component instance
@@ -136,9 +138,6 @@ function BatchManager(api) {
             selectedCount: function () {
                 return this.selectedFiles.filter(f => f.selected).length;
             },
-            isSearchValid: function () {
-                return this.sourceCategory.trim() !== '';
-            },
             totalFilesCount: function () {
                 return this.selectedFiles.length;
             }
@@ -151,34 +150,7 @@ function BatchManager(api) {
 
             // should be moved to services/FileService.js
             searchFiles: function () {
-                this.resetMessageState();
-
-                if (!this.isSearchValid) {
-                    this.showWarningMessage('Please enter a source category.');
-                    return;
-                }
-
-                this.showProgress = true;
-                this.progressText = 'Searching for files...';
-
-                // Placeholder - implement actual search logic
-                setTimeout(() => {
-                    // Mock results for demonstration
-                    this.searchResults = [
-                        { title: 'File:GDP-per-capita,BLR.svg', selected: false },
-                        { title: 'File:Life-expectancy,BLR.svg', selected: false },
-                        { title: 'File:Population,BLR.svg', selected: false },
-                        { title: 'File:Unemployment-rate,BLR.svg', selected: false },
-                        { title: 'File:Literacy-rate,BLR.svg', selected: false },
-                        { title: 'File:Infant-mortality,BLR.svg', selected: false },
-                        { title: 'File:CO2-emissions,BLR.svg', selected: false },
-                        { title: 'File:Energy-consumption,BLR.svg', selected: false }
-                    ];
-                    this.selectedFiles = [...this.searchResults];
-                    this.showProgress = false;
-                    this.showResultsMessage = true;
-                    this.resultsMessageText = `Found ${this.searchResults.length} files matching the pattern.`;
-                }, 1000);
+                return this.file_service.searchFilesOld(this)
             },
 
             /* *************************

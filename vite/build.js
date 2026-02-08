@@ -8,8 +8,11 @@ const path = require('path');
 
 // File order according to dependency requirements
 const SOURCE_FILES = [
+    'src/models/FileModel.js',
+    'src/models/CategoryOperation.js',
     'vite/src/services/APIService.js',
     // 'vite/src/services/CategoryService.js',
+    'vite/src/services/FileService.js',
     'vite/src/ui/components/SearchPanel.js',
     'vite/src/ui/components/CategoryInputs.js',
     'vite/src/ui/components/FilesList.js',

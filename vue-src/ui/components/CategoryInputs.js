@@ -6,7 +6,7 @@
  */
 class CategoryInputs {
     /**
-     * @param {mw.Api} apiService - API service for category search
+     * @param {APIService} apiService - API service for category search
      */
     constructor(apiService) {
         this.apiService = apiService;
@@ -72,9 +72,69 @@ class CategoryInputs {
     }
     // handleAddCategoryChipChange, onAddCategoryInput, onRemoveCategoryInput, handleRemoveCategoryChipChange
     /**
-     * Attach event listeners for category inputs including autocomplete
+     * Handle add category input with debounce.
+     * @param {string} value - The input value to search for
      */
-    attachListeners() {
+    onAddCategoryInput(value) {
+        // Clear previous timeout
+        if (this.addCategoryDebounce) {
+            clearTimeout(this.addCategoryDebounce);
+        }
+
+        // If empty, clear menu items
+        if (!value || value.trim().length < 2) {
+            this.addCategoryMenuItems = [];
+            return;
+        }
+
+        // Debounce API call
+        this.addCategoryDebounce = setTimeout(() => {
+            this.apiService.fetchCategories(value).then((items) => {
+                this.addCategoryMenuItems = items;
+            });
+        }, 300); // 300ms debounce
+    }
+
+    /**
+     * Handle remove category input with debounce.
+     * @param {string} value - The input value to search for
+     */
+    onRemoveCategoryInput(value) {
+        // Clear previous timeout
+        if (this.removeCategoryDebounce) {
+            clearTimeout(this.removeCategoryDebounce);
+        }
+
+        // If empty, clear menu items
+        if (!value || value.trim().length < 2) {
+            this.removeCategoryMenuItems = [];
+            return;
+        }
+
+        // Debounce API call
+        this.removeCategoryDebounce = setTimeout(() => {
+            this.apiService.fetchCategories(value).then((items) => {
+                this.removeCategoryMenuItems = items;
+            });
+        }, 300); // 300ms debounce
+    }
+
+    /**
+     * Handle chip changes for add categories.
+     * @param {Array} newChips - The new chips array
+     */
+    handleAddCategoryChipChange(newChips) {
+        this.addCategoryChips = newChips;
+        this.addCategories = newChips.map(chip => chip.value);
+    }
+
+    /**
+     * Handle chip changes for remove categories.
+     * @param {Array} newChips - The new chips array
+     */
+    handleRemoveCategoryChipChange(newChips) {
+        this.removeCategoryChips = newChips;
+        this.removeCategories = newChips.map(chip => chip.value);
     }
 }
 if (typeof module !== 'undefined' && module.exports) {

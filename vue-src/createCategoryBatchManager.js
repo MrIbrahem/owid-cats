@@ -3,12 +3,12 @@
  * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
  * @returns {Object} Vue app definition object.
  */
-/* global SearchPanel */
+/* global APIService, SearchPanel, CategoryInputs, FilesList, ProgressSection */
 
 function createCategoryBatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
-    const category_inputs = new CategoryInputs(api);
+    const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList();
     const progress_section = new ProgressSection();
 
@@ -144,6 +144,11 @@ function createCategoryBatchManager(api) {
             }
         },
         methods: {
+            /* *************************
+            **      FileService
+            ** *************************
+            */
+
             // should be moved to services/FileService.js
             searchFiles: function () {
                 this.resetMessageState();
@@ -176,6 +181,11 @@ function createCategoryBatchManager(api) {
                 }, 1000);
             },
 
+            /* *************************
+            **      FilesList
+            ** *************************
+            */
+
             // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Select all files
             selectAll: function () {
@@ -196,6 +206,11 @@ function createCategoryBatchManager(api) {
                     this.showResultsMessage = false;
                 }
             },
+
+            /* *************************
+            **      BatchProcessor
+            ** *************************
+            */
 
             // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
@@ -223,6 +238,11 @@ function createCategoryBatchManager(api) {
 
                 alert(previewMessage);
             },
+
+            /* *************************
+            **      ExecuteHandler
+            ** *************************
+            */
 
             // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
             // Execute batch operation
@@ -280,63 +300,31 @@ function createCategoryBatchManager(api) {
                 this.shouldStop = true;
             },
 
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle add category input with debounce
-            onAddCategoryInput: function (value) {
-                // Clear previous timeout
-                if (this.addCategoryDebounce) {
-                    clearTimeout(this.addCategoryDebounce);
-                }
+            /* *************************
+            **      CategoryInputs
+            ** *************************
+            */
 
-                // If empty, clear menu items
-                if (!value || value.trim().length < 2) {
-                    this.addCategoryMenuItems = [];
-                    return;
-                }
-
-                // Debounce API call
-                this.addCategoryDebounce = setTimeout(() => {
-                    this.mwApi.fetchCategories(value).then((items) => {
-                        this.addCategoryMenuItems = items;
-                    });
-                }, 300); // 300ms debounce
-            },
-
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle remove category input with debounce
-            onRemoveCategoryInput: function (value) {
-                // Clear previous timeout
-                if (this.removeCategoryDebounce) {
-                    clearTimeout(this.removeCategoryDebounce);
-                }
-
-                // If empty, clear menu items
-                if (!value || value.trim().length < 2) {
-                    this.removeCategoryMenuItems = [];
-                    return;
-                }
-
-                // Debounce API call
-                this.removeCategoryDebounce = setTimeout(() => {
-                    this.mwApi.fetchCategories(value).then((items) => {
-                        this.removeCategoryMenuItems = items;
-                    });
-                }, 300); // 300ms debounce
-            },
-
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle chip changes for add categories
             handleAddCategoryChipChange: function (newChips) {
-                this.addCategoryChips = newChips;
-                this.addCategories = newChips.map(chip => chip.value);
+                return this.category_inputs.handleAddCategoryChipChange(newChips);
             },
 
-            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
-            // Handle chip changes for remove categories
-            handleRemoveCategoryChipChange: function (newChips) {
-                this.removeCategoryChips = newChips;
-                this.removeCategories = newChips.map(chip => chip.value);
+            onAddCategoryInput: function (value) {
+                return this.category_inputs.onAddCategoryInput(value);
             },
+
+            onRemoveCategoryInput: function (value) {
+                return this.category_inputs.onRemoveCategoryInput(value);
+            },
+
+            handleRemoveCategoryChipChange: function (newChips) {
+                return this.category_inputs.handleRemoveCategoryChipChange(newChips);
+            },
+
+            /* *************************
+            **      Message Handlers
+            ** *************************
+            */
 
             // Message handlers
             resetMessageState: function () {

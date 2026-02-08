@@ -2,7 +2,7 @@
  * Preview Handler
  *
  * @description
- * Handles all preview-related functionality for CategoryBatchManagerUI.
+ * Handles all preview-related functionality for BatchManager.
  * Manages preview generation, modal display, and validation.
  *
  * @requires ValidationHelper - For common validation logic
@@ -12,7 +12,7 @@
 
 class PreviewHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;

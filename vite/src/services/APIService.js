@@ -278,7 +278,6 @@ class APIService {
             return await this.mwApi.get(params);
         } catch (error) {
             console.error('API request failed', error);
-
             throw error;
         }
     }

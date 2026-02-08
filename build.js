@@ -8,27 +8,23 @@ const path = require('path');
 
 // File order according to dependency requirements
 const SOURCE_FILES = [
-  'src/utils/Logger.js',
   'src/utils/RateLimiter.js',
   'src/utils/Validator.js',
   'src/utils/WikitextParser.js',
-  'src/utils/UsageLogger.js',
   'src/models/FileModel.js',
   'src/models/CategoryOperation.js',
   'src/services/APIService.js',
   'src/services/FileService.js',
   'src/services/CategoryService.js',
-  'src/services/ErrorRecovery.js',
   'src/services/BatchProcessor.js',
-  'src/ui/components/SearchPanel.js',
-  'src/ui/components/FileList.js',
+  'src/ui/components/FilesList.js',
   'src/ui/components/CategoryInputs.js',
   'src/ui/components/ProgressBar.js',
   'src/ui/helpers/ValidationHelper.js',
   'src/ui/handlers/SearchHandler.js',
   'src/ui/handlers/PreviewHandler.js',
   'src/ui/handlers/ExecuteHandler.js',
-  'src/ui/CategoryBatchManagerUI.js',
+  'src/BatchManager.js',
   'src/gadget-entry.js',
 ];
 

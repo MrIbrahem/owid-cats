@@ -12,96 +12,49 @@
 (function () {
 'use strict';
 
-// === src/utils/Logger.js ===
-/**
- * Logger utility for debugging and monitoring
- * @class Logger
- */
-class Logger {
-  /**
-   * Log a message at the specified level
-   * @param {string} message - The message to log
-   * @param {string} level - Log level: 'info', 'warn', 'error', 'debug'
-   */
-  static log(message, level = 'info') {
-    const timestamp = new Date().toISOString();
-    const prefix = `[CategoryBatchManager][${level.toUpperCase()}][${timestamp}]`;
-
-    switch (level) {
-      case 'error':
-        console.error(`${prefix} ${message}`);
-        break;
-      case 'warn':
-        console.warn(`${prefix} ${message}`);
-        break;
-      case 'debug':
-        console.debug(`${prefix} ${message}`);
-        break;
-      default:
-        console.log(`${prefix} ${message}`);
-    }
-  }
-
-  /**
-   * Log an error with optional error object
-   * @param {string} message - The error message
-   * @param {Error} error - The error object
-   */
-  static error(message, error) {
-    Logger.log(`${message}: ${error && error.message ? error.message : error}`, 'error');
-  }
-
-  /**
-   * Log a warning
-   * @param {string} message - The warning message
-   */
-  static warn(message) {
-    Logger.log(message, 'warn');
-  }
-}
-
 // === src/utils/RateLimiter.js ===
 /**
  * Rate limiter to prevent API abuse
  * @class RateLimiter
  */
 class RateLimiter {
-  /**
-   * Wait for a specified duration
-   * @param {number} ms - Milliseconds to wait
-   * @returns {Promise<void>}
-   */
-  async wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Throttle a function call with a delay
-   * @param {Function} fn - Function to execute
-   * @param {number} delay - Delay in milliseconds
-   * @returns {Promise<*>} Result of the function
-   */
-  static async throttle(fn, delay) {
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return fn();
-  }
-
-  /**
-   * Process items in batches with delay between each
-   * @param {Array} items - Items to process
-   * @param {number} batchSize - Number of items per batch
-   * @param {Function} processor - Async function to process each item
-   * @returns {Promise<Array>} Results of processing
-   */
-  static async batch(items, batchSize, processor) {
-    const results = [];
-    for (let i = 0; i < items.length; i += batchSize) {
-      const batch = items.slice(i, i + batchSize);
-      const batchResults = await Promise.all(batch.map(processor));
-      results.push(...batchResults);
+    /**
+     * Wait for a specified duration
+     * @param {number} ms - Milliseconds to wait
+     * @returns {Promise<void>}
+     */
+    async wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
-    return results;
-  }
+
+    /**
+     * TODO: use it in the workflow
+     * Throttle a function call with a delay
+     * @param {Function} fn - Function to execute
+     * @param {number} delay - Delay in milliseconds
+     * @returns {Promise<*>} Result of the function
+     */
+    static async throttle(fn, delay) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fn();
+    }
+
+    /**
+     * Process items in batches with delay between each
+     * @param {Array} items - Items to process
+     * @param {number} batchSize - Number of items per batch
+     * @param {Function} processor - Async function to process each item
+     * @returns {Promise<Array>} Results of processing
+     */
+    static async batch(items, batchSize, processor) {
+        const results = [];
+        for (let i = 0; i < items.length; i += batchSize) {
+            const batch = items.slice(i, i + batchSize);
+            const batchResults = await Promise.all(batch.map(processor));
+            results.push(...batchResults);
+        }
+        return results;
+    }
 }
 
 // === src/utils/Validator.js ===
@@ -110,67 +63,70 @@ class RateLimiter {
  * @class Validator
  */
 class Validator {
-  /**
-   * Check if a category name is valid
-   * @param {string} name - Category name to validate
-   * @returns {boolean} True if valid
-   */
-  static isValidCategoryName(name) {
-    if (!name || typeof name !== 'string') return false;
-    const trimmed = name.trim();
-    if (trimmed.length === 0) return false;
-    // Category names must not contain certain characters
-    const invalidChars = /[#<>\[\]{|}]/;
-    const cleanName = trimmed.replace(/^Category:/i, '');
-    return cleanName.length > 0 && !invalidChars.test(cleanName);
-  }
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Check if a category name is valid
+     * @param {string} name - Category name to validate
+     * @returns {boolean} True if valid
+     */
+    static isValidCategoryName(name) {
+        if (!name || typeof name !== 'string') return false;
+        const trimmed = name.trim();
+        if (trimmed.length === 0) return false;
+        // Category names must not contain certain characters
+        const invalidChars = /[#<>\[\]{|}]/;
+        const cleanName = trimmed.replace(/^Category:/i, '');
+        return cleanName.length > 0 && !invalidChars.test(cleanName);
+    }
 
-  /**
-   * Check if a search pattern is valid
-   * @param {string} pattern - Search pattern to validate
-   * @returns {boolean} True if valid
-   */
-  static isValidSearchPattern(pattern) {
-    if (!pattern || typeof pattern !== 'string') return false;
-    return pattern.trim().length > 0;
-  }
-  /**
-   * Sanitize user input to prevent injection
-   * @param {string} input - Raw user input
-   * @returns {string} Sanitized input
-   */
-  static sanitizeInput(input) {
-    if (!input || typeof input !== 'string') return '';
-    return input.trim();
-  }
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Check if a search pattern is valid
+     * @param {string} pattern - Search pattern to validate
+     * @returns {boolean} True if valid
+     */
+    static isValidSearchPattern(pattern) {
+        if (!pattern || typeof pattern !== 'string') return false;
+        return pattern.trim().length > 0;
+    }
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Sanitize user input to prevent injection
+     * @param {string} input - Raw user input
+     * @returns {string} Sanitized input
+     */
+    static sanitizeInput(input) {
+        if (!input || typeof input !== 'string') return '';
+        return input.trim();
+    }
 
-  /**
-   * Normalize category name for comparison (remove prefix, convert underscores to spaces)
-   * @param {string} categoryName - Category name to normalize
-   * @returns {string} Normalized category name
-   */
-  static normalizeCategoryName(categoryName) {
-    if (!categoryName || typeof categoryName !== 'string') return '';
-    return categoryName
-      .replace(/^Category:/i, '')
-      .replace(/_/g, ' ')
-      .trim();
-  }
+    /**
+     * Normalize category name for comparison (remove prefix, convert underscores to spaces)
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    static normalizeCategoryName(categoryName) {
+        if (!categoryName || typeof categoryName !== 'string') return '';
+        return categoryName
+            .replace(/^Category:/i, '')
+            .replace(/_/g, ' ')
+            .trim();
+    }
 
-  /**
-   * Check if a category is trying to add itself (circular reference)
-   * @param {string} currentCategory - The category being edited
-   * @param {string} categoryToAdd - The category to be added
-   * @returns {boolean} True if circular reference detected
-   */
-  static isCircularCategory(currentCategory, categoryToAdd) {
-    if (!currentCategory || !categoryToAdd) return false;
+    /**
+     * Check if a category is trying to add itself (circular reference)
+     * @param {string} currentCategory - The category being edited
+     * @param {string} categoryToAdd - The category to be added
+     * @returns {boolean} True if circular reference detected
+     */
+    static isCircularCategory(currentCategory, categoryToAdd) {
+        if (!currentCategory || !categoryToAdd) return false;
 
-    const normalizedCurrent = this.normalizeCategoryName(currentCategory);
-    const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
+        const normalizedCurrent = this.normalizeCategoryName(currentCategory);
+        const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
 
-    return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
-  }
+        return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
+    }
 }
 
 // === src/utils/WikitextParser.js ===
@@ -179,164 +135,119 @@ class Validator {
  * @class WikitextParser
  */
 class WikitextParser {
-  /**
-   * Extract all categories from wikitext
-   * @param {string} wikitext - The wikitext content
-   * @returns {Array<string>} Array of category names with "Category:" prefix
-   */
-  extractCategories(wikitext) {
-    const categoryRegex = /\[\[Category:([^\]|]+)(?:\|[^\]]*)?\]\]/gi;
-    const matches = [];
-    let match;
+    /**
+     * TODO: use it in the workflow
+     * Extract all categories from wikitext
+     * @param {string} wikitext - The wikitext content
+     * @returns {Array<string>} Array of category names with "Category:" prefix
+     */
+    extractCategories(wikitext) {
+        const categoryRegex = /\[\[Category:([^\]|]+)(?:\|[^\]]*)?\]\]/gi;
+        const matches = [];
+        let match;
 
-    while ((match = categoryRegex.exec(wikitext)) !== null) {
-      matches.push(`Category:${this.normalize(match[1].trim())}`);
+        while ((match = categoryRegex.exec(wikitext)) !== null) {
+            matches.push(`Category:${this.normalize(match[1].trim())}`);
+        }
+
+        return matches;
+    }
+    /**
+     * Normalize category name by replacing underscores with spaces and trimming
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    normalize(categoryName) {
+        return categoryName.replace(/_/g, ' ').trim();
     }
 
-    return matches;
-  }
-  /**
-   * Normalize category name by replacing underscores with spaces and trimming
-   * @param {string} categoryName - Category name to normalize
-   * @returns {string} Normalized category name
-   */
-  normalize(categoryName) {
-    return categoryName.replace(/_/g, ' ').trim();
-  }
+    /**
+     * Check if category exists in wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to check (with or without "Category:" prefix)
+     * @returns {boolean} True if category exists
+     */
+    hasCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
 
-  /**
-   * Check if category exists in wikitext
-   * @param {string} wikitext - The wikitext content
-   * @param {string} categoryName - Category name to check (with or without "Category:" prefix)
-   * @returns {boolean} True if category exists
-   */
-  hasCategory(wikitext, categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    const normalizedName = this.normalize(cleanName);
+        // Create a pattern that matches both spaces and underscores
+        const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
+        const regex = new RegExp(
+            `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]`,
+            'i'
+        );
+        return regex.test(wikitext);
+    }
+    /**
+     * Add a category to wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to add (with or without "Category:" prefix)
+     * @returns {string} Modified wikitext
+     */
+    addCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
 
-    // Create a pattern that matches both spaces and underscores
-    const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
-    const regex = new RegExp(
-      `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]`,
-      'i'
-    );
-    return regex.test(wikitext);
-  }
-  /**
-   * Add a category to wikitext
-   * @param {string} wikitext - The wikitext content
-   * @param {string} categoryName - Category name to add (with or without "Category:" prefix)
-   * @returns {string} Modified wikitext
-   */
-  addCategory(wikitext, categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    const normalizedName = this.normalize(cleanName);
+        // Check if category already exists (with normalization)
+        if (this.hasCategory(wikitext, normalizedName)) {
+            return wikitext;
+        }
 
-    // Check if category already exists (with normalization)
-    if (this.hasCategory(wikitext, normalizedName)) {
-      return wikitext;
+        const categorySyntax = `[[Category:${normalizedName}]]`;
+
+        // Find last category or end of file
+        const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
+
+        if (lastCategoryMatch) {
+            // Add after last category
+            return wikitext.replace(
+                /(\[\[Category:[^\]]+\]\])\s*$/,
+                `$1\n${categorySyntax}\n`
+            );
+        } else {
+            // Add at end
+            return wikitext.trim() + `\n${categorySyntax}\n`;
+        }
+    }
+    /**
+     * Remove a category from wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to remove (with or without "Category:" prefix)
+     * @returns {string} Modified wikitext
+     */
+    removeCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
+
+        // Create a pattern that matches both spaces and underscores
+        const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
+        const regex = new RegExp(
+            `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
+            'gi'
+        );
+        return wikitext.replace(regex, '');
     }
 
-    const categorySyntax = `[[Category:${normalizedName}]]`;
-
-    // Find last category or end of file
-    const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
-
-    if (lastCategoryMatch) {
-      // Add after last category
-      return wikitext.replace(
-        /(\[\[Category:[^\]]+\]\])\s*$/,
-        `$1\n${categorySyntax}\n`
-      );
-    } else {
-      // Add at end
-      return wikitext.trim() + `\n${categorySyntax}\n`;
+    /**
+     * Escape special regex characters in a string
+     * @param {string} string - String to escape
+     * @returns {string} Escaped string
+     */
+    escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-  }
-  /**
-   * Remove a category from wikitext
-   * @param {string} wikitext - The wikitext content
-   * @param {string} categoryName - Category name to remove (with or without "Category:" prefix)
-   * @returns {string} Modified wikitext
-   */
-  removeCategory(wikitext, categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    const normalizedName = this.normalize(cleanName);
 
-    // Create a pattern that matches both spaces and underscores
-    const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
-    const regex = new RegExp(
-      `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
-      'gi'
-    );
-    return wikitext.replace(regex, '');
-  }
-
-  /**
-   * Escape special regex characters in a string
-   * @param {string} string - String to escape
-   * @returns {string} Escaped string
-   */
-  escapeRegex(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  /**
-   * Get the proper wikitext syntax for a category
-   * @param {string} categoryName - Category name (with or without "Category:" prefix)
-   * @returns {string} Wikitext category syntax
-   */
-  getCategorySyntax(categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    return `[[Category:${cleanName}]]`;
-  }
-}
-
-// === src/utils/UsageLogger.js ===
-/**
- * Usage logger for monitoring and analytics
- * @class UsageLogger
- */
-class UsageLogger {
-  /**
-   * Log a search operation
-   * @param {string} pattern - Search pattern used
-   * @param {number} resultsCount - Number of results found
-   */
-  static logSearch(pattern, resultsCount) {
-    console.log(`[CBM] Search: "${pattern}" - ${resultsCount} results`);
-  }
-
-  /**
-   * Log a batch operation
-   * @param {number} filesCount - Number of files processed
-   * @param {Array<string>} categoriesAdded - Categories that were added
-   * @param {Array<string>} categoriesRemoved - Categories that were removed
-   */
-  static logBatchOperation(filesCount, categoriesAdded, categoriesRemoved) {
-    console.log(
-      `[CBM] Batch: ${filesCount} files, ` +
-      `+${categoriesAdded.length} -${categoriesRemoved.length} categories`
-    );
-  }
-
-  /**
-   * Log an error
-   * @param {string} context - Where the error occurred
-   * @param {Error} error - The error object
-   */
-  static logError(context, error) {
-    console.error(`[CBM] Error in ${context}:`, error);
-  }
-
-  /**
-   * Log performance metrics
-   * @param {string} operation - Operation name
-   * @param {number} duration - Duration in milliseconds
-   */
-  static logPerformance(operation, duration) {
-    console.log(`[CBM] Performance: ${operation} took ${duration}ms`);
-  }
+    /**
+     * TODO: use it in the workflow or remove if not needed
+     * Get the proper wikitext syntax for a category
+     * @param {string} categoryName - Category name (with or without "Category:" prefix)
+     * @returns {string} Wikitext category syntax
+     */
+    getCategorySyntax(categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        return `[[Category:${cleanName}]]`;
+    }
 }
 
 // === src/models/FileModel.js ===
@@ -405,174 +316,275 @@ class CategoryOperation {
 
 
 class APIService {
-  constructor() {
+    constructor() {
+        /**
+         * Native MediaWiki API helper
+         * @type {mw.Api}
+         */
+        this.mwApi = new mw.Api();
+    }
+    /* ------------------------------------------------------------------ */
+    /*  Public helpers used by other services                              */
+    /* ------------------------------------------------------------------ */
+
     /**
-     * Native MediaWiki API helper — instantiated lazily on first use.
-     * @type {mw.Api|null}
+     * TODO: remove it and related tests
+     * Fetch files from a category with pagination support.
+     * @param {string} categoryName - Full category name including "Category:" prefix
+     * @param {Object} [options={}] - Query options
+     * @param {number} [options.limit=500] - Maximum files to retrieve per request
+     * @returns {Promise<Array>} Array of file objects
      */
-    this.mwApi = null;
-  }
+    async getCategoryMembers(categoryName, options = {}) {
+        const allMembers = [];
+        let cmcontinue = null;
 
-  /* ------------------------------------------------------------------ */
-  /*  mw.Api helper                                                      */
-  /* ------------------------------------------------------------------ */
+        do {
+            const params = {
+                action: 'query',
+                list: 'categorymembers',
+                cmtitle: categoryName,
+                cmtype: 'file',
+                cmlimit: options.limit || 500,
+                format: 'json'
+            };
 
-  /**
-   * Return (and lazily create) an mw.Api instance.
-   * @returns {mw.Api}
-   * @throws {Error} If mw.Api is not available
-   */
-  _getMwApi() {
-    if (this.mwApi) return this.mwApi;
-    if (typeof mw !== 'undefined' && mw.Api) {
-      this.mwApi = new mw.Api();
-      return this.mwApi;
+            if (cmcontinue) {
+                params.cmcontinue = cmcontinue;
+            }
+
+            const data = await this.makeRequest(params);
+            allMembers.push(...data.query.categorymembers);
+
+            cmcontinue = data.continue ? data.continue.cmcontinue : null;
+        } while (cmcontinue);
+
+        return allMembers;
     }
-    throw new Error('mw.Api is not available — are you running inside MediaWiki?');
-  }
 
-  /* ------------------------------------------------------------------ */
-  /*  Public helpers used by other services                              */
-  /* ------------------------------------------------------------------ */
+    /**
+     * Get file details including categories.
+     * @param {Array<string>} titles - Array of file titles
+     * @returns {Promise<Object>} API response with file info
+     */
+    async getFileInfo(titles) {
+        const params = {
+            action: 'query',
+            titles: titles.join('|'),
+            prop: 'categories|imageinfo',
+            cllimit: 500,
+            format: 'json'
+        };
 
-  /**
-   * Fetch files from a category with pagination support.
-   * @param {string} categoryName - Full category name including "Category:" prefix
-   * @param {Object} [options={}] - Query options
-   * @param {number} [options.limit=500] - Maximum files to retrieve per request
-   * @returns {Promise<Array>} Array of file objects
-   */
-  async getCategoryMembers(categoryName, options = {}) {
-    const allMembers = [];
-    let cmcontinue = null;
-
-    do {
-      const params = {
-        action: 'query',
-        list: 'categorymembers',
-        cmtitle: categoryName,
-        cmtype: 'file',
-        cmlimit: options.limit || 500,
-        format: 'json'
-      };
-
-      if (cmcontinue) {
-        params.cmcontinue = cmcontinue;
-      }
-
-      const data = await this.makeRequest(params);
-      allMembers.push(...data.query.categorymembers);
-
-      cmcontinue = data.continue ? data.continue.cmcontinue : null;
-    } while (cmcontinue);
-
-    return allMembers;
-  }
-
-  /**
-   * Get file details including categories.
-   * @param {Array<string>} titles - Array of file titles
-   * @returns {Promise<Object>} API response with file info
-   */
-  async getFileInfo(titles) {
-    const params = {
-      action: 'query',
-      titles: titles.join('|'),
-      prop: 'categories|imageinfo',
-      cllimit: 500,
-      format: 'json'
-    };
-
-    return this.makeRequest(params);
-  }
-  /**
-   * Get page content (wikitext).
-   * @param {string} title - Page title
-   * @returns {Promise<string>} Page wikitext content
-   */
-  async getPageContent(title) {
-    const params = {
-      action: 'query',
-      titles: title,
-      prop: 'revisions',
-      rvprop: 'content',
-      rvslots: 'main',
-      format: 'json'
-    };
-
-    const data = await this.makeRequest(params);
-    const pages = data.query.pages;
-    const pageId = Object.keys(pages)[0];
-    return pages[pageId].revisions[0].slots.main['*'];
-  }
-
-  /**
-   * Get categories that a page belongs to.
-   * @param {string} title - Page title
-   * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
-   */
-  async getCategories(title) {
-    const api = this._getMwApi();
-    try {
-      const categories = await api.getCategories(title);
-      if (categories === false) {
-        return false;
-      }
-      // Convert mw.Title objects to strings and remove "Category:" prefix
-      return categories.map(cat => {
-        const catStr = cat.toString();
-        return catStr.replace(/^Category:/, '');
-      });
-    } catch (error) {
-      if (typeof Logger !== 'undefined') {
-        Logger.error('Failed to get categories', error);
-      }
-      throw error;
+        return this.makeRequest(params);
     }
-  }
+    /**
+     * Get page content (wikitext).
+     * @param {string} title - Page title
+     * @returns {Promise<string>} Page wikitext content
+     */
+    async getPageContent(title) {
+        const params = {
+            action: 'query',
+            titles: title,
+            prop: 'revisions',
+            rvprop: 'content',
+            rvslots: 'main',
+            format: 'json'
+        };
 
-  /**
-   * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
-   *
-   * @param {string} title   - Page title
-   * @param {string} content - New page content (wikitext)
-   * @param {string} summary - Edit summary
-   * @param {Object} [options={}] - Additional edit options (minor, bot, etc.)
-   * @returns {Promise<Object>} API response
-   */
-  async editPage(title, content, summary, options = {}) {
-    const api = this._getMwApi();
-
-    // Use mw.Api.edit() with a transform function
-    return api.edit(title, function () {
-      return {
-        text: content,
-        summary: summary,
-        ...options
-      };
-    });
-  }
-
-  /* ------------------------------------------------------------------ */
-  /*  Low-level request method                                           */
-  /* ------------------------------------------------------------------ */
-
-  /**
-   * Make a GET request to the MediaWiki API via mw.Api.get().
-   * @param {Object} params - Query parameters
-   * @returns {Promise<Object>} Parsed JSON response
-   */
-  async makeRequest(params) {
-    const api = this._getMwApi();
-    try {
-      return await api.get(params);
-    } catch (error) {
-      if (typeof Logger !== 'undefined') {
-        Logger.error('API request failed', error);
-      }
-      throw error;
+        const data = await this.makeRequest(params);
+        const pages = data.query.pages;
+        const pageId = Object.keys(pages)[0];
+        return pages[pageId].revisions[0].slots.main['*'];
     }
-  }
+
+    /**
+     * Search for categories by prefix.
+     * Uses MediaWiki's opensearch API for category suggestions.
+     * @param {string} prefix - Search prefix (can include or exclude "Category:" prefix)
+     * @param {Object} [options={}] - Search options
+     * @param {number} [options.limit=10] - Maximum results to return
+     * @returns {Promise<Array<string>>} Array of category names with "Category:" prefix
+     */
+    async searchCategories(prefix, options = {}) {
+        const limit = options.limit || 10;
+
+        // Remove "Category:" prefix if present for the search
+        const searchPrefix = prefix.replace(/^Category:/, '');
+
+        const params = {
+            action: 'opensearch',
+            search: `Category:${searchPrefix}`,
+            namespace: 14, // Category namespace
+            limit: limit,
+            format: 'json'
+        };
+
+        try {
+            const data = await this.makeRequest(params);
+            // opensearch returns: [query, [titles], [descriptions], [urls]]
+            // We only need the titles
+            const titles = data[1] || [];
+
+            // Ensure all results have "Category:" prefix and filter to only categories
+            return titles
+                .filter(title => title.startsWith('Category:'))
+                .map(title => {
+                    // Preserve the exact format from API (already has Category: prefix)
+                    return title;
+                });
+        } catch (error) {
+            console.error('Failed to search categories', error);
+            return [];
+        }
+    }
+
+    async fetchCategories(searchTerm, options = {}) {
+        const limit = options.limit || 10;
+        if (!searchTerm || searchTerm.length < 2) {
+            return Promise.resolve([]);
+        }
+        const params = {
+            action: 'opensearch',
+            search: searchTerm,
+            namespace: 14, // Category namespace
+            limit: limit
+        };
+        if (options.offset) {
+            params.continue = String(options.offset);
+        }
+        const data = await this.makeRequest(params);
+        // data[1] contains the category titles
+        if (data && data[1]) {
+            return data[1].map(function (title) {
+                return {
+                    value: title,
+                    label: title
+                };
+            });
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Get categories that a page belongs to.
+     * @param {string} title - Page title
+     * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
+     */
+    async getCategories(title) {
+        try {
+            const categories = await this.mwApi.getCategories(title);
+            if (categories === false) {
+                return false;
+            }
+            // Convert mw.Title objects to strings and remove "Category:" prefix
+            return categories.map(cat => {
+                const catStr = cat.toString();
+                return catStr.replace(/^Category:/, '');
+            });
+        } catch (error) {
+            console.error('Failed to get categories', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Search for files in a category using MediaWiki search API
+     * Much more efficient than loading all category members
+     * @param {string} categoryName - Category name (without "Category:" prefix)
+     * @param {string} pattern - Search pattern
+     * @returns {Promise<Array>} Array of file objects
+     */
+    async searchInCategory(categoryName, pattern) {
+        const results = [];
+        let continueToken = null;
+
+        do {
+            // Replace spaces with underscores in category name for search API
+            const searchCategoryName = categoryName.replace(/\s+/g, '_');
+            const params = {
+                action: 'query',
+                list: 'search',
+                srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`,
+                srnamespace: 6, // File namespace
+                srlimit: 'max',
+                srprop: 'size|wordcount|timestamp',
+                format: 'json'
+            };
+
+            if (continueToken) {
+                params.sroffset = continueToken;
+            }
+
+            const response = await this.makeRequest(params);
+
+            if (response.query && response.query.search) {
+                const searchResults = response.query.search.map(file => ({
+                    title: file.title,
+                    pageid: file.pageid,
+                    size: file.size,
+                    timestamp: file.timestamp
+                }));
+
+                results.push(...searchResults);
+            }
+
+            // Check if there are more results
+            continueToken = response.continue ? response.continue.sroffset : null;
+
+            // Safety limit to prevent too many requests
+            if (results.length >= 5000) {
+                console.warn('Search result limit reached (5000 files)');
+                break;
+            }
+
+        } while (continueToken);
+
+        return results;
+    }
+
+
+    /**
+     * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
+     *
+     * @param {string} title   - Page title
+     * @param {string} content - New page content (wikitext)
+     * @param {string} summary - Edit summary
+     * @param {Object} [options={}] - Additional edit options (minor, bot, etc.)
+     * @returns {Promise<Object>} API response
+     */
+    async editPage(title, content, summary, options = {}) {
+
+        // Use mw.Api.edit() with a transform function
+        return this.mwApi.edit(title, function () {
+            return {
+                text: content,
+                summary: summary,
+                ...options
+            };
+        });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Low-level request method                                           */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Make a GET request to the MediaWiki API via mw.Api.get().
+     * @param {Object} params - Query parameters
+     * @returns {Promise<Object>} Parsed JSON response
+     */
+    async makeRequest(params) {
+        try {
+            return await this.mwApi.get(params);
+        } catch (error) {
+            console.error('API request failed', error);
+
+            throw error;
+        }
+    }
 }
 
 // === src/services/FileService.js ===
@@ -584,152 +596,127 @@ class APIService {
 
 
 class FileService {
-  /**
-   * @param {APIService} apiService - API service instance
-   */
-  constructor(apiService) {
-    this.api = apiService;
-  }
-  /**
-   * Search files by pattern within a category
-   * Uses MediaWiki search API for efficiency instead of loading all category members
-   * @param {string} categoryName - Category to search in
-   * @param {string} searchPattern - Pattern to match against file titles
-   * @returns {Promise<Array<FileModel>>} Array of matching file models
-   */
-  async searchFiles(categoryName, searchPattern) {
-    // Normalize category name
-    const cleanCategoryName = categoryName.replace(/^Category:/i, '');
-
-    // Use search API to find files matching the pattern in the category
-    const searchResults = await this.searchInCategory(cleanCategoryName, searchPattern);
-
-    // Get detailed info for matching files
-    const filesWithInfo = await this.getFilesDetails(searchResults);
-
-    return filesWithInfo;
-  }
-
-  /**
-   * Search for files in a category using MediaWiki search API
-   * Much more efficient than loading all category members
-   * @param {string} categoryName - Category name (without "Category:" prefix)
-   * @param {string} pattern - Search pattern
-   * @returns {Promise<Array>} Array of file objects
-   */
-  async searchInCategory(categoryName, pattern) {
-    const results = [];
-    let continueToken = null;
-
-    do {
-      // Replace spaces with underscores in category name for search API
-      const searchCategoryName = categoryName.replace(/\s+/g, '_');
-      const params = {
-        action: 'query',
-        list: 'search',
-        srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`,
-        srnamespace: 6, // File namespace
-        srlimit: 'max',
-        srprop: 'size|wordcount|timestamp',
-        format: 'json'
-      };
-
-      if (continueToken) {
-        params.sroffset = continueToken;
-      }
-
-      const response = await this.api.makeRequest(params);
-
-      if (response.query && response.query.search) {
-        const searchResults = response.query.search.map(file => ({
-          title: file.title,
-          pageid: file.pageid,
-          size: file.size,
-          timestamp: file.timestamp
-        }));
-
-        results.push(...searchResults);
-      }
-
-      // Check if there are more results
-      continueToken = response.continue ? response.continue.sroffset : null;
-
-      // Safety limit to prevent too many requests
-      if (results.length >= 5000) {
-        console.warn('Search result limit reached (5000 files)');
-        break;
-      }
-
-    } while (continueToken);
-
-    return results;
-  }
-
-  /**
-   * Get detailed information for a batch of files
-   * @param {Array} files - Array of file objects with title property
-   * @returns {Promise<Array<FileModel>>} Array of file models with details
-   */
-  async getFilesDetails(files) {
-    if (files.length === 0) return [];
-
-    const batchSize = 50; // API limit
-    const batches = this.createBatches(files, batchSize);
-
-    const results = [];
-    for (const batch of batches) {
-      const titles = batch.map(f => f.title);
-      const info = await this.api.getFileInfo(titles);
-      results.push(...this.parseFileInfo(info));
+    /**
+     * @param {APIService} apiService - API service instance
+     */
+    constructor(apiService) {
+        this.api = apiService;
     }
 
-    return results;
-  }
+    async executeFileSearch(self) {
+        self.resetMessageState();
 
-  /**
-   * Split an array into batches
-   * @param {Array} array - Array to split
-   * @param {number} size - Batch size
-   * @returns {Array<Array>} Array of batches
-   */
-  createBatches(array, size) {
-    const batches = [];
-    for (let i = 0; i < array.length; i += size) {
-      batches.push(array.slice(i, i + size));
+        if (self.sourceCategory.trim() === '') {
+            self.showWarningMessage('Please enter a source category.');
+            return;
+        }
+
+        self.showProgress = true;
+        self.progressText = 'Searching for files...';
+
+        // Placeholder - implement actual search logic
+        // Mock results for demonstration
+        self.searchResults = await this.searchFiles(self.sourceCategory, self.searchPattern);
+        const searchResults_demo = [
+            { title: 'File:GDP-per-capita,BLR.svg', selected: false },
+            { title: 'File:Life-expectancy,BLR.svg', selected: false },
+            { title: 'File:Population,BLR.svg', selected: false },
+            { title: 'File:Unemployment-rate,BLR.svg', selected: false },
+            { title: 'File:Literacy-rate,BLR.svg', selected: false },
+            { title: 'File:Infant-mortality,BLR.svg', selected: false },
+            { title: 'File:CO2-emissions,BLR.svg', selected: false },
+            { title: 'File:Energy-consumption,BLR.svg', selected: false }
+        ];
+        self.selectedFiles = [...self.searchResults];
+        self.showProgress = false;
+        self.showResultsMessage = true;
+        self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
-    return batches;
-  }
+    /**
+     * Search files by pattern within a category
+     * Uses MediaWiki search API for efficiency instead of loading all category members
+     * @param {string} categoryName - Category to search in
+     * @param {string} searchPattern - Pattern to match against file titles
+     * @returns {Promise<Array<FileModel>>} Array of matching file models
+     */
+    async searchFiles(categoryName, searchPattern) {
+        // Normalize category name
+        const cleanCategoryName = categoryName.replace(/^Category:/i, '');
 
-  /**
-   * Parse API response into FileModel objects
-   * @param {Object} apiResponse - Raw API response
-   * @returns {Array<FileModel>} Array of file models
-   */
-  parseFileInfo(apiResponse) {
-    const pages = apiResponse.query.pages;
-    const fileModels = [];
+        // Use search API to find files matching the pattern in the category
+        const searchResults = await this.api.searchInCategory(cleanCategoryName, searchPattern);
 
-    for (const pageId of Object.keys(pages)) {
-      const page = pages[pageId];
-      if (parseInt(pageId) < 0) continue; // Skip missing pages
+        // Get detailed info for matching files
+        const filesWithInfo = await this.getFilesDetails(searchResults);
 
-      const categories = (page.categories || []).map(cat => cat.title);
-      const FileModelClass = typeof FileModel !== 'undefined' ? FileModel : function (d) {
-        return d;
-      };
-
-      fileModels.push(new FileModelClass({
-        title: page.title,
-        pageid: page.pageid,
-        selected: true,
-        currentCategories: categories,
-        thumbnail: page.imageinfo && page.imageinfo[0] ? page.imageinfo[0].url : '',
-        size: page.imageinfo && page.imageinfo[0] ? page.imageinfo[0].size : 0
-      }));
+        return filesWithInfo;
     }
 
-    return fileModels;
-  }
+    /**
+     * Get detailed information for a batch of files
+     * @param {Array} files - Array of file objects with title property
+     * @returns {Promise<Array<FileModel>>} Array of file models with details
+     */
+    async getFilesDetails(files) {
+        if (files.length === 0) return [];
+
+        const batchSize = 50; // API limit
+        const batches = this.createBatches(files, batchSize);
+
+        const results = [];
+        for (const batch of batches) {
+            const titles = batch.map(f => f.title);
+            const info = await this.api.getFileInfo(titles);
+            results.push(...this.parseFileInfo(info));
+        }
+
+        return results;
+    }
+
+    /**
+     * Split an array into batches
+     * @param {Array} array - Array to split
+     * @param {number} size - Batch size
+     * @returns {Array<Array>} Array of batches
+     */
+    createBatches(array, size) {
+        const batches = [];
+        for (let i = 0; i < array.length; i += size) {
+            batches.push(array.slice(i, i + size));
+        }
+        return batches;
+    }
+
+    /**
+     * Parse API response into FileModel objects
+     * @param {Object} apiResponse - Raw API response
+     * @returns {Array<FileModel>} Array of file models
+     */
+    parseFileInfo(apiResponse) {
+        const pages = apiResponse.query.pages;
+        const fileModels = [];
+
+        for (const pageId of Object.keys(pages)) {
+            const page = pages[pageId];
+            if (parseInt(pageId) < 0) continue; // Skip missing pages
+
+            const categories = (page.categories || []).map(cat => cat.title);
+            const FileModelClass = typeof FileModel !== 'undefined' ? FileModel : function (d) {
+                return d;
+            };
+
+            fileModels.push(new FileModelClass({
+                title: page.title,
+                pageid: page.pageid,
+                selected: true,
+                currentCategories: categories,
+                thumbnail: page.imageinfo && page.imageinfo[0] ? page.imageinfo[0].url : '',
+                size: page.imageinfo && page.imageinfo[0] ? page.imageinfo[0].size : 0
+            }));
+        }
+
+        return fileModels;
+    }
 }
 
 // === src/services/CategoryService.js ===
@@ -741,275 +728,179 @@ class FileService {
 
 
 class CategoryService {
-  /**
-   * @param {APIService} apiService - API service instance
-   */
-  constructor(apiService) {
-    this.api = apiService;
-    this.parser = typeof WikitextParser !== 'undefined' ? new WikitextParser() : null;
-  }
-
-  /**
-   * Add categories to a file
-   * @param {string} fileTitle - File page title
-   * @param {Array<string>} categoriesToAdd - Categories to add
-   * @returns {Promise<{success: boolean, modified: boolean}>}
-   */
-  async addCategories(fileTitle, categoriesToAdd) {
-    const wikitext = await this.api.getPageContent(fileTitle);
-
-    let newWikitext = wikitext;
-    for (const category of categoriesToAdd) {
-      if (!this.parser.hasCategory(newWikitext, category)) {
-        newWikitext = this.parser.addCategory(newWikitext, category);
-      }
+    /**
+     * @param {APIService} apiService - API service instance
+     */
+    constructor(apiService) {
+        this.api = apiService;
+        this.parser = typeof WikitextParser !== 'undefined' ? new WikitextParser() : null;
     }
 
-    if (newWikitext !== wikitext) {
-      await this.api.editPage(
-        fileTitle,
-        newWikitext,
-        `Adding categories: ${categoriesToAdd.join(', ')}`
-      );
+    /**
+     * TODO: use it in the workflow
+     * Add categories to a file
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async addCategoriesToFile(fileTitle, categoriesToAdd) {
+        const wikitext = await this.api.getPageContent(fileTitle);
+
+        let newWikitext = wikitext;
+        for (const category of categoriesToAdd) {
+            if (!this.parser.hasCategory(newWikitext, category)) {
+                newWikitext = this.parser.addCategory(newWikitext, category);
+            }
+        }
+
+        if (newWikitext !== wikitext) {
+            await this.api.editPage(
+                fileTitle,
+                newWikitext,
+                `Adding categories: ${categoriesToAdd.join(', ')}`
+            );
+        }
+
+        return { success: true, modified: newWikitext !== wikitext };
     }
 
-    return { success: true, modified: newWikitext !== wikitext };
-  }
+    /**
+     * TODO: use it in the workflow
+     * Remove categories from a file
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async removeCategoriesFromFile(fileTitle, categoriesToRemove) {
+        const wikitext = await this.api.getPageContent(fileTitle);
 
-  /**
-   * Remove categories from a file
-   * @param {string} fileTitle - File page title
-   * @param {Array<string>} categoriesToRemove - Categories to remove
-   * @returns {Promise<{success: boolean, modified: boolean}>}
-   */
-  async removeCategories(fileTitle, categoriesToRemove) {
-    const wikitext = await this.api.getPageContent(fileTitle);
+        let newWikitext = wikitext;
+        for (const category of categoriesToRemove) {
+            newWikitext = this.parser.removeCategory(newWikitext, category);
+        }
 
-    let newWikitext = wikitext;
-    for (const category of categoriesToRemove) {
-      newWikitext = this.parser.removeCategory(newWikitext, category);
+        if (newWikitext !== wikitext) {
+            await this.api.editPage(
+                fileTitle,
+                newWikitext,
+                `Removing categories: ${categoriesToRemove.join(', ')}`
+            );
+        }
+
+        return { success: true, modified: newWikitext !== wikitext };
     }
 
-    if (newWikitext !== wikitext) {
-      await this.api.editPage(
-        fileTitle,
-        newWikitext,
-        `Removing categories: ${categoriesToRemove.join(', ')}`
-      );
-    }
+    /**
+     * Combined add and remove operation
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} toAdd - Categories to add
+     * @param {Array<string>} toRemove - Categories to remove
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async updateCategories(fileTitle, toAdd, toRemove) {
+        const wikitext = await this.api.getPageContent(fileTitle);
+        let newWikitext = wikitext;
 
-    return { success: true, modified: newWikitext !== wikitext };
-  }
-
-  /**
-   * Combined add and remove operation
-   * @param {string} fileTitle - File page title
-   * @param {Array<string>} toAdd - Categories to add
-   * @param {Array<string>} toRemove - Categories to remove
-   * @returns {Promise<{success: boolean, modified: boolean}>}
-   */
-  async updateCategories(fileTitle, toAdd, toRemove) {
-    const wikitext = await this.api.getPageContent(fileTitle);
-    let newWikitext = wikitext;
-
-    // Remove first
-    for (const category of toRemove) {
-      newWikitext = this.parser.removeCategory(newWikitext, category);
-    }
-
-    // Then add
-    for (const category of toAdd) {
-      if (!this.parser.hasCategory(newWikitext, category)) {
-        newWikitext = this.parser.addCategory(newWikitext, category);
-      }
-    }
-
-    if (newWikitext !== wikitext) {
-      const summary = this.buildEditSummary(toAdd, toRemove);
-      await this.api.editPage(fileTitle, newWikitext, summary);
-    }
-
-    return { success: true, modified: newWikitext !== wikitext };
-  }
-
-  /**
-   * Combined add and remove operation using mw.Api.edit() for better conflict handling
-   * @param {string} fileTitle - File page title
-   * @param {Array<string>} toAdd - Categories to add
-   * @param {Array<string>} toRemove - Categories to remove
-   * @returns {Promise<{success: boolean, modified: boolean}>}
-   */
-  async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
-    const api = this.api._getMwApi();
-    const parser = this.parser;
-
-    try {
-      await api.edit(fileTitle, function (revision) {
-        let newWikitext = revision.content;
-
-        // Remove categories first
+        // Remove first
         for (const category of toRemove) {
-          newWikitext = parser.removeCategory(newWikitext, category);
+            newWikitext = this.parser.removeCategory(newWikitext, category);
         }
 
-        // Then add new categories
+        // Then add
         for (const category of toAdd) {
-          if (!parser.hasCategory(newWikitext, category)) {
-            newWikitext = parser.addCategory(newWikitext, category);
-          }
+            if (!this.parser.hasCategory(newWikitext, category)) {
+                newWikitext = this.parser.addCategory(newWikitext, category);
+            }
         }
 
-        // Only save if changed
-        if (newWikitext === revision.content) {
-          return false; // No changes needed
+        if (newWikitext !== wikitext) {
+            const summary = this.buildEditSummary(toAdd, toRemove);
+            await this.api.editPage(fileTitle, newWikitext, summary);
         }
 
+        return { success: true, modified: newWikitext !== wikitext };
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Combined add and remove operation using mw.Api.edit() for better conflict handling
+     * @param {string} fileTitle - File page title
+     * @param {Array<string>} toAdd - Categories to add
+     * @param {Array<string>} toRemove - Categories to remove
+     * @returns {Promise<{success: boolean, modified: boolean}>}
+     */
+    async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
+        const api = new mw.Api();
+        const parser = this.parser;
+
+        try {
+            await api.edit(fileTitle, function (revision) {
+                let newWikitext = revision.content;
+
+                // Remove categories first
+                for (const category of toRemove) {
+                    newWikitext = parser.removeCategory(newWikitext, category);
+                }
+
+                // Then add new categories
+                for (const category of toAdd) {
+                    if (!parser.hasCategory(newWikitext, category)) {
+                        newWikitext = parser.addCategory(newWikitext, category);
+                    }
+                }
+
+                // Only save if changed
+                if (newWikitext === revision.content) {
+                    return false; // No changes needed
+                }
+
+                const parts = [];
+                if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
+                if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
+
+                return {
+                    text: newWikitext,
+                    summary: `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`,
+                    minor: false
+                };
+            });
+
+            return { success: true, modified: true };
+        } catch (error) {
+            if (error.message && error.message.includes('no changes')) {
+                return { success: true, modified: false };
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * TODO: use it in the workflow
+     * Get current categories for a file using the optimized API method
+     * @param {string} fileTitle - File page title
+     * @returns {Promise<Array<string>>} Array of category names
+     */
+    async getCurrentCategories(fileTitle) {
+        const categories = await this.api.getCategories(fileTitle);
+        if (categories === false) {
+            return [];
+        }
+        return categories;
+    }
+
+    /**
+     * TODO: use it in the workflow or move it to a utility module
+     * Build an edit summary from add/remove lists
+     * @param {Array<string>} toAdd - Categories added
+     * @param {Array<string>} toRemove - Categories removed
+     * @returns {string} Edit summary
+     */
+    buildEditSummary(toAdd, toRemove) {
         const parts = [];
         if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
         if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
-
-        return {
-          text: newWikitext,
-          summary: `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`,
-          minor: false
-        };
-      });
-
-      return { success: true, modified: true };
-    } catch (error) {
-      if (error.message && error.message.includes('no changes')) {
-        return { success: true, modified: false };
-      }
-      throw error;
+        return `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`;
     }
-  }
-
-  /**
-   * Get current categories for a file using the optimized API method
-   * @param {string} fileTitle - File page title
-   * @returns {Promise<Array<string>>} Array of category names
-   */
-  async getCurrentCategories(fileTitle) {
-    const categories = await this.api.getCategories(fileTitle);
-    if (categories === false) {
-      return [];
-    }
-    return categories;
-  }
-
-  /**
-   * Build an edit summary from add/remove lists
-   * @param {Array<string>} toAdd - Categories added
-   * @param {Array<string>} toRemove - Categories removed
-   * @returns {string} Edit summary
-   */
-  buildEditSummary(toAdd, toRemove) {
-    const parts = [];
-    if (toAdd.length) parts.push(`+${toAdd.join(', ')}`);
-    if (toRemove.length) parts.push(`-${toRemove.join(', ')}`);
-    return `Batch category update: ${parts.join('; ')} (via Category Batch Manager)`;
-  }
-}
-
-// === src/services/ErrorRecovery.js ===
-/**
- * Error recovery system for failed operations
- * @class ErrorRecovery
- */
-class ErrorRecovery {
-  constructor() {
-    this.failedOperations = [];
-    this.loadFromStorage();
-  }
-
-  /**
-   * Record a failed operation
-   * @param {Object} operation - The failed operation details
-   */
-  recordFailure(operation) {
-    this.failedOperations.push({
-      ...operation,
-      timestamp: new Date().toISOString(),
-      attemptCount: (operation.attemptCount || 0) + 1
-    });
-
-    this.saveToStorage();
-  }
-
-  /**
-   * Retry all failed operations that haven't exceeded max attempts
-   * @param {Function} executeOperation - Function to retry an operation
-   * @returns {Promise<Object>} Results of retry attempts
-   */
-  async retryFailed(executeOperation) {
-    const toRetry = this.failedOperations.filter(
-      op => op.attemptCount < 3
-    );
-
-    const results = { retried: 0, succeeded: 0, failed: 0 };
-
-    for (const operation of toRetry) {
-      try {
-        await executeOperation(operation);
-        this.removeFailure(operation);
-        results.succeeded++;
-      } catch (error) {
-        this.recordFailure(operation);
-        results.failed++;
-      }
-      results.retried++;
-    }
-
-    return results;
-  }
-
-  /**
-   * Remove a failure from the list
-   * @param {Object} operation - The operation to remove
-   */
-  removeFailure(operation) {
-    const index = this.failedOperations.indexOf(operation);
-    if (index > -1) {
-      this.failedOperations.splice(index, 1);
-      this.saveToStorage();
-    }
-  }
-
-  /**
-   * Save failed operations to localStorage
-   */
-  saveToStorage() {
-    try {
-      localStorage.setItem(
-        'cbm-failed-operations',
-        JSON.stringify(this.failedOperations)
-      );
-    } catch (e) {
-      // localStorage may not be available
-    }
-  }
-
-  /**
-   * Load failed operations from localStorage
-   */
-  loadFromStorage() {
-    try {
-      const stored = localStorage.getItem('cbm-failed-operations');
-      if (stored) {
-        this.failedOperations = JSON.parse(stored);
-      }
-    } catch (e) {
-      this.failedOperations = [];
-    }
-  }
-
-  /**
-   * Clear all failed operations
-   */
-  clearAll() {
-    this.failedOperations = [];
-    this.saveToStorage();
-  }
 }
 
 // === src/services/BatchProcessor.js ===
@@ -1021,246 +912,168 @@ class ErrorRecovery {
 
 
 class BatchProcessor {
-  /**
-   * @param {CategoryService} categoryService - Category service instance
-   */
-  constructor(categoryService) {
-    this.categoryService = categoryService;
-    this.rateLimiter = new RateLimiter();
-  }
+    /**
+     * @param {CategoryService} categoryService - Category service instance
+     */
+    constructor(categoryService) {
+        this.categoryService = categoryService;
+        this.rateLimiter = new RateLimiter();
+    }
 
-  /**
-   * Process a batch of files with category updates
-   * @param {Array} files - Files to process
-   * @param {Array<string>} categoriesToAdd - Categories to add
-   * @param {Array<string>} categoriesToRemove - Categories to remove
-   * @param {Object} [callbacks={}] - Callback functions
-   * @param {Function} [callbacks.onProgress] - Progress callback (percentage, results)
-   * @param {Function} [callbacks.onFileComplete] - File complete callback (file, success)
-   * @param {Function} [callbacks.onError] - Error callback (file, error)
-   * @returns {Promise<Object>} Results with total, processed, successful, failed, errors
-   */
-  async processBatch(files, categoriesToAdd, categoriesToRemove, callbacks = {}) {
-    const {
-      onProgress = () => { },
-      onFileComplete = () => { },
-      onError = () => { }
-    } = callbacks; const results = {
-      total: files.length,
-      processed: 0,
-      successful: 0,
-      skipped: 0,
-      failed: 0,
-      errors: []
-    };
+    /**
+     * Process a batch of files with category updates
+     * @param {Array} files - Files to process
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @param {Object} [callbacks={}] - Callback functions
+     * @param {Function} [callbacks.onProgress] - Progress callback (percentage, results)
+     * @param {Function} [callbacks.onFileComplete] - File complete callback (file, success)
+     * @param {Function} [callbacks.onError] - Error callback (file, error)
+     * @returns {Promise<Object>} Results with total, processed, successful, failed, errors
+     */
+    async processBatch(files, categoriesToAdd, categoriesToRemove, callbacks = {}) {
+        const {
+            onProgress = () => { },
+            onFileComplete = () => { },
+            onError = () => { }
+        } = callbacks; const results = {
+            total: files.length,
+            processed: 0,
+            successful: 0,
+            skipped: 0,
+            failed: 0,
+            errors: []
+        };
 
-    // Process files sequentially with throttling
-    for (const file of files) {
-      try {
-        // Wait to respect rate limits (1 edit per 2 seconds)
-        await this.rateLimiter.wait(2000);
+        // Process files sequentially with throttling
+        for (const file of files) {
+            try {
+                // Wait to respect rate limits (1 edit per 2 seconds)
+                await this.rateLimiter.wait(2000);
 
-        // Update categories
-        const result = await this.categoryService.updateCategories(
-          file.title,
-          categoriesToAdd,
-          categoriesToRemove
-        );
+                // Update categories
+                const result = await this.categoryService.updateCategories(
+                    file.title,
+                    categoriesToAdd,
+                    categoriesToRemove
+                );
 
-        results.processed++;
-        if (result.success) {
-          if (result.modified) {
-            results.successful++;
-            onFileComplete(file, true);
-          } else {
-            results.skipped++;
-            onFileComplete(file, false);
-          }
+                results.processed++;
+                if (result.success) {
+                    if (result.modified) {
+                        results.successful++;
+                        onFileComplete(file, true);
+                    } else {
+                        results.skipped++;
+                        onFileComplete(file, false);
+                    }
+                }
+
+                // Update progress
+                const progress = (results.processed / results.total) * 100;
+                onProgress(progress, results);
+
+            } catch (error) {
+                results.processed++;
+                results.failed++;
+                results.errors.push({
+                    file: file.title,
+                    error: error.message
+                });
+
+                onError(file, error);
+                onProgress((results.processed / results.total) * 100, results);
+            }
         }
 
-        // Update progress
-        const progress = (results.processed / results.total) * 100;
-        onProgress(progress, results);
+        return results;
+    }
 
-      } catch (error) {
-        results.processed++;
-        results.failed++;
-        results.errors.push({
-          file: file.title,
-          error: error.message
+    /**
+     * Normalize category name for comparison
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    normalizeCategoryName(categoryName) {
+        return Validator.normalizeCategoryName(categoryName);
+    }
+
+    /**
+     * Check if a category exists in a list (with normalization)
+     * @param {string} category - Category to find
+     * @param {Array<string>} categoryList - List to search in
+     * @returns {number} Index of the category in the list, or -1 if not found
+     */
+    findCategoryIndex(category, categoryList) {
+        const normalized = this.normalizeCategoryName(category);
+        return categoryList.findIndex(cat => {
+            return this.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
         });
-
-        onError(file, error);
-        onProgress((results.processed / results.total) * 100, results);
-      }
     }
 
-    return results;
-  }
+    /**
+     * Check if category exists in a list (with normalization)
+     * @param {string} category - Category to check
+     * @param {Array<string>} categoryList - List to search in
+     * @returns {boolean} True if category exists in the list
+     */
+    categoryExists(category, categoryList) {
+        return this.findCategoryIndex(category, categoryList) !== -1;
+    }
 
-  /**
-   * Normalize category name for comparison
-   * @param {string} categoryName - Category name to normalize
-   * @returns {string} Normalized category name
-   */
-  normalizeCategoryName(categoryName) {
-    return Validator.normalizeCategoryName(categoryName);
-  }
+    /**
+     * Preview changes without actually editing
+     * @param {Array} files - Files to preview
+     * @param {Array<string>} categoriesToAdd - Categories to add
+     * @param {Array<string>} categoriesToRemove - Categories to remove
+     * @returns {Promise<Array>} Preview of changes
+     */
+    async previewChanges(files, categoriesToAdd, categoriesToRemove) {
+        const previews = [];
 
-  /**
-   * Check if a category exists in a list (with normalization)
-   * @param {string} category - Category to find
-   * @param {Array<string>} categoryList - List to search in
-   * @returns {number} Index of the category in the list, or -1 if not found
-   */
-  findCategoryIndex(category, categoryList) {
-    const normalized = this.normalizeCategoryName(category);
-    return categoryList.findIndex(cat => {
-      return this.normalizeCategoryName(cat).toLowerCase() === normalized.toLowerCase();
-    });
-  }
+        for (const file of files) {
+            const current = file.currentCategories || [];
 
-  /**
-   * Check if category exists in a list (with normalization)
-   * @param {string} category - Category to check
-   * @param {Array<string>} categoryList - List to search in
-   * @returns {boolean} True if category exists in the list
-   */
-  categoryExists(category, categoryList) {
-    return this.findCategoryIndex(category, categoryList) !== -1;
-  }
+            // Check if trying to add categories that already exist (with normalization)
+            if (categoriesToAdd.length > 0) {
+                const duplicateCategories = categoriesToAdd.filter(cat => this.categoryExists(cat, current));
+                if (duplicateCategories.length > 0) {
+                    throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+                }
+            }
 
-  /**
-   * Preview changes without actually editing
-   * @param {Array} files - Files to preview
-   * @param {Array<string>} categoriesToAdd - Categories to add
-   * @param {Array<string>} categoriesToRemove - Categories to remove
-   * @returns {Promise<Array>} Preview of changes
-   */
-  async previewChanges(files, categoriesToAdd, categoriesToRemove) {
-    const previews = [];
+            const after = [...current];
 
-    for (const file of files) {
-      const current = file.currentCategories || [];
+            // Simulate removal (with normalization for matching)
+            categoriesToRemove.forEach(cat => {
+                const index = this.findCategoryIndex(cat, after);
+                if (index > -1) after.splice(index, 1);
+            });
 
-      // Check if trying to add categories that already exist (with normalization)
-      if (categoriesToAdd.length > 0) {
-        const duplicateCategories = categoriesToAdd.filter(cat => this.categoryExists(cat, current));
-        if (duplicateCategories.length > 0) {
-          throw new Error(`The following categories already exist and cannot be added: ${duplicateCategories.join(', ')}`);
+            // Simulate addition (with normalization for checking duplicates)
+            categoriesToAdd.forEach(cat => {
+                if (!this.categoryExists(cat, after)) after.push(cat);
+            });
+
+            previews.push({
+                file: file.title,
+                currentCategories: current,
+                newCategories: after,
+                willChange: JSON.stringify(current) !== JSON.stringify(after)
+            });
         }
-      }
 
-      const after = [...current];
-
-      // Simulate removal (with normalization for matching)
-      categoriesToRemove.forEach(cat => {
-        const index = this.findCategoryIndex(cat, after);
-        if (index > -1) after.splice(index, 1);
-      });
-
-      // Simulate addition (with normalization for checking duplicates)
-      categoriesToAdd.forEach(cat => {
-        if (!this.categoryExists(cat, after)) after.push(cat);
-      });
-
-      previews.push({
-        file: file.title,
-        currentCategories: current,
-        newCategories: after,
-        willChange: JSON.stringify(current) !== JSON.stringify(after)
-      });
+        return previews;
     }
-
-    return previews;
-  }
 }
 
-// === src/ui/components/SearchPanel.js ===
-/**
- * Search panel UI component using Codex CSS-only classes.
- * @see https://doc.wikimedia.org/codex/latest/
- * @class SearchPanel
- */
-class SearchPanel {
-  /**
-   * @param {Function} onSearch - Callback when search is triggered
-   */
-  constructor(onSearch) {
-    this.onSearch = onSearch;
-  }
-
-  /**
-   * Create the search panel HTML element with Codex components.
-   * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
-   * @returns {HTMLElement} The search panel element
-   */
-  createElement(sourceCategory) {
-    const div = document.createElement('div');
-    div.className = 'cbm-search';
-    div.innerHTML = `
-      <div class="cdx-field">
-        <div class="cdx-label">
-          <label class="cdx-label__label" for="cbm-source-category">
-            <span class="cdx-label__label__text">Source Category</span>
-          </label>
-        </div>
-        <div class="cdx-field__control">
-          <div class="cdx-text-input">
-            <input id="cbm-source-category" class="cdx-text-input__input" type="text"
-            value="${sourceCategory}"
-                   placeholder="Category:Example">
-          </div>
-        </div>
-      </div>
-
-      <div class="cdx-field" style="margin-top: 12px;">
-        <div class="cdx-label">
-          <label class="cdx-label__label" for="cbm-pattern">
-            <span class="cdx-label__label__text">Search Pattern</span>
-          </label>
-          <span class="cdx-label__description">
-            Enter a pattern to filter files (e.g., ,BLR.svg)
-          </span>
-        </div>
-        <div class="cdx-field__control cbm-search-row">
-          <div class="cdx-text-input" style="flex: 1;">
-            <input id="cbm-pattern" class="cdx-text-input__input" type="text"
-                   placeholder="e.g., ,BLR.svg">
-          </div>
-          <button id="cbm-search-btn"
-                  class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
-            Search
-          </button>
-        </div>
-      </div>
-    `;
-    return div;
-  }
-
-  /**
-   * Attach event listeners
-   */
-  attachListeners() {
-    document.getElementById('cbm-search-btn').addEventListener('click', () => {
-      this.onSearch();
-    });
-
-    document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        this.onSearch();
-      }
-    });
-  }
-}
-
-// === src/ui/components/FileList.js ===
+// === src/ui/components/FilesList.js ===
 /**
  * File list UI component using Codex CSS-only classes.
  * @see https://doc.wikimedia.org/codex/latest/
- * @class FileList
+ * @class FilesList
  */
-class FileList {
+class FilesList {
     /**
      * @param {Function} onSelectionChange - Callback when selection changes
      * @param {Function} onRemoveFile - Callback when remove button is clicked (receives index)
@@ -1351,11 +1164,21 @@ class FileList {
 // === src/ui/components/CategoryInputs.js ===
 /**
  * Category inputs UI component using Codex CSS-only classes.
- * Manages the add categories, remove categories, and edit summary inputs.
+ * Manages the add categories, remove categories inputs with autocomplete.
  * @see https://doc.wikimedia.org/codex/latest/
  * @class CategoryInputs
  */
 class CategoryInputs {
+    /**
+     * @param {APIService} apiService - API service for category search
+     */
+    constructor(apiService) {
+        this.apiService = apiService;
+        this.searchTimeout = null;
+        this.activeDropdown = null;
+        this.selectedIndex = -1;
+    }
+
     /**
      * Create the category inputs HTML element with Codex components.
      * Uses CdxField, CdxTextInput CSS-only patterns.
@@ -1374,9 +1197,9 @@ class CategoryInputs {
                         e.g., Category:Belarus, Category:Europe
                     </span>
                 </div>
-                <div class="cdx-field__control">
+                <div class="cdx-field__control cbm-input-with-dropdown">
                     <div class="cdx-text-input">
-                        <input id="cbm-add-cats" class="cdx-text-input__input" type="text" placeholder="Category:Example">
+                        <input id="cbm-add-cats" class="cdx-text-input__input cbm-category-input" type="text" placeholder="Category:Example" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -1387,9 +1210,9 @@ class CategoryInputs {
                         <span class="cdx-label__label__text">Remove Categories (comma-separated)</span>
                     </label>
                 </div>
-                <div class="cdx-field__control">
+                <div class="cdx-field__control cbm-input-with-dropdown">
                     <div class="cdx-text-input">
-                        <input id="cbm-remove-cats" class="cdx-text-input__input" type="text" placeholder="Category:Old">
+                        <input id="cbm-remove-cats" class="cdx-text-input__input cbm-category-input" type="text" placeholder="Category:Old" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -1399,20 +1222,230 @@ class CategoryInputs {
     }
 
     /**
-     * Attach event listeners for category inputs
+     * Attach event listeners for category inputs including autocomplete
      */
     attachListeners() {
-        // Add Enter key support for category inputs
-        ['cbm-add-cats', 'cbm-remove-cats'].forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.target.blur();
-                    }
-                });
+        const inputs = document.querySelectorAll('.cbm-category-input');
+
+        inputs.forEach(input => {
+            // Input event for autocomplete
+            input.addEventListener('input', (e) => {
+                this.handleInput(e.target);
+            });
+
+            // Keyboard navigation
+            input.addEventListener('keydown', (e) => {
+                this.handleKeydown(e);
+            });
+
+            // Close dropdown on blur
+            input.addEventListener('blur', (e) => {
+                // Delay to allow clicking on dropdown items
+                setTimeout(() => {
+                    this.hideDropdown();
+                }, 200);
+            });
+
+            // Show dropdown on focus
+            input.addEventListener('focus', (e) => {
+                const value = e.target.value.trim();
+                if (value) {
+                    this.handleInput(e.target);
+                }
+            });
+        });
+    }
+
+    /**
+     * Handle input event for autocomplete
+     * @param {HTMLInputElement} input - The input element
+     */
+    async handleInput(input) {
+        // Clear previous timeout
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+
+        const value = input.value.trim();
+
+        // Get the last category being typed (after last comma)
+        const lastCommaIndex = value.lastIndexOf(',');
+        const currentInput = lastCommaIndex >= 0
+            ? value.substring(lastCommaIndex + 1).trim()
+            : value;
+
+        // Don't search if empty or already has Category: prefix (user might be pasting)
+        if (!currentInput || currentInput === 'Category:') {
+            this.hideDropdown();
+            return;
+        }
+
+        // Debounce search
+        this.searchTimeout = setTimeout(async () => {
+            try {
+                const results = await this.apiService.searchCategories(currentInput, { limit: 10 });
+                this.showDropdown(input, results, lastCommaIndex);
+            } catch (error) {
+                // Silently fail on search errors
+                this.hideDropdown();
+            }
+        }, 300);
+    }
+
+    /**
+     * Handle keyboard navigation in dropdown
+     * @param {KeyboardEvent} e - The keyboard event
+     */
+    handleKeydown(e) {
+        const dropdown = this.activeDropdown;
+        if (!dropdown) return;
+
+        const items = dropdown.querySelectorAll('.cbm-dropdown-item');
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                this.selectedIndex = Math.min(this.selectedIndex + 1, items.length - 1);
+                this.updateSelection(items);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
+                this.updateSelection(items);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (this.selectedIndex >= 0 && items[this.selectedIndex]) {
+                    this.selectItem(items[this.selectedIndex]);
+                }
+                break;
+            case 'Escape':
+                this.hideDropdown();
+                break;
+        }
+    }
+
+    /**
+     * Update visual selection in dropdown
+     * @param {NodeListOf<Element>} items - Dropdown items
+     */
+    updateSelection(items) {
+        items.forEach((item, index) => {
+            if (index === this.selectedIndex) {
+                item.classList.add('cbm-dropdown-item--selected');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('cbm-dropdown-item--selected');
             }
         });
+    }
+
+    /**
+     * Show dropdown with suggestions
+     * @param {HTMLInputElement} input - The input element
+     * @param {string[]} results - Search results
+     * @param {number} lastCommaIndex - Index of last comma in input value
+     */
+    showDropdown(input, results, lastCommaIndex = -1) {
+        // Remove existing dropdown
+        this.hideDropdown();
+
+        if (results.length === 0) {
+            return;
+        }
+
+        // Create dropdown
+        const dropdown = document.createElement('div');
+        dropdown.className = 'cbm-dropdown';
+        dropdown.innerHTML = results.map(cat => `
+            <div class="cbm-dropdown-item" data-value="${this.escapeHtml(cat)}">
+                ${this.escapeHtml(cat)}
+            </div>
+        `).join('');
+
+        // Position dropdown below input
+        const rect = input.getBoundingClientRect();
+        dropdown.style.position = 'fixed';
+        dropdown.style.top = `${rect.bottom + 4}px`;
+        dropdown.style.left = `${rect.left}px`;
+        dropdown.style.width = `${rect.width}px`;
+        dropdown.style.maxHeight = '200px';
+        dropdown.style.overflowY = 'auto';
+        dropdown.style.zIndex = '1000';
+
+        // Add click handlers
+        dropdown.querySelectorAll('.cbm-dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.selectItem(item, input, lastCommaIndex);
+            });
+            item.addEventListener('mouseenter', () => {
+                const items = dropdown.querySelectorAll('.cbm-dropdown-item');
+                items.forEach(i => i.classList.remove('cbm-dropdown-item--selected'));
+                item.classList.add('cbm-dropdown-item--selected');
+                this.selectedIndex = Array.from(items).indexOf(item);
+            });
+        });
+
+        document.body.appendChild(dropdown);
+        this.activeDropdown = dropdown;
+        this.selectedIndex = -1;
+    }
+
+    /**
+     * Hide and remove dropdown
+     */
+    hideDropdown() {
+        if (this.activeDropdown) {
+            this.activeDropdown.remove();
+            this.activeDropdown = null;
+        }
+        this.selectedIndex = -1;
+    }
+
+    /**
+     * Select a dropdown item
+     * @param {Element} item - The selected item
+     * @param {HTMLInputElement} input - The input element
+     * @param {number} lastCommaIndex - Index of last comma in input value
+     */
+    selectItem(item, input = null, lastCommaIndex = -1) {
+        if (!input) {
+            input = document.querySelector('.cbm-category-input:focus');
+        }
+        if (!input) return;
+
+        const value = item.dataset.value;
+        const currentValue = input.value;
+
+        let newValue;
+        if (lastCommaIndex >= 0) {
+            // Replace the part after last comma
+            newValue = currentValue.substring(0, lastCommaIndex + 1) + ' ' + value + ', ';
+        } else {
+            // Replace entire value
+            newValue = value + ', ';
+        }
+
+        input.value = newValue;
+        input.focus();
+        this.hideDropdown();
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     * @param {string} text - Text to escape
+     * @returns {string} Escaped text
+     */
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
     }
 
     /**
@@ -1520,7 +1553,7 @@ class ProgressBar {
  * Validation Helper
  *
  * @description
- * Shared validation logic for CategoryBatchManagerUI handlers.
+ * Shared validation logic for BatchManager handlers.
  * Provides common validation functions used by PreviewHandler and ExecuteHandler.
  *
  * @requires Validator - For checking circular category references
@@ -1530,7 +1563,7 @@ class ProgressBar {
 
 class ValidationHelper {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -1642,20 +1675,65 @@ class ValidationHelper {
  * Search Handler
  *
  * @description
- * Handles all search-related functionality for CategoryBatchManagerUI.
+ * Handles all search-related functionality for BatchManager.
  * Manages search execution, stopping, progress display, and button state.
  *
- * @requires UsageLogger - For logging search operations
  */
-
-
 
 class SearchHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
+    }
+
+    /**
+     * Create the search panel HTML element with Codex components.
+     * Uses CdxField, CdxTextInput, and CdxButton CSS-only patterns.
+     * @returns {HTMLElement} The search panel element
+     */
+    createElement(sourceCategory) {
+        const div = document.createElement('div');
+        div.className = 'cbm-search';
+        div.innerHTML = `
+      <div class="cdx-field">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-source-category">
+            <span class="cdx-label__label__text">Source Category</span>
+          </label>
+        </div>
+        <div class="cdx-field__control">
+          <div class="cdx-text-input">
+            <input id="cbm-source-category" class="cdx-text-input__input" type="text"
+            value="${sourceCategory}"
+                   placeholder="Category:Example">
+          </div>
+        </div>
+      </div>
+
+      <div class="cdx-field" style="margin-top: 12px;">
+        <div class="cdx-label">
+          <label class="cdx-label__label" for="cbm-pattern">
+            <span class="cdx-label__label__text">Search Pattern</span>
+          </label>
+          <span class="cdx-label__description">
+            Enter a pattern to filter files (e.g., ,BLR.svg)
+          </span>
+        </div>
+        <div class="cdx-field__control cbm-search-row">
+          <div class="cdx-text-input" style="flex: 1;">
+            <input id="cbm-pattern" class="cdx-text-input__input" type="text"
+                   placeholder="e.g., ,BLR.svg">
+          </div>
+          <button id="cbm-search-btn"
+                  class="cdx-button cdx-button--action-progressive cdx-button--weight-primary cdx-button--size-medium">
+            Search
+          </button>
+        </div>
+      </div>
+    `;
+        return div;
     }
 
     /**
@@ -1706,7 +1784,7 @@ class SearchHandler {
             this.updateSearchButton(false);
             this.ui.state.isSearching = false;
 
-            UsageLogger.logSearch(pattern, files.length);
+            console.log(`[CBM] Search: "${pattern}" - ${files.length} results`);
         } catch (error) {
             this.hideSearchProgress();
             this.updateSearchButton(false);
@@ -1766,10 +1844,24 @@ class SearchHandler {
 
     /**
      * Hide search progress indicator
-     * Content will be replaced by FileList.renderFileList
+     * Content will be replaced by FilesList.renderFileList
      */
     hideSearchProgress() {
-        // Content will be replaced by FileList.renderFileList
+        // Content will be replaced by FilesList.renderFileList
+    }
+    /**
+     * Attach event listeners
+     */
+    attachListeners() {
+        document.getElementById('cbm-search-btn').addEventListener('click', () => {
+            this.handleSearch();
+        });
+
+        document.getElementById('cbm-pattern').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.handleSearch();
+            }
+        });
     }
 }
 
@@ -1778,7 +1870,7 @@ class SearchHandler {
  * Preview Handler
  *
  * @description
- * Handles all preview-related functionality for CategoryBatchManagerUI.
+ * Handles all preview-related functionality for BatchManager.
  * Manages preview generation, modal display, and validation.
  *
  * @requires ValidationHelper - For common validation logic
@@ -1788,7 +1880,7 @@ class SearchHandler {
 
 class PreviewHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -1890,11 +1982,10 @@ class PreviewHandler {
  * Execute Handler
  *
  * @description
- * Handles all execute-related functionality for CategoryBatchManagerUI.
+ * Handles all execute-related functionality for BatchManager.
  * Manages batch execution, progress display, and result reporting.
  *
  * @requires ValidationHelper - For common validation logic
- * @requires UsageLogger - For logging batch operations
  * @requires ProgressBar - For progress display
  */
 
@@ -1902,7 +1993,7 @@ class PreviewHandler {
 
 class ExecuteHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -1990,7 +2081,10 @@ class ExecuteHandler {
             );
 
             console.log('[CBM-E] Batch operation results:', results);
-            UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
+            console.log(
+                `[CBM] Batch: ${selectedFiles.length} files, ` +
+                `+${toAdd.length} -${toRemove.length} categories`
+            );
             this.showResults(results);
 
         } catch (error) {
@@ -2077,7 +2171,7 @@ class ExecuteHandler {
     }
 }
 
-// === src/ui/CategoryBatchManagerUI.js ===
+// === src/BatchManager.js ===
 /**
  * Category Batch Manager UI
  *
@@ -2090,7 +2184,7 @@ class ExecuteHandler {
 
 
 
-class CategoryBatchManagerUI {
+class BatchManager {
     constructor() {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
@@ -2098,9 +2192,8 @@ class CategoryBatchManagerUI {
         this.batchProcessor = new BatchProcessor(this.categoryService);
 
         // Initialize UI components
-        this.searchPanel = new SearchPanel(() => this.searchHandler.handleSearch());
-        this.categoryInputs = new CategoryInputs();
-        this.fileList = new FileList(
+        this.categoryInputs = new CategoryInputs(this.apiService);
+        this.fileList = new FilesList(
             () => this.updateSelectedCount(),
             (index) => this.removeFile(index)
         );
@@ -2143,10 +2236,10 @@ class CategoryBatchManagerUI {
         reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
-        // SearchPanel element
-        const searchPanelElement = this.searchPanel.createElement(this.state.sourceCategory);
+        // Searchelement
+        const searchElement = this.searchHandler.createElement(this.state.sourceCategory);
         // Create main container
-        const container = this.buildContainer(searchPanelElement);
+        const container = this.buildContainer(searchElement);
         document.body.appendChild(container);
 
         // Add reopen button listener
@@ -2155,7 +2248,7 @@ class CategoryBatchManagerUI {
         });
     }
 
-    buildContainer(searchPanelElement) {
+    buildContainer(searchElement) {
         const categoryInputsElement = this.categoryInputs.createElement();
         const ProgressBarElement = this.progressBarHandler.createElement();
 
@@ -2179,7 +2272,7 @@ class CategoryBatchManagerUI {
                 <div class="cbm-main-layout">
                     <!-- Left Panel: Search and Actions -->
                     <div class="cbm-left-panel">
-                        ${searchPanelElement.outerHTML}
+                        ${searchElement.outerHTML}
                         <div id="cbm-results-message" class="hidden"></div>
 
                         <div class="cbm-actions">
@@ -2241,7 +2334,8 @@ class CategoryBatchManagerUI {
                         </div>
                     </div>
                 </div>
-            </div>            <div id="cbm-preview-modal" class="cbm-modal hidden">
+            </div>
+            <div id="cbm-preview-modal" class="cbm-modal hidden">
                 <div class="cbm-modal-content">
                     <h3>Preview Changes</h3>
                     <div id="cbm-preview-content"></div>
@@ -2259,7 +2353,7 @@ class CategoryBatchManagerUI {
 
     attachEventListeners() {
         // Search panel listeners
-        this.searchPanel.attachListeners();
+        this.searchHandler.attachListeners();
 
         // Category inputs listeners
         this.categoryInputs.attachListeners();
@@ -2519,7 +2613,7 @@ class CategoryBatchManagerUI {
           if (reopenBtn) reopenBtn.style.display = 'none';
         } else if (!existingModal) {
           // Create new instance
-          window.categoryBatchManager = new CategoryBatchManagerUI();
+          window.categoryBatchManager = new BatchManager();
         }
       });
     });

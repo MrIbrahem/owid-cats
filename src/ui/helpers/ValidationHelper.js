@@ -2,7 +2,7 @@
  * Validation Helper
  *
  * @description
- * Shared validation logic for CategoryBatchManagerUI handlers.
+ * Shared validation logic for BatchManager handlers.
  * Provides common validation functions used by PreviewHandler and ExecuteHandler.
  *
  * @requires Validator - For checking circular category references
@@ -12,7 +12,7 @@
 
 class ValidationHelper {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;

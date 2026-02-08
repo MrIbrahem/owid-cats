@@ -249,3 +249,29 @@
 .hidden {
   display: none !important;
 }
+
+/* ── Autocomplete Dropdown ── */
+.cbm-dropdown {
+  background: #fff;
+  border: 1px solid #a2a9b1;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.25);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cbm-dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.cbm-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.cbm-dropdown-item:hover,
+.cbm-dropdown-item--selected {
+  background: #f8f9fa;
+}

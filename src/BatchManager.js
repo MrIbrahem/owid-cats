@@ -8,9 +8,9 @@
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FileList, CategoryInputs */
+/* global APIService, FileService, CategoryService, BatchProcessor, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, FilesList, CategoryInputs */
 
-class CategoryBatchManagerUI {
+class BatchManager {
     constructor() {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
@@ -18,9 +18,8 @@ class CategoryBatchManagerUI {
         this.batchProcessor = new BatchProcessor(this.categoryService);
 
         // Initialize UI components
-        this.searchPanel = new SearchPanel(() => this.searchHandler.handleSearch());
-        this.categoryInputs = new CategoryInputs();
-        this.fileList = new FileList(
+        this.categoryInputs = new CategoryInputs(this.apiService);
+        this.fileList = new FilesList(
             () => this.updateSelectedCount(),
             (index) => this.removeFile(index)
         );
@@ -63,10 +62,10 @@ class CategoryBatchManagerUI {
         reopenBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 99; display: none;';
         document.body.appendChild(reopenBtn);
 
-        // SearchPanel element
-        const searchPanelElement = this.searchPanel.createElement(this.state.sourceCategory);
+        // Searchelement
+        const searchElement = this.searchHandler.createElement(this.state.sourceCategory);
         // Create main container
-        const container = this.buildContainer(searchPanelElement);
+        const container = this.buildContainer(searchElement);
         document.body.appendChild(container);
 
         // Add reopen button listener
@@ -75,7 +74,7 @@ class CategoryBatchManagerUI {
         });
     }
 
-    buildContainer(searchPanelElement) {
+    buildContainer(searchElement) {
         const categoryInputsElement = this.categoryInputs.createElement();
         const ProgressBarElement = this.progressBarHandler.createElement();
 
@@ -99,7 +98,7 @@ class CategoryBatchManagerUI {
                 <div class="cbm-main-layout">
                     <!-- Left Panel: Search and Actions -->
                     <div class="cbm-left-panel">
-                        ${searchPanelElement.outerHTML}
+                        ${searchElement.outerHTML}
                         <div id="cbm-results-message" class="hidden"></div>
 
                         <div class="cbm-actions">
@@ -161,7 +160,8 @@ class CategoryBatchManagerUI {
                         </div>
                     </div>
                 </div>
-            </div>            <div id="cbm-preview-modal" class="cbm-modal hidden">
+            </div>
+            <div id="cbm-preview-modal" class="cbm-modal hidden">
                 <div class="cbm-modal-content">
                     <h3>Preview Changes</h3>
                     <div id="cbm-preview-content"></div>
@@ -179,7 +179,7 @@ class CategoryBatchManagerUI {
 
     attachEventListeners() {
         // Search panel listeners
-        this.searchPanel.attachListeners();
+        this.searchHandler.attachListeners();
 
         // Category inputs listeners
         this.categoryInputs.attachListeners();
@@ -395,5 +395,5 @@ class CategoryBatchManagerUI {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CategoryBatchManagerUI;
+    module.exports = BatchManager;
 }

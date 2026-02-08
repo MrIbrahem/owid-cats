@@ -32,8 +32,11 @@ class SearchPanel {
                 </span>
                 <div class="cbm-input-button-group">
                     <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg" />
-                    <cdx-button @click="searchFiles" action="progressive" weight="primary">
+                    <cdx-button v-if="!isSearching" @click="searchFiles" action="progressive" weight="primary">
                         Search
+                    </cdx-button>
+                    <cdx-button v-if="isSearching" @click="stopSearch" action="destructive" weight="primary">
+                        Stop Process
                     </cdx-button>
                 </div>
             </div>

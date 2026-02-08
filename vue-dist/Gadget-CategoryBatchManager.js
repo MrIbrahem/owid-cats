@@ -327,17 +327,6 @@ function createCategoryBatchManager(api) {
     </div>
     `;
 
-    const fileSelectionComputed = {
-        selectedCount: function () {
-            return this.selectedFiles.filter(f => f.selected).length;
-        },
-        isSearchValid: function () {
-            return this.sourceCategory.trim() !== '';
-        },
-        totalFilesCount: function () {
-            return this.selectedFiles.length;
-        }
-    };
     const app = {
         data: function () {
             return {
@@ -380,7 +369,17 @@ function createCategoryBatchManager(api) {
                 removeCategoryDebounce: null
             };
         },
-        computed: fileSelectionComputed,
+        computed: {
+            selectedCount: function () {
+                return this.selectedFiles.filter(f => f.selected).length;
+            },
+            isSearchValid: function () {
+                return this.sourceCategory.trim() !== '';
+            },
+            totalFilesCount: function () {
+                return this.selectedFiles.length;
+            }
+        },
         methods: {
             // should be moved to services/FileService.js
             searchFiles: function () {

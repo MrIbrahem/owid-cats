@@ -7,13 +7,28 @@ global.WikitextParser = WikitextParser;
 describe('CategoryService', () => {
   let service;
   let mockApi;
+  let mockMwApiEdit;
 
   beforeEach(() => {
+    mockMwApiEdit = jest.fn();
+
+    // Mock mw.Api globally for updateCategoriesOptimized tests
+    global.mw = {
+      Api: jest.fn().mockImplementation(() => ({
+        edit: mockMwApiEdit
+      }))
+    };
+
     mockApi = {
       getPageContent: jest.fn(),
       editPage: jest.fn().mockResolvedValue({ edit: { result: 'Success' } })
     };
     service = new CategoryService(mockApi);
+  });
+
+  afterEach(() => {
+    // Clean up global mw mock
+    delete global.mw;
   });
 
   describe('addCategories', () => {
@@ -125,8 +140,7 @@ describe('CategoryService', () => {
 
   describe('updateCategoriesOptimized', () => {
     test('should add and remove categories using mw.Api.edit', async () => {
-      const mockEdit = jest.fn().mockResolvedValue({ edit: { result: 'Success' } });
-      mockApi._getMwApi = jest.fn().mockReturnValue({ edit: mockEdit });
+      mockMwApiEdit.mockResolvedValue({ edit: { result: 'Success' } });
 
       const result = await service.updateCategoriesOptimized(
         'File:Test.svg',
@@ -136,12 +150,11 @@ describe('CategoryService', () => {
 
       expect(result.success).toBe(true);
       expect(result.modified).toBe(true);
-      expect(mockEdit).toHaveBeenCalledWith('File:Test.svg', expect.any(Function));
+      expect(mockMwApiEdit).toHaveBeenCalledWith('File:Test.svg', expect.any(Function));
     });
 
     test('should handle no changes scenario', async () => {
-      const mockEdit = jest.fn().mockRejectedValue(new Error('no changes'));
-      mockApi._getMwApi = jest.fn().mockReturnValue({ edit: mockEdit });
+      mockMwApiEdit.mockRejectedValue(new Error('no changes'));
 
       const result = await service.updateCategoriesOptimized(
         'File:Test.svg',

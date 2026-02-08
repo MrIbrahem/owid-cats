@@ -89,9 +89,10 @@ function BatchManager(api) {
                 mwApi: mwApi, // Reference to API service instance
                 files_list: files_list, // Reference to FilesList component instance
                 category_inputs: category_inputs, // Reference to CategoryInputs component instance
-                sourceCategory: 'Category:Economic Data',
-                searchPattern: '',
+                sourceCategory: 'Category:Our World in Data graphs of Austria',
+                searchPattern: '1990',
                 addCategories: [],
+                addInputValue: '',
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
@@ -109,7 +110,10 @@ function BatchManager(api) {
 
                 // For multiselect lookup - Add Categories
                 addCategoryChips: [],
-                addCategoryMenuItems: [],
+                addCategoryMenuItems: [
+                    { value: 'Category:Economics', label: 'Category:Economics' },
+                    { value: 'Category:Science', label: 'Category:Science' }
+                ],
                 addCategoryMenuConfig: {
                     boldLabel: true,
                     visibleItemLimit: 10
@@ -117,7 +121,9 @@ function BatchManager(api) {
 
                 // For multiselect lookup - Remove Categories
                 removeCategoryChips: [],
-                removeCategoryMenuItems: [],
+                removeCategoryMenuItems: [
+                    { value: 'Category:Politics', label: 'Category:Politics' }
+                ],
                 removeCategoryMenuConfig: {
                     boldLabel: true,
                     visibleItemLimit: 10
@@ -301,8 +307,8 @@ function BatchManager(api) {
             ** *************************
             */
 
-            handleAddCategoryChipChange: function (newChips) {
-                return this.category_inputs.handleAddCategoryChipChange(this, newChips);
+            onUpdateInputValue: function (newChips) {
+                return this.category_inputs.onUpdateInputValue(this, newChips);
             },
 
             onAddCategoryInput: function (value) {

@@ -1,7 +1,7 @@
-.cbm-preview-dialog {
-    --cdx-dialog-max-width: 80vw;
+.cbm-preview-dialog .cdx-dialog__surface {
+    max-width: 90vw;   /* Or any value you want */
+    width: 1100px;     /* Fixed width if needed */
 }
-
 /* Container styles */
 .cbm-container {
     max-width: 1200px;

@@ -149,7 +149,7 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                return this.file_service.searchFilesOld(this)
+                return this.file_service.executeFileSearch(this)
             },
 
             /* *************************

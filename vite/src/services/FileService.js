@@ -13,7 +13,7 @@ class FileService {
         this.api = apiService;
     }
 
-    async searchFilesOld(self) {
+    async executeFileSearch(self) {
         self.resetMessageState();
 
         if (self.sourceCategory.trim() === '') {

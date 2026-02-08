@@ -93,6 +93,7 @@ function BatchManager(api) {
                 searchPattern: '1990',
                 addCategories: [],
                 addInputValue: '',
+                removeInputValue: '',
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
@@ -111,8 +112,8 @@ function BatchManager(api) {
                 // For multiselect lookup - Add Categories
                 addCategoryChips: [],
                 addCategoryMenuItems: [
-                    { value: 'Category:Economics', label: 'Category:Economics' },
-                    { value: 'Category:Science', label: 'Category:Science' }
+                    // { value: 'Category:Economics', label: 'Category:Economics' },
+                    // { value: 'Category:Science', label: 'Category:Science' }
                 ],
                 addCategoryMenuConfig: {
                     boldLabel: true,
@@ -122,16 +123,13 @@ function BatchManager(api) {
                 // For multiselect lookup - Remove Categories
                 removeCategoryChips: [],
                 removeCategoryMenuItems: [
-                    { value: 'Category:Politics', label: 'Category:Politics' }
+                    // { value: 'Category:Politics', label: 'Category:Politics' }
                 ],
                 removeCategoryMenuConfig: {
                     boldLabel: true,
                     visibleItemLimit: 10
                 },
 
-                // Debounce timers
-                addCategoryDebounce: null,
-                removeCategoryDebounce: null
             };
         },
         computed: {
@@ -306,21 +304,17 @@ function BatchManager(api) {
             **      CategoryInputs
             ** *************************
             */
-
-            onUpdateInputValue: function (newChips) {
-                return this.category_inputs.onUpdateInputValue(this, newChips);
-            },
-
             onAddCategoryInput: function (value) {
                 return this.category_inputs.onAddCategoryInput(this, value);
             },
-
             onRemoveCategoryInput: function (value) {
                 return this.category_inputs.onRemoveCategoryInput(this, value);
             },
-
-            handleRemoveCategoryChipChange: function (newChips) {
-                return this.category_inputs.handleRemoveCategoryChipChange(this, newChips);
+            addOnLoadMore: function () {
+                return this.category_inputs.addOnLoadMore(this);
+            },
+            removeOnLoadMore: function () {
+                return this.category_inputs.removeOnLoadMore(this);
             },
 
             /* *************************

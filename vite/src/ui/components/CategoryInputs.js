@@ -33,8 +33,7 @@ class CategoryInputs {
                     :menu-config="addCategoryMenuConfig"
                     aria-label="Add categories"
                     placeholder="Type to search categories"
-                    @input="onAddCategoryInput"
-                    @update:input-value="onUpdateInputValue"
+                    @update:input-value="onAddCategoryInput"
 		            @load-more="addOnLoadMore"
                 >
                     <template #no-results>
@@ -51,12 +50,13 @@ class CategoryInputs {
                     id="cdx-category-remove"
                     v-model:input-chips="removeCategoryChips"
                     v-model:selected="removeCategories"
+		            v-model:input-value="removeInputValue"
                     :menu-items="removeCategoryMenuItems"
                     :menu-config="removeCategoryMenuConfig"
                     aria-label="Remove categories"
                     placeholder="Type to search categories"
-                    @input="onRemoveCategoryInput"
-                    @update:input-value="handleRemoveCategoryChipChange"
+                    @update:input-value="onRemoveCategoryInput"
+		            @load-more="removeOnLoadMore"
                     >
                     <template #no-results>
                         Type at least 2 characters to search
@@ -65,14 +65,21 @@ class CategoryInputs {
             </div>
     `;
     }
+
+    deduplicateResults(items1, results) {
+        const seen = new Set(items1.map((result) => result.value));
+        return results.filter((result) => !seen.has(result.value));
+    }
+
     /**
      * Handle add category input with debounce.
      * @param {string} value - The input value to search for
      */
-    onAddCategoryInput(self, value) {
-        // Clear previous timeout
-        if (self.addCategoryDebounce) {
-            clearTimeout(self.addCategoryDebounce);
+    async onAddCategoryInput(self, value) {
+        // Clear menu items if the input was cleared.
+        if (!value) {
+            self.addCategoryMenuItems = [];
+            return;
         }
 
         // If empty, clear menu items
@@ -81,22 +88,32 @@ class CategoryInputs {
             return;
         }
 
-        // Debounce API call
-        self.addCategoryDebounce = setTimeout(() => {
-            this.apiService.fetchCategories(value).then((items) => {
-                self.addCategoryMenuItems = items;
-            });
-        }, 300); // 300ms debounce
+        const data = await this.apiService.fetchCategories(value);
+
+        // Make sure this data is still relevant first.
+        if (self.addInputValue !== value) {
+            return;
+        }
+
+        // Reset the menu items if there are no results.
+        if (!data || data.length === 0) {
+            self.addCategoryMenuItems = [];
+            return;
+        }
+
+        // Update addCategoryMenuItems.
+        self.addCategoryMenuItems = data;
     }
 
     /**
      * Handle remove category input with debounce.
      * @param {string} value - The input value to search for
      */
-    onRemoveCategoryInput(self, value) {
-        // Clear previous timeout
-        if (self.removeCategoryDebounce) {
-            clearTimeout(self.removeCategoryDebounce);
+    async onRemoveCategoryInput(self, value) {
+        // Clear menu items if the input was cleared.
+        if (!value) {
+            self.removeCategoryMenuItems = [];
+            return;
         }
 
         // If empty, clear menu items
@@ -105,31 +122,55 @@ class CategoryInputs {
             return;
         }
 
-        // Debounce API call
-        self.removeCategoryDebounce = setTimeout(() => {
-            this.apiService.fetchCategories(value).then((items) => {
-                self.removeCategoryMenuItems = items;
-            });
-        }, 300); // 300ms debounce
+        const data = await this.apiService.fetchCategories(value);
+
+        // Make sure this data is still relevant first.
+        if (self.removeInputValue !== value) {
+            return;
+        }
+
+        // Reset the menu items if there are no results.
+        if (!data || data.length === 0) {
+            self.removeCategoryMenuItems = [];
+            return;
+        }
+
+        // Update removeCategoryMenuItems.
+        self.removeCategoryMenuItems = data;
     }
 
-    /**
-     * Handle chip changes for add categories.
-     * @param {Array} newChips - The new chips array
-     */
-    onUpdateInputValue(self, newChips) {
-        self.addCategoryChips = newChips;
-        self.addCategories = newChips.map(chip => chip.value);
+    async addOnLoadMore(self) {
+        if (!self.addInputValue) {
+            return;
+        }
+
+        const data = await this.apiService.fetchCategories(self.addInputValue, { offset: self.addCategoryMenuItems.length });
+
+        if (!data || data.length === 0) {
+            return;
+        }
+
+        // Update self.addCategoryMenuItems.
+        const deduplicatedResults = this.deduplicateResults(self.addCategoryMenuItems, data);
+        self.addCategoryMenuItems.push(...deduplicatedResults);
     }
 
-    /**
-     * Handle chip changes for remove categories.
-     * @param {Array} newChips - The new chips array
-     */
-    handleRemoveCategoryChipChange(self, newChips) {
-        self.removeCategoryChips = newChips;
-        self.removeCategories = newChips.map(chip => chip.value);
+    async removeOnLoadMore(self) {
+        if (!self.removeInputValue) {
+            return;
+        }
+
+        const data = await this.apiService.fetchCategories(self.removeInputValue, { offset: self.removeCategoryMenuItems.length });
+
+        if (!data || data.length === 0) {
+            return;
+        }
+
+        // Update self.removeCategoryMenuItems.
+        const deduplicatedResults = this.deduplicateResults(self.removeCategoryMenuItems, data);
+        self.removeCategoryMenuItems.push(...deduplicatedResults);
     }
+
 }
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = CategoryInputs;

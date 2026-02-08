@@ -369,7 +369,7 @@ class FileService {
         this.api = apiService;
     }
 
-    async searchFilesOld(self) {
+    async executeFileSearch(self) {
         self.resetMessageState();
 
         if (self.sourceCategory.trim() === '') {
@@ -792,11 +792,11 @@ class FilesList {
     }
 }
 
-// === vite/src/ui/components/ProgressSection.js ===
+// === vite/src/ui/components/ProgressBar.js ===
 /**
- * @class ProgressSection
+ * @class ProgressBar
  */
-class ProgressSection {
+class ProgressBar {
     /**
      */
     constructor() {
@@ -840,7 +840,7 @@ function BatchManager(api) {
     const search_panel = new SearchPanel();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
-    const progress_section = new ProgressSection();
+    const progress_section = new ProgressBar();
     const file_service = new FileService(mwApi);
 
     const Search_SectionHtml = search_panel.createElement();
@@ -979,7 +979,7 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                return this.file_service.searchFilesOld(this)
+                return this.file_service.executeFileSearch(this)
             },
 
             /* *************************
@@ -1157,7 +1157,7 @@ function BatchManager(api) {
     return app;
 }
 
-// === vite/src/main.js ===
+// === vite/src/gadget-entry.js ===
 // <nowiki>
 
 if (typeof categoryBatchManager === 'undefined') {

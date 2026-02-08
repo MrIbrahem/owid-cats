@@ -1318,13 +1318,13 @@ class SearchPanel {
   }
 }
 
-// === src/ui/components/FileList.js ===
+// === src/ui/components/FilesList.js ===
 /**
  * File list UI component using Codex CSS-only classes.
  * @see https://doc.wikimedia.org/codex/latest/
- * @class FileList
+ * @class FilesList
  */
-class FileList {
+class FilesList {
     /**
      * @param {Function} onSelectionChange - Callback when selection changes
      * @param {Function} onRemoveFile - Callback when remove button is clicked (receives index)
@@ -1804,7 +1804,7 @@ class ProgressBar {
  * Validation Helper
  *
  * @description
- * Shared validation logic for CategoryBatchManagerUI handlers.
+ * Shared validation logic for BatchManager handlers.
  * Provides common validation functions used by PreviewHandler and ExecuteHandler.
  *
  * @requires Validator - For checking circular category references
@@ -1814,7 +1814,7 @@ class ProgressBar {
 
 class ValidationHelper {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -1926,7 +1926,7 @@ class ValidationHelper {
  * Search Handler
  *
  * @description
- * Handles all search-related functionality for CategoryBatchManagerUI.
+ * Handles all search-related functionality for BatchManager.
  * Manages search execution, stopping, progress display, and button state.
  *
  * @requires UsageLogger - For logging search operations
@@ -1936,7 +1936,7 @@ class ValidationHelper {
 
 class SearchHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -2050,10 +2050,10 @@ class SearchHandler {
 
     /**
      * Hide search progress indicator
-     * Content will be replaced by FileList.renderFileList
+     * Content will be replaced by FilesList.renderFileList
      */
     hideSearchProgress() {
-        // Content will be replaced by FileList.renderFileList
+        // Content will be replaced by FilesList.renderFileList
     }
 }
 
@@ -2062,7 +2062,7 @@ class SearchHandler {
  * Preview Handler
  *
  * @description
- * Handles all preview-related functionality for CategoryBatchManagerUI.
+ * Handles all preview-related functionality for BatchManager.
  * Manages preview generation, modal display, and validation.
  *
  * @requires ValidationHelper - For common validation logic
@@ -2072,7 +2072,7 @@ class SearchHandler {
 
 class PreviewHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -2174,7 +2174,7 @@ class PreviewHandler {
  * Execute Handler
  *
  * @description
- * Handles all execute-related functionality for CategoryBatchManagerUI.
+ * Handles all execute-related functionality for BatchManager.
  * Manages batch execution, progress display, and result reporting.
  *
  * @requires ValidationHelper - For common validation logic
@@ -2186,7 +2186,7 @@ class PreviewHandler {
 
 class ExecuteHandler {
     /**
-     * @param {CategoryBatchManagerUI} ui - The main UI instance
+     * @param {BatchManager} ui - The main UI instance
      */
     constructor(ui) {
         this.ui = ui;
@@ -2361,7 +2361,7 @@ class ExecuteHandler {
     }
 }
 
-// === src/ui/CategoryBatchManagerUI.js ===
+// === src/BatchManager.js ===
 /**
  * Category Batch Manager UI
  *
@@ -2374,7 +2374,7 @@ class ExecuteHandler {
 
 
 
-class CategoryBatchManagerUI {
+class BatchManager {
     constructor() {
         this.apiService = new APIService();
         this.fileService = new FileService(this.apiService);
@@ -2384,7 +2384,7 @@ class CategoryBatchManagerUI {
         // Initialize UI components
         this.searchPanel = new SearchPanel(() => this.searchHandler.handleSearch());
         this.categoryInputs = new CategoryInputs(this.apiService);
-        this.fileList = new FileList(
+        this.fileList = new FilesList(
             () => this.updateSelectedCount(),
             (index) => this.removeFile(index)
         );
@@ -2804,7 +2804,7 @@ class CategoryBatchManagerUI {
           if (reopenBtn) reopenBtn.style.display = 'none';
         } else if (!existingModal) {
           // Create new instance
-          window.categoryBatchManager = new CategoryBatchManagerUI();
+          window.categoryBatchManager = new BatchManager();
         }
       });
     });

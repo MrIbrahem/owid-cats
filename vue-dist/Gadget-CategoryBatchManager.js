@@ -330,13 +330,14 @@ function createCategoryBatchManager(api) {
     const app = {
         data: function () {
             return {
+                files_list: files_list, // Reference to FilesList component instance
                 sourceCategory: 'Category:Economic Data',
                 searchPattern: '',
                 addCategories: [],
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
-                selectedFiles: this.selectedFiles, // Bind to FilesList component's selectedFiles
+                selectedFiles: [], // Bind to FilesList component's selectedFiles
                 showMessage: false,
                 messageType: '',
                 messageContent: '',

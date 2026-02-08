@@ -1,154 +1,20 @@
+/**
+ * Creates the Vue app definition for the Category Batch Manager tool.
+ * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
+ * @returns {Object} Vue app definition object.
+ */
+/* global SearchPanel */
 
 function createCategoryBatchManager(api) {
-    const Search_SectionHtml = `
-        <div style="margin-bottom: 25px;">
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-source-category"
-                    style="font-weight: 600; margin-bottom: 5px; display: block;">
-                    Source Category
-                </cdx-label>
-                <cdx-text-input id="cbm-source-category" v-model="sourceCategory"
-                    placeholder="Category:Economic Data" />
-            </div>
+    const search_panel = new SearchPanel();
+    const CategoryInputs = new CategoryInputs(api);
+    const FilesList = new FilesList();
+    const ProgressSection = new ProgressSection();
 
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-pattern" style="font-weight: 600; margin-bottom: 5px; display: block;">
-                    Search Pattern
-                </cdx-label>
-                <span style="display: block; color: #54595d; font-size: 0.875em; margin-bottom: 5px;">
-                    Enter a pattern to filter files (e.g., ,BLR.svg)
-                </span>
-                <div style="display: flex; gap: 10px;">
-                    <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg"
-                        style="flex: 1;" />
-                    <cdx-button @click="searchFiles" action="progressive" weight="primary">
-                        Search
-                    </cdx-button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    const Actions_SectionHtml = `
-        <div>
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-add-cats" style="font-weight: 600; margin-bottom: 5px; display: block;">
-                    Add Categories
-                </cdx-label>
-                <span style="display: block; color: #54595d; font-size: 0.875em; margin-bottom: 5px;">
-                    e.g., Category:Belarus, Category:Europe
-                </span>
-                <cdx-multiselect-lookup v-model:input-chips="addCategoryChips" v-model:selected="addCategories"
-                    :menu-items="addCategoryMenuItems" :menu-config="addCategoryMenuConfig"
-                    aria-label="Add categories" placeholder="Type to search categories" @input="onAddCategoryInput"
-                    @update:input-chips="handleAddCategoryChipChange">
-                    <template #no-results>
-                        Type at least 2 characters to search
-                    </template>
-                </cdx-multiselect-lookup>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <cdx-label input-id="cbm-remove-cats" style="font-weight: 600; margin-bottom: 5px; display: block;">
-                    Remove Categories
-                </cdx-label>
-                <cdx-multiselect-lookup v-model:input-chips="removeCategoryChips"
-                    v-model:selected="removeCategories" :menu-items="removeCategoryMenuItems"
-                    :menu-config="removeCategoryMenuConfig" aria-label="Remove categories"
-                    placeholder="Type to search categories" @input="onRemoveCategoryInput"
-                    @update:input-chips="handleRemoveCategoryChipChange">
-                    <template #no-results>
-                        Type at least 2 characters to search
-                    </template>
-                </cdx-multiselect-lookup>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <cdx-label input-id="cbm-summary" style="font-weight: 600; margin-bottom: 5px; display: block;">
-                    Edit Summary
-                </cdx-label>
-                <cdx-text-input id="cbm-summary" v-model="editSummary" />
-            </div>
-
-            <div style="margin-bottom: 15px; padding: 10px; background-color: #eaecf0; border-radius: 4px;">
-                Selected: <strong>{{ selectedCount }}</strong> files
-            </div>
-
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <cdx-button @click="previewChanges" action="default" weight="normal" style="flex: 1;"
-                    :disabled="isProcessing">
-                    Preview Changes
-                </cdx-button>
-                <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary"
-                    style="flex: 1;">
-                    GO
-                </cdx-button>
-                <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary"
-                    style="flex: 1;">
-                    Stop Process
-                </cdx-button>
-            </div>
-        </div>
-    `;
-
-    const Progress_SectionHtml = `
-        <div v-if="showProgress"
-            style="margin-top: 20px; padding: 15px; background-color: #ffffff; border: 1px solid #c8ccd1; border-radius: 4px;">
-            <div
-                style="width: 100%; background-color: #eaecf0; border-radius: 2px; height: 20px; overflow: hidden; margin-bottom: 10px;">
-                <div
-                    :style="{ width: progressPercent + '%', height: '100%', backgroundColor: '#36c', transition: 'width 0.3s ease' }">
-                </div>
-            </div>
-            <div style="text-align: center; color: #202122; font-weight: 500;">
-                {{ progressText }}
-            </div>
-        </div>
-    `;
-
-    const Files_List_SectionHtml = `
-        <div v-if="selectedFiles.length > 0"
-            style="background-color: #ffffff; padding: 20px; border-radius: 4px; border: 1px solid #c8ccd1; height: fit-content;">
-            <!-- Results Header -->
-            <div
-                style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #c8ccd1;">
-                <div
-                    style="background-color: #eaf3ff; color: #36c; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.9em;">
-                    Found <strong>{{ totalFilesCount }}</strong> files
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <cdx-button @click="selectAll" action="default" weight="quiet" size="medium">
-                        Select All
-                    </cdx-button>
-                    <cdx-button @click="deselectAll" action="default" weight="quiet" size="medium">
-                        Deselect All
-                    </cdx-button>
-                </div>
-            </div>
-
-            <!-- File List -->
-            <div style="max-height: 500px; overflow-y: auto;">
-                <div v-for="(file, index) in selectedFiles" :key="index"
-                    style="display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eaecf0; gap: 10px;">
-                    <cdx-checkbox v-model="file.selected" :input-id="'file-' + index" style="flex-shrink: 0;" />
-                    <label :for="'file-' + index" style="flex: 1; cursor: pointer; font-size: 0.9em;">
-                        {{ file.title }}
-                    </label>
-                    <button @click="removeFile(index)"
-                        style="flex-shrink: 0; background: none; border: none; color: #d33; font-size: 1.5em; cursor: pointer; padding: 0 8px; line-height: 1;"
-                        title="Remove from list">
-                        ×
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else
-            style="background-color: #ffffff; padding: 40px; border-radius: 4px; border: 1px solid #c8ccd1; text-align: center; color: #72777d;">
-            <p style="margin: 0; font-size: 1.1em;">No files found. Use the search to find files.</p>
-        </div>
-    `;
+    const Search_SectionHtml = search_panel.createElement();
+    const CategoryInputPanelHtml = CategoryInputs.createElement();
+    const FilesListHtml = FilesList.createElement();
+    const ProgressSectionHtml = ProgressSection.createElement();
 
     const app = {
         data: function () {
@@ -159,7 +25,8 @@ function createCategoryBatchManager(api) {
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
-                selectedFiles: [],
+                // selectedFiles: [],
+                selectedFiles: this.FilesList.selectedFiles, // Bind to FilesList component's selectedFiles
                 showMessage: false,
                 messageType: '',
                 messageContent: '',
@@ -204,7 +71,6 @@ function createCategoryBatchManager(api) {
             }
         },
         methods: {
-            // Search for files in category
             searchFiles: function () {
                 this.resetMessageState();
 
@@ -238,16 +104,12 @@ function createCategoryBatchManager(api) {
 
             // Select all files
             selectAll: function () {
-                this.selectedFiles.forEach(file => {
-                    file.selected = true;
-                });
+                return this.FilesList.selectAll();
             },
 
             // Deselect all files
             deselectAll: function () {
-                this.selectedFiles.forEach(file => {
-                    file.selected = false;
-                });
+                return this.FilesList.deselectAll();
             },
 
             // Remove individual file from list
@@ -470,15 +332,42 @@ function createCategoryBatchManager(api) {
                     </div>
 
                     <!-- Actions Section -->
-                    ${Actions_SectionHtml}
+                    <div>
+                        ${CategoryInputPanelHtml}
 
+                        <div style="margin-bottom: 20px;">
+                            <cdx-label input-id="cbm-summary" style="font-weight: 600; margin-bottom: 5px; display: block;">
+                                Edit Summary
+                            </cdx-label>
+                            <cdx-text-input id="cbm-summary" v-model="editSummary" />
+                        </div>
+
+                        <div style="margin-bottom: 15px; padding: 10px; background-color: #eaecf0; border-radius: 4px;">
+                            Selected: <strong>{{ selectedCount }}</strong> files
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <cdx-button @click="previewChanges" action="default" weight="normal" style="flex: 1;"
+                                :disabled="isProcessing">
+                                Preview Changes
+                            </cdx-button>
+                            <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary"
+                                style="flex: 1;">
+                                GO
+                            </cdx-button>
+                            <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary"
+                                style="flex: 1;">
+                                Stop Process
+                            </cdx-button>
+                        </div>
+                    </div>
                     <!-- Progress Section -->
-                    ${Progress_SectionHtml}
+                    ${ProgressSectionHtml}
                 </div>
 
                 <!-- Right Panel: File List -->
                 <div>
-                    ${Files_List_SectionHtml}
+                    ${FilesListHtml}
                 </div>
             </div>
         </div>
@@ -495,6 +384,7 @@ function createCategoryBatchManager(api) {
     };
     return app;
 }
+
 
 module.exports = {
     createCategoryBatchManager

@@ -1,8 +1,8 @@
 # Vite version
 
 ## UI merge
-- [ ] Source Category
-- [ ] Search Pattern
-- [ ] Add Categories autocomplate
-- [ ] Remove Categories autocomplate
+- [x] Source Category
+- [x] Search Pattern
+- [x] Add Categories autocomplate
+- [x] Remove Categories autocomplate
 - [ ] Preview Changes

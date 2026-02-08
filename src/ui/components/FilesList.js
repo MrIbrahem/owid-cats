@@ -1,9 +1,9 @@
 /**
  * File list UI component using Codex CSS-only classes.
  * @see https://doc.wikimedia.org/codex/latest/
- * @class FileList
+ * @class FilesList
  */
-class FileList {
+class FilesList {
     /**
      * @param {Function} onSelectionChange - Callback when selection changes
      * @param {Function} onRemoveFile - Callback when remove button is clicked (receives index)
@@ -92,5 +92,5 @@ class FileList {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = FileList;
+    module.exports = FilesList;
 }

@@ -126,10 +126,10 @@ class SearchHandler {
 
     /**
      * Hide search progress indicator
-     * Content will be replaced by FileList.renderFileList
+     * Content will be replaced by FilesList.renderFileList
      */
     hideSearchProgress() {
-        // Content will be replaced by FileList.renderFileList
+        // Content will be replaced by FilesList.renderFileList
     }
 }
 

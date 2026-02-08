@@ -21,7 +21,7 @@ const SOURCE_FILES = [
   'src/services/ErrorRecovery.js',
   'src/services/BatchProcessor.js',
   'src/ui/components/SearchPanel.js',
-  'src/ui/components/FileList.js',
+  'src/ui/components/FilesList.js',
   'src/ui/components/CategoryInputs.js',
   'src/ui/components/ProgressBar.js',
   'src/ui/helpers/ValidationHelper.js',

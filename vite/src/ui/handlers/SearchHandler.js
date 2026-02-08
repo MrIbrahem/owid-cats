@@ -41,6 +41,12 @@ class SearchHandler {
                 </div>
             </div>
         </div>
+        <!-- Results Message -->
+        <div v-if="showResultsMessage" class="margin-bottom-20">
+            <cdx-message type="success" :inline="false">
+                {{ resultsMessageText }}
+            </cdx-message>
+        </div>
         `;
     }
 

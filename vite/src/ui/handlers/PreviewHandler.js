@@ -28,6 +28,8 @@ class PreviewHandler {
     }
     // Preview changes before executing
     previewTheChanges(self) {
+        console.log('[CBM-P] Preview button clicked');
+
         const selectedCount = self.selectedCount;
 
         if (selectedCount === 0) {
@@ -40,13 +42,18 @@ class PreviewHandler {
             return;
         }
 
+        const validation = this.validator.validateBatchOperation(self);
+        if (!validation) return;
+
+        const { selectedFiles, toAdd, toRemove } = validation;
+
         // Placeholder - implement preview logic
-        let previewMessage = `Preview for ${selectedCount} file(s):\n`;
-        if (self.addCategories.length > 0) {
-            previewMessage += `\nAdding: ${self.addCategories.join(', ')}`;
+        let previewMessage = `Preview for ${selectedFiles.length} file(s):\n`;
+        if (toAdd.length > 0) {
+            previewMessage += `\nAdding: ${toAdd.join(', ')}`;
         }
-        if (self.removeCategories.length > 0) {
-            previewMessage += `\nRemoving: ${self.removeCategories.join(', ')}`;
+        if (toRemove.length > 0) {
+            previewMessage += `\nRemoving: ${toRemove.join(', ')}`;
         }
 
         // should be replaced by showPreviewModal
@@ -56,11 +63,11 @@ class PreviewHandler {
      * Handle preview button click
      * Generates and displays a preview of category changes
      */
-    async handlePreview() {
+    async handlePreview(self) {
         console.log('[CBM-P] Preview button clicked');
 
         // Use ValidationHelper for common validation
-        const validation = this.validator.validateBatchOperation();
+        const validation = this.validator.validateBatchOperation(self);
         if (!validation) return;
 
         const { selectedFiles, toAdd, toRemove } = validation;

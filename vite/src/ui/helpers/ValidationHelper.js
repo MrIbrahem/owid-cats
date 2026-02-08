@@ -62,13 +62,11 @@ class ValidationHelper {
      * @param {Array<string>} categoriesToAdd - Categories to check for circular references
      * @returns {Array<string>|null} Filtered categories, or null if all are circular
      */
-    filterCircularCategories(categoriesToAdd) {
-        const sourceCategory = this.ui.state.sourceCategory;
+    filterCircularCategories(self) {
         const circularCategories = [];
         const validCategories = [];
-
-        for (const category of categoriesToAdd) {
-            if (Validator.isCircularCategory(sourceCategory, category)) {
+        for (const category of self.addCategories) {
+            if (Validator.isCircularCategory(self.sourceCategory, category)) {
                 console.log('[CBM-V] Circular category detected (silently removed):', category);
                 circularCategories.push(category);
             } else {
@@ -78,7 +76,7 @@ class ValidationHelper {
 
         // If all categories are circular, show error
         if (circularCategories.length > 0 && validCategories.length === 0) {
-            this.ui.showMessage(
+            self.displayAddCategoryMessage(
                 `❌ Cannot add: all categorie(s) are circular references to the current page. Cannot add "${circularCategories.join(', ')}" to itself.`,
                 'error'
             );
@@ -93,28 +91,25 @@ class ValidationHelper {
      * Perform all validation steps before a batch operation
      * @returns {Object|null} Object with selectedFiles, toAdd, toRemove, or null if validation fails
      */
-    validateBatchOperation() {
-        const selectedFiles = this.getSelectedFiles();
-        if (!selectedFiles) return null;
-
-        const categoryInputs = this.parseCategoryInputs();
-        if (!categoryInputs) return null;
+    validateBatchOperation(self) {
+        if (!self.selectedFiles) return null;
+        if (!self.addCategories && !self.removeCategories) return null;
 
         // Filter out circular categories (returns null if ALL are circular)
-        const filteredToAdd = this.filterCircularCategories(categoryInputs.toAdd);
+        const filteredToAdd = this.filterCircularCategories(self);
         if (filteredToAdd === null) return null; // All categories were circular
 
         // Check if there are any valid operations remaining
-        if (filteredToAdd.length === 0 && categoryInputs.toRemove.length === 0) {
+        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
-            this.ui.showMessage('No valid categories to add or remove.', 'warning');
+            self.displayAddCategoryMessage('No valid categories to add or remove.', 'warning');
             return null;
         }
 
         return {
-            selectedFiles,
+            selectedFiles: self.selectedFiles,
             toAdd: filteredToAdd,
-            toRemove: categoryInputs.toRemove
+            toRemove: self.removeCategories
         };
     }
 }

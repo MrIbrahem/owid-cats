@@ -32,12 +32,6 @@ function BatchManager() {
             <div>
                 <!-- Search Section -->
                 ${Search_SectionHtml}
-                <!-- Results Message -->
-                <div v-if="showResultsMessage" class="margin-bottom-20">
-                    <cdx-message type="success" :inline="false">
-                        {{ resultsMessageText }}
-                    </cdx-message>
-                </div>
 
                 <!-- Actions Section -->
                 <div>
@@ -109,6 +103,10 @@ function BatchManager() {
                 isProcessing: false,
                 shouldStopProgress: false,
                 shouldStopSearch: false,
+
+                showAddCategoryMessage: false,
+                addCategoryMessageText: '',
+
                 showResultsMessage: false,
                 resultsMessageText: '',
 
@@ -217,6 +215,12 @@ function BatchManager() {
             **      CategoryInputs
             ** *************************
             */
+            displayAddCategoryMessage: function (text, type) {
+                return this.category_inputs.displayAddCategoryMessage(this, text, type);
+            },
+            hideAddCategoryMessage: function () {
+                return this.category_inputs.hideAddCategoryMessage(this);
+            },
             onAddCategoryInput: function (value) {
                 return this.category_inputs.onAddCategoryInput(this, value);
             },

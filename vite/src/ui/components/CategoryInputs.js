@@ -42,6 +42,13 @@ class CategoryInputs {
                 </cdx-multiselect-lookup>
             </div>
 
+            <!-- Category Add Message -->
+            <div v-if="showAddCategoryMessage" class="margin-bottom-20">
+                <cdx-message type="{{ addCategoryMessageType }}" :inline="false">
+                    {{ addCategoryMessageText }}
+                </cdx-message>
+            </div>
+
             <div class="cbm-category-input-group">
                 <cdx-label input-id="cbm-remove-cats" class="cbm-label">
                     Remove Categories
@@ -65,7 +72,15 @@ class CategoryInputs {
             </div>
     `;
     }
-
+    displayAddCategoryMessage(self, text, type = 'error') {
+        self.showAddCategoryMessage = true;
+        self.addCategoryMessageType = type;
+        self.addCategoryMessageText = text;
+    }
+    hideAddCategoryMessage(self) {
+        self.showAddCategoryMessage = false;
+        self.addCategoryMessageText = '';
+    }
     deduplicateResults(items1, results) {
         const seen = new Set(items1.map((result) => result.value));
         return results.filter((result) => !seen.has(result.value));

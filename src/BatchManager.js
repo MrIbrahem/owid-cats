@@ -8,7 +8,7 @@
  * @requires OO.ui - MediaWiki's OOUI library for dialogs
  */
 
-/* global APIService, FileService, CategoryService, BatchProcessor, UsageLogger, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FilesList, CategoryInputs */
+/* global APIService, FileService, CategoryService, BatchProcessor, Validator, OO, SearchHandler, PreviewHandler, ExecuteHandler, ValidationHelper, SearchPanel, FilesList, CategoryInputs */
 
 class BatchManager {
     constructor() {

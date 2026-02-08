@@ -6,11 +6,10 @@
  * Manages batch execution, progress display, and result reporting.
  *
  * @requires ValidationHelper - For common validation logic
- * @requires UsageLogger - For logging batch operations
  * @requires ProgressBar - For progress display
  */
 
-/* global ValidationHelper, UsageLogger, ProgressBar */
+/* global ValidationHelper, ProgressBar */
 
 class ExecuteHandler {
     /**
@@ -102,7 +101,10 @@ class ExecuteHandler {
             );
 
             console.log('[CBM-E] Batch operation results:', results);
-            UsageLogger.logBatchOperation(selectedFiles.length, toAdd, toRemove);
+            console.log(
+                `[CBM] Batch: ${selectedFiles.length} files, ` +
+                `+${toAdd.length} -${toRemove.length} categories`
+            );
             this.showResults(results);
 
         } catch (error) {

@@ -11,7 +11,6 @@ const SOURCE_FILES = [
   'src/utils/RateLimiter.js',
   'src/utils/Validator.js',
   'src/utils/WikitextParser.js',
-  'src/utils/UsageLogger.js',
   'src/models/FileModel.js',
   'src/models/CategoryOperation.js',
   'src/services/APIService.js',

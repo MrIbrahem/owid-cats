@@ -288,8 +288,7 @@ category-batch-manager/
 │   │   └── CategoryOperation.js
 │   ├── utils/
 │   │   ├── WikitextParser.js
-│   │   ├── Validator.js
-│   │   └── Logger.js
+│   │   └── Validator.js
 │   └── main.js
 ├── tests/
 │   ├── unit/
@@ -314,12 +313,6 @@ category-batch-manager/
 **Utilities to Create:**
 
 ```javascript
-// Logger.js - For debugging and monitoring
-class Logger {
-  static log(message, level = 'info') {}
-  static error(message, error) {}
-  static warn(message) {}
-}
 
 // Validator.js - Input validation
 class Validator {
@@ -1609,28 +1602,6 @@ class ErrorRecovery {
 
 ### Task 5.3: Add Logging & Analytics
 **Objective:** Monitor usage and issues
-
-```javascript
-class UsageLogger {
-  static logSearch(pattern, resultsCount) {
-    console.log(`Search: "${pattern}" - ${resultsCount} results`);
-    // Could send to analytics service
-  }
-
-  static logBatchOperation(filesCount, categoriesAdded, categoriesRemoved) {
-    console.log(`Batch: ${filesCount} files, +${categoriesAdded.length} -${categoriesRemoved.length} categories`);
-  }
-
-  static logError(context, error) {
-    console.error(`Error in ${context}:`, error);
-    // Could send to error tracking service
-  }
-
-  static logPerformance(operation, duration) {
-    console.log(`Performance: ${operation} took ${duration}ms`);
-  }
-}
-```
 
 **Deliverables:**
 - Logging system

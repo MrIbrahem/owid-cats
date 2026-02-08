@@ -5,10 +5,7 @@
  * Handles all search-related functionality for BatchManager.
  * Manages search execution, stopping, progress display, and button state.
  *
- * @requires UsageLogger - For logging search operations
  */
-
-/* global UsageLogger */
 
 class SearchHandler {
     /**
@@ -66,7 +63,7 @@ class SearchHandler {
             this.updateSearchButton(false);
             this.ui.state.isSearching = false;
 
-            UsageLogger.logSearch(pattern, files.length);
+            console.log(`[CBM] Search: "${pattern}" - ${files.length} results`);
         } catch (error) {
             this.hideSearchProgress();
             this.updateSearchButton(false);

@@ -76,9 +76,7 @@ category-batch-manager/
 │   ├── utils/
 │   │   ├── WikitextParser.js
 │   │   ├── Validator.js
-│   │   ├── Logger.js
-│   │   ├── RateLimiter.js
-│   │   └── UsageLogger.js
+│   │   └── RateLimiter.js
 │   ├── main.js
 │   └── gadget-entry.js
 ├── tests/
@@ -115,7 +113,7 @@ The tool follows a layered architecture:
 - **Controller Layer**: `CategoryBatchManagerUI` manages state and user interactions
 - **Service Layer**: `APIService`, `FileService`, `CategoryService`, `BatchProcessor`
 - **Data Layer**: `FileModel`, `CategoryOperation` models
-- **Utilities**: `WikitextParser`, `Validator`, `Logger`, `RateLimiter`
+- **Utilities**: `WikitextParser`, `Validator`, `RateLimiter`
 
 ## API
 

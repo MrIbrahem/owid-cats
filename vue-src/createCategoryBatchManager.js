@@ -6,6 +6,7 @@
 /* global SearchPanel */
 
 function createCategoryBatchManager(api) {
+    const mwApi = new APIService();
     const search_panel = new SearchPanel();
     const category_inputs = new CategoryInputs(api);
     const files_list = new FilesList();
@@ -89,6 +90,7 @@ function createCategoryBatchManager(api) {
     const app = {
         data: function () {
             return {
+                mwApi: mwApi, // Reference to API service instance
                 files_list: files_list, // Reference to FilesList component instance
                 category_inputs: category_inputs, // Reference to CategoryInputs component instance
                 sourceCategory: 'Category:Economic Data',
@@ -278,35 +280,6 @@ function createCategoryBatchManager(api) {
                 this.shouldStop = true;
             },
 
-            // should be moved to `class CategoryService` at `src/services/CategoryService.js`
-            // Fetch categories from API with autocomplete
-            fetchCategories: function (searchTerm) {
-                if (!searchTerm || searchTerm.length < 2) {
-                    return Promise.resolve([]);
-                }
-
-                return api.get({
-                    action: 'opensearch',
-                    search: searchTerm,
-                    namespace: 14, // Category namespace
-                    limit: 10
-                }).then(function (data) {
-                    // data[1] contains the category titles
-                    if (data && data[1]) {
-                        return data[1].map(function (title) {
-                            return {
-                                value: title,
-                                label: title
-                            };
-                        });
-                    }
-                    return [];
-                }).catch(function (error) {
-                    console.error('Error fetching categories:', error);
-                    return [];
-                });
-            },
-
             // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
             // Handle add category input with debounce
             onAddCategoryInput: function (value) {
@@ -323,7 +296,7 @@ function createCategoryBatchManager(api) {
 
                 // Debounce API call
                 this.addCategoryDebounce = setTimeout(() => {
-                    this.fetchCategories(value).then((items) => {
+                    this.mwApi.fetchCategories(value).then((items) => {
                         this.addCategoryMenuItems = items;
                     });
                 }, 300); // 300ms debounce
@@ -345,7 +318,7 @@ function createCategoryBatchManager(api) {
 
                 // Debounce API call
                 this.removeCategoryDebounce = setTimeout(() => {
-                    this.fetchCategories(value).then((items) => {
+                    this.mwApi.fetchCategories(value).then((items) => {
                         this.removeCategoryMenuItems = items;
                     });
                 }, 300); // 300ms debounce

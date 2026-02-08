@@ -957,6 +957,10 @@ if (typeof categoryBatchManager === 'undefined') {
 }
 
 mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (require) {
+    const target = document.getElementById('category-batch-manager2');
+    if (!target) {
+        return;
+    }
     categoryBatchManager.api = new mw.Api();
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');

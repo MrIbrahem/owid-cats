@@ -10,6 +10,26 @@ class CategoryInputs {
      */
     constructor(apiService) {
         this.apiService = apiService;
+
+        // For multiselect lookup - Add Categories
+        this.addCategoryChips = [];
+        this.addCategoryMenuItems = [];
+        this.addCategoryMenuConfig = {
+            boldLabel: true,
+            visibleItemLimit: 10
+        };
+
+        // For multiselect lookup - Remove Categories
+        this.removeCategoryChips = [];
+        this.removeCategoryMenuItems = [];
+        this.removeCategoryMenuConfig = {
+            boldLabel: true,
+            visibleItemLimit: 10
+        };
+
+        // Debounce timers
+        this.addCategoryDebounce = null;
+        this.removeCategoryDebounce = null;
     }
 
     /**

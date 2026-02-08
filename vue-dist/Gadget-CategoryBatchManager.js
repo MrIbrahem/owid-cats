@@ -331,13 +331,14 @@ function createCategoryBatchManager(api) {
         data: function () {
             return {
                 files_list: files_list, // Reference to FilesList component instance
+                category_inputs: category_inputs, // Reference to CategoryInputs component instance
                 sourceCategory: 'Category:Economic Data',
                 searchPattern: '',
                 addCategories: [],
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
-                selectedFiles: [], // Bind to FilesList component's selectedFiles
+                selectedFiles: this.files_list.selectedFiles, // Bind to FilesList component's selectedFiles
                 showMessage: false,
                 messageType: '',
                 messageContent: '',

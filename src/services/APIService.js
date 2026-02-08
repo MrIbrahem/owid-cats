@@ -183,6 +183,62 @@ class APIService {
     }
 
     /**
+     * Search for files in a category using MediaWiki search API
+     * Much more efficient than loading all category members
+     * @param {string} categoryName - Category name (without "Category:" prefix)
+     * @param {string} pattern - Search pattern
+     * @returns {Promise<Array>} Array of file objects
+     */
+    async searchInCategory(categoryName, pattern) {
+        const results = [];
+        let continueToken = null;
+
+        do {
+            // Replace spaces with underscores in category name for search API
+            const searchCategoryName = categoryName.replace(/\s+/g, '_');
+            const params = {
+                action: 'query',
+                list: 'search',
+                srsearch: `incategory:${searchCategoryName} intitle:/${pattern}/`,
+                srnamespace: 6, // File namespace
+                srlimit: 'max',
+                srprop: 'size|wordcount|timestamp',
+                format: 'json'
+            };
+
+            if (continueToken) {
+                params.sroffset = continueToken;
+            }
+
+            const response = await this.makeRequest(params);
+
+            if (response.query && response.query.search) {
+                const searchResults = response.query.search.map(file => ({
+                    title: file.title,
+                    pageid: file.pageid,
+                    size: file.size,
+                    timestamp: file.timestamp
+                }));
+
+                results.push(...searchResults);
+            }
+
+            // Check if there are more results
+            continueToken = response.continue ? response.continue.sroffset : null;
+
+            // Safety limit to prevent too many requests
+            if (results.length >= 5000) {
+                console.warn('Search result limit reached (5000 files)');
+                break;
+            }
+
+        } while (continueToken);
+
+        return results;
+    }
+
+
+    /**
      * Edit a page using mw.Api.edit() which handles revision fetching and conflicts.
      *
      * @param {string} title   - Page title

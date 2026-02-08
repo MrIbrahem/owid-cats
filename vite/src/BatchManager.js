@@ -8,6 +8,7 @@
 function BatchManager(api) {
     const mwApi = new APIService();
     const search_panel = new SearchPanel();
+    // const search_handler = new SearchHandler();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
     const progress_section = new ProgressBar();
@@ -106,8 +107,10 @@ function BatchManager(api) {
                 showProgress: false,
                 progressPercent: 0,
                 progressText: 'Processing...',
+                isSearching: false,
                 isProcessing: false,
-                shouldStop: false,
+                shouldStopProgress: false,
+                shouldStopSearch: false,
                 showResultsMessage: false,
                 resultsMessageText: '',
 
@@ -149,7 +152,13 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                return this.file_service.executeFileSearch(this)
+                this.isSearching = true;
+                this.file_service.executeFileSearch(this)
+            },
+            stopSearch: function () {
+                this.isSearching = false;
+                this.shouldStopSearch = true;
+                // Implement logic to stop ongoing search if possible
             },
 
             /* *************************
@@ -235,7 +244,7 @@ function BatchManager(api) {
                 }
 
                 this.isProcessing = true;
-                this.shouldStop = false;
+                this.shouldStopProgress = false;
                 this.showProgress = true;
 
                 // Placeholder - implement actual batch processing
@@ -245,10 +254,10 @@ function BatchManager(api) {
 
             // Process files sequentially
             processBatch: function (files, index) {
-                if (this.shouldStop || index >= files.length) {
+                if (this.shouldStopProgress || index >= files.length) {
                     this.isProcessing = false;
                     this.showProgress = false;
-                    if (!this.shouldStop) {
+                    if (!this.shouldStopProgress) {
                         this.showSuccessMessage('Batch operation completed successfully!');
                     } else {
                         this.showWarningMessage('Operation stopped by user.');
@@ -268,7 +277,7 @@ function BatchManager(api) {
 
             // Stop ongoing operation
             stopOperation: function () {
-                this.shouldStop = true;
+                this.shouldStopProgress = true;
             },
 
             /* *************************

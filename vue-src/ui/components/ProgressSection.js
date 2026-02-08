@@ -34,6 +34,6 @@ class ProgressSection {
     }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ProgressSection;
-}
+module.exports = {
+    ProgressSection
+};

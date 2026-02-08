@@ -1,0 +1,153 @@
+/**
+ * Build script for Vue-based Category Batch Manager gadget
+ * Concatenates all Vue source files into a single bundle for Wikimedia Commons
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// File order according to dependency requirements
+const SOURCE_FILES = [
+    'vue-src/ui/components/SearchPanel.js',
+    'vue-src/ui/components/CategoryInputs.js',
+    'vue-src/ui/components/FilesList.js',
+    'vue-src/ui/components/ProgressSection.js',
+    'vue-src/createCategoryBatchManager.js',
+    'vue-src/main.js',
+];
+
+const DIST_DIR = 'vue-dist';
+const OUTPUT_JS = 'vue-dist/Gadget-CategoryBatchManager.js';
+
+/**
+ * Strip module.exports blocks from JavaScript code
+ * @param {string} code - The JavaScript code
+ * @returns {string} Code with module.exports blocks removed
+ */
+function stripModuleExports(code) {
+    // Remove blocks like:
+    // if (typeof module !== 'undefined' && module.exports) {
+    //   module.exports = ClassName;
+    // }
+    // Use [\s\S] instead of . to match across newlines
+    code = code.replace(
+        /if \(typeof module !== 'undefined' && module\.exports\) \{[\s\S]*?module\.exports = [^;]+;[\s\S]*?\}\n?/g,
+        ''
+    );
+    // Remove blocks like:
+    // module.exports = {
+    //     createCategoryBatchManager
+    // };
+    code = code.replace(/module\.exports = \{[\s\S]*?\};\n?/g, '');
+    return code;
+}
+
+/**
+ * Strip global comments from JavaScript code
+ * @param {string} code - The JavaScript code
+ * @returns {string} Code with global comments removed
+ */
+function stripGlobalComments(code) {
+    // Use [\s\S] to match content across lines
+    return code.replace(/\/\* global [\s\S]+? \*\/\n?/g, '');
+}
+
+/**
+ * Process a single JavaScript file
+ * @param {string} filePath - Path to the file
+ * @returns {string} Processed file content with header comment
+ */
+function processFile(filePath) {
+    let content = fs.readFileSync(filePath, 'utf8');
+
+    // Strip module.exports blocks
+    content = stripModuleExports(content);
+
+    // Strip global comments
+    content = stripGlobalComments(content);
+
+    // For main.js, we need to wrap it differently since it's the entry point
+    if (filePath === 'vue-src/main.js') {
+        // Remove the outer wrapper
+        content = content.replace(/\/\/ <nowiki>\n\nif \(typeof categoryBatchManager === 'undefined'\) \{\s*var categoryBatchManager = \{\};\s*\}\n\n/m, '');
+        content = content.replace(/\n\n\/\/ <\/nowiki>\n$/, '');
+    }
+
+    // Trim trailing whitespace and ensure proper ending
+    content = content.trim();
+
+    // Add file marker comment
+    const marker = `// === ${filePath} ===\n`;
+
+    return marker + content;
+}
+
+/**
+ * Generate the header comment for the bundled file
+ * @returns {string} Header comment block
+ */
+function generateHeader() {
+    return `/**
+ * Gadget-CategoryBatchManager.js (Vue-based)
+ * Category Batch Manager for Wikimedia Commons
+ *
+ * @version 1.0.0
+ * @license MIT
+ * @description A tool for batch categorization of files in Wikimedia Commons.
+ *              Built with Vue.js and Wikimedia Codex.
+ *
+ * Built from: https://github.com/MrIbrahem/owid-cats
+ */
+// <nowiki>
+
+`;
+}
+
+/**
+ * Generate the footer comment for the bundled file
+ * @returns {string} Footer comment block
+ */
+function generateFooter() {
+    return `
+// </nowiki>
+`;
+}
+
+/**
+ * Build the bundled JavaScript file
+ */
+function buildJS() {
+    console.log('Building Vue JavaScript bundle...');
+
+    // Process all source files
+    const processedFiles = SOURCE_FILES.map(processFile);
+
+    // Combine all processed files
+    const combinedContent = processedFiles.join('\n\n');
+
+    // Create the bundle with header and footer
+    const bundle = generateHeader() + combinedContent + generateFooter();
+
+    // Write output file
+    fs.writeFileSync(OUTPUT_JS, bundle, 'utf8');
+    console.log(`✓ Created ${OUTPUT_JS}`);
+}
+
+/**
+ * Main build function
+ */
+function build() {
+    // Create dist directory if it doesn't exist
+    if (!fs.existsSync(DIST_DIR)) {
+        fs.mkdirSync(DIST_DIR, { recursive: true });
+        console.log(`✓ Created ${DIST_DIR}/ directory`);
+    }
+
+    // Build JS
+    buildJS();
+
+    console.log('\nVue build completed successfully!');
+}
+
+// Run the build
+build();

@@ -18,21 +18,25 @@ class PreviewHandler {
     }
     createElement() {
         return `
-        <!-- Preview Modal should be changed to use cdx-dialog -->
-        <div id="cbm-preview-modal" class="hidden">
-            <div class="cbm-modal-content">
-                <h3>Preview Changes</h3>
-                <div id="cbm-preview-content"></div>
-                <button id="cbm-preview-close"
-                    class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
-                    Close
-                </button>
-            </div>
-        </div>
         <cdx-button @click="handlePreview" action="default" weight="normal"
             :disabled="isProcessing">
             Preview Changes
         </cdx-button>
+
+        <cdx-dialog
+            v-model:open="openPreviewHandler"
+            title="Save changes"
+            :use-close-button="true"
+            :primary-action="primaryAction"
+            :default-action="defaultAction"
+            @primary="onPrimaryAction"
+            @default="openPreviewHandler = false"
+        >
+            {{ previewHtml }}
+
+            <template #footer-text>
+            </template>
+        </cdx-dialog>
     `;
     }
     // Preview changes before executing
@@ -120,16 +124,6 @@ class PreviewHandler {
      * @param {Array} preview - Array of preview items
      */
     showPreviewModal(self, preview) {
-        const modal = document.getElementById('cbm-preview-modal');
-        const content = document.getElementById('cbm-preview-content');
-        if (!modal) {
-            console.error('[CBM] Preview modal container not found');
-            return;
-        }
-        if (!content) {
-            console.error('[CBM] Preview content container not found');
-            return;
-        }
         let html = '<table class="cbm-preview-table">';
         html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
 
@@ -157,18 +151,9 @@ class PreviewHandler {
 
         html = `<p>${changesCount} files will be modified</p>` + html;
 
-        content.innerHTML = html;
-        modal.classList.remove('hidden');
+        self.previewHtml = html;
+        self.openPreviewHandler = true;
     }
-
-    /**
-     * Hide the preview modal
-     */
-    hidePreviewModal() {
-        const modal = document.getElementById('cbm-preview-modal');
-        modal.classList.add('hidden');
-    }
-
     /**
      * Check if a category exists in a list (with normalization)
      * @param {string} category - Category to find

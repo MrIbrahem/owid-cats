@@ -1399,6 +1399,17 @@ class PreviewHandler {
     }
     createElement() {
         return `
+        <!-- Preview Modal should be changed to use cdx-dialog -->
+        <div id="cbm-preview-modal" class="hidden">
+            <div class="cbm-modal-content">
+                <h3>Preview Changes</h3>
+                <div id="cbm-preview-content"></div>
+                <button id="cbm-preview-close"
+                    class="cdx-button cdx-button--action-default cdx-button--weight-normal cdx-button--size-medium">
+                    Close
+                </button>
+            </div>
+        </div>
         <cdx-button @click="handlePreview" action="default" weight="normal"
             :disabled="isProcessing">
             Preview Changes

@@ -115,6 +115,9 @@ function BatchManager() {
                 showResultsMessage: false,
                 resultsMessageText: '',
 
+                previewHtml: '',
+                openPreviewHandler: false,
+
                 // For multiselect lookup - Add Categories
                 addCategoryChips: [],
                 addCategoryMenuItems: [

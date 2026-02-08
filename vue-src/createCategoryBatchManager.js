@@ -106,7 +106,6 @@ function createCategoryBatchManager(api) {
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
-                // selectedFiles: [],
                 selectedFiles: this.selectedFiles, // Bind to FilesList component's selectedFiles
                 showMessage: false,
                 messageType: '',
@@ -142,6 +141,7 @@ function createCategoryBatchManager(api) {
         },
         computed: fileSelectionComputed,
         methods: {
+            // should be moved to services/FileService.js
             searchFiles: function () {
                 this.resetMessageState();
 
@@ -173,16 +173,19 @@ function createCategoryBatchManager(api) {
                 }, 1000);
             },
 
+            // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Select all files
             selectAll: function () {
                 return this.files_list.selectAll(this.selectedFiles);
             },
 
+            // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Deselect all files
             deselectAll: function () {
                 return this.files_list.deselectAll(this.selectedFiles);
             },
 
+            // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Remove individual file from list
             removeFile: function (index) {
                 this.selectedFiles.splice(index, 1);
@@ -191,6 +194,7 @@ function createCategoryBatchManager(api) {
                 }
             },
 
+            // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
             previewChanges: function () {
                 const selectedCount = this.selectedCount;
@@ -217,6 +221,7 @@ function createCategoryBatchManager(api) {
                 alert(previewMessage);
             },
 
+            // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
             // Execute batch operation
             executeOperation: function () {
                 const selectedCount = this.selectedCount;
@@ -272,6 +277,7 @@ function createCategoryBatchManager(api) {
                 this.shouldStop = true;
             },
 
+            // should be moved to `class CategoryService` at `src/services/CategoryService.js`
             // Fetch categories from API with autocomplete
             fetchCategories: function (searchTerm) {
                 if (!searchTerm || searchTerm.length < 2) {
@@ -300,6 +306,7 @@ function createCategoryBatchManager(api) {
                 });
             },
 
+            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
             // Handle add category input with debounce
             onAddCategoryInput: function (value) {
                 // Clear previous timeout
@@ -321,6 +328,7 @@ function createCategoryBatchManager(api) {
                 }, 300); // 300ms debounce
             },
 
+            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
             // Handle remove category input with debounce
             onRemoveCategoryInput: function (value) {
                 // Clear previous timeout
@@ -342,12 +350,14 @@ function createCategoryBatchManager(api) {
                 }, 300); // 300ms debounce
             },
 
+            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
             // Handle chip changes for add categories
             handleAddCategoryChipChange: function (newChips) {
                 this.addCategoryChips = newChips;
                 this.addCategories = newChips.map(chip => chip.value);
             },
 
+            // should be moved to `class CategoryInputs` at `ui/components/CategoryInputs.js`
             // Handle chip changes for remove categories
             handleRemoveCategoryChipChange: function (newChips) {
                 this.removeCategoryChips = newChips;

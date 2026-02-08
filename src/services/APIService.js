@@ -15,30 +15,11 @@
 class APIService {
     constructor() {
         /**
-         * Native MediaWiki API helper — instantiated lazily on first use.
-         * @type {mw.Api|null}
+         * Native MediaWiki API helper
+         * @type {mw.Api}
          */
-        this.mwApi = null;
+        this.mwApi = new mw.Api();
     }
-
-    /* ------------------------------------------------------------------ */
-    /*  mw.Api helper                                                      */
-    /* ------------------------------------------------------------------ */
-
-    /**
-     * Return (and lazily create) an mw.Api instance.
-     * @returns {mw.Api}
-     * @throws {Error} If mw.Api is not available
-     */
-    _getMwApi() {
-        if (this.mwApi) return this.mwApi;
-        if (typeof mw !== 'undefined' && mw.Api) {
-            this.mwApi = new mw.Api();
-            return this.mwApi;
-        }
-        throw new Error('mw.Api is not available — are you running inside MediaWiki?');
-    }
-
     /* ------------------------------------------------------------------ */
     /*  Public helpers used by other services                              */
     /* ------------------------------------------------------------------ */
@@ -163,9 +144,8 @@ class APIService {
      * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
      */
     async getCategories(title) {
-        const api = this._getMwApi();
         try {
-            const categories = await api.getCategories(title);
+            const categories = await this.mwApi.getCategories(title);
             if (categories === false) {
                 return false;
             }
@@ -248,10 +228,9 @@ class APIService {
      * @returns {Promise<Object>} API response
      */
     async editPage(title, content, summary, options = {}) {
-        const api = this._getMwApi();
 
         // Use mw.Api.edit() with a transform function
-        return api.edit(title, function () {
+        return this.mwApi.edit(title, function () {
             return {
                 text: content,
                 summary: summary,
@@ -270,9 +249,8 @@ class APIService {
      * @returns {Promise<Object>} Parsed JSON response
      */
     async makeRequest(params) {
-        const api = this._getMwApi();
         try {
-            return await api.get(params);
+            return await this.mwApi.get(params);
         } catch (error) {
             if (typeof Logger !== 'undefined') {
                 Logger.error('API request failed', error);

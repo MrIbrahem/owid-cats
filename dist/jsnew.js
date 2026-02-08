@@ -18,46 +18,46 @@
  * @class Logger
  */
 class Logger {
-  /**
-   * Log a message at the specified level
-   * @param {string} message - The message to log
-   * @param {string} level - Log level: 'info', 'warn', 'error', 'debug'
-   */
-  static log(message, level = 'info') {
-    const timestamp = new Date().toISOString();
-    const prefix = `[CategoryBatchManager][${level.toUpperCase()}][${timestamp}]`;
+    /**
+     * Log a message at the specified level
+     * @param {string} message - The message to log
+     * @param {string} level - Log level: 'info', 'warn', 'error', 'debug'
+     */
+    static log(message, level = 'info') {
+        const timestamp = new Date().toISOString();
+        const prefix = `[CategoryBatchManager][${level.toUpperCase()}][${timestamp}]`;
 
-    switch (level) {
-      case 'error':
-        console.error(`${prefix} ${message}`);
-        break;
-      case 'warn':
-        console.warn(`${prefix} ${message}`);
-        break;
-      case 'debug':
-        console.debug(`${prefix} ${message}`);
-        break;
-      default:
-        console.log(`${prefix} ${message}`);
+        switch (level) {
+            case 'error':
+                console.error(`${prefix} ${message}`);
+                break;
+            case 'warn':
+                console.warn(`${prefix} ${message}`);
+                break;
+            case 'debug':
+                console.debug(`${prefix} ${message}`);
+                break;
+            default:
+                console.log(`${prefix} ${message}`);
+        }
     }
-  }
 
-  /**
-   * Log an error with optional error object
-   * @param {string} message - The error message
-   * @param {Error} error - The error object
-   */
-  static error(message, error) {
-    Logger.log(`${message}: ${error && error.message ? error.message : error}`, 'error');
-  }
+    /**
+     * Log an error with optional error object
+     * @param {string} message - The error message
+     * @param {Error} error - The error object
+     */
+    static error(message, error) {
+        Logger.log(`${message}: ${error && error.message ? error.message : error}`, 'error');
+    }
 
-  /**
-   * Log a warning
-   * @param {string} message - The warning message
-   */
-  static warn(message) {
-    Logger.log(message, 'warn');
-  }
+    /**
+     * Log a warning
+     * @param {string} message - The warning message
+     */
+    static warn(message) {
+        Logger.log(message, 'warn');
+    }
 }
 
 // === src/utils/RateLimiter.js ===
@@ -66,42 +66,42 @@ class Logger {
  * @class RateLimiter
  */
 class RateLimiter {
-  /**
-   * Wait for a specified duration
-   * @param {number} ms - Milliseconds to wait
-   * @returns {Promise<void>}
-   */
-  async wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Throttle a function call with a delay
-   * @param {Function} fn - Function to execute
-   * @param {number} delay - Delay in milliseconds
-   * @returns {Promise<*>} Result of the function
-   */
-  static async throttle(fn, delay) {
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return fn();
-  }
-
-  /**
-   * Process items in batches with delay between each
-   * @param {Array} items - Items to process
-   * @param {number} batchSize - Number of items per batch
-   * @param {Function} processor - Async function to process each item
-   * @returns {Promise<Array>} Results of processing
-   */
-  static async batch(items, batchSize, processor) {
-    const results = [];
-    for (let i = 0; i < items.length; i += batchSize) {
-      const batch = items.slice(i, i + batchSize);
-      const batchResults = await Promise.all(batch.map(processor));
-      results.push(...batchResults);
+    /**
+     * Wait for a specified duration
+     * @param {number} ms - Milliseconds to wait
+     * @returns {Promise<void>}
+     */
+    async wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
-    return results;
-  }
+
+    /**
+     * Throttle a function call with a delay
+     * @param {Function} fn - Function to execute
+     * @param {number} delay - Delay in milliseconds
+     * @returns {Promise<*>} Result of the function
+     */
+    static async throttle(fn, delay) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return fn();
+    }
+
+    /**
+     * Process items in batches with delay between each
+     * @param {Array} items - Items to process
+     * @param {number} batchSize - Number of items per batch
+     * @param {Function} processor - Async function to process each item
+     * @returns {Promise<Array>} Results of processing
+     */
+    static async batch(items, batchSize, processor) {
+        const results = [];
+        for (let i = 0; i < items.length; i += batchSize) {
+            const batch = items.slice(i, i + batchSize);
+            const batchResults = await Promise.all(batch.map(processor));
+            results.push(...batchResults);
+        }
+        return results;
+    }
 }
 
 // === src/utils/Validator.js ===
@@ -110,67 +110,67 @@ class RateLimiter {
  * @class Validator
  */
 class Validator {
-  /**
-   * Check if a category name is valid
-   * @param {string} name - Category name to validate
-   * @returns {boolean} True if valid
-   */
-  static isValidCategoryName(name) {
-    if (!name || typeof name !== 'string') return false;
-    const trimmed = name.trim();
-    if (trimmed.length === 0) return false;
-    // Category names must not contain certain characters
-    const invalidChars = /[#<>\[\]{|}]/;
-    const cleanName = trimmed.replace(/^Category:/i, '');
-    return cleanName.length > 0 && !invalidChars.test(cleanName);
-  }
+    /**
+     * Check if a category name is valid
+     * @param {string} name - Category name to validate
+     * @returns {boolean} True if valid
+     */
+    static isValidCategoryName(name) {
+        if (!name || typeof name !== 'string') return false;
+        const trimmed = name.trim();
+        if (trimmed.length === 0) return false;
+        // Category names must not contain certain characters
+        const invalidChars = /[#<>\[\]{|}]/;
+        const cleanName = trimmed.replace(/^Category:/i, '');
+        return cleanName.length > 0 && !invalidChars.test(cleanName);
+    }
 
-  /**
-   * Check if a search pattern is valid
-   * @param {string} pattern - Search pattern to validate
-   * @returns {boolean} True if valid
-   */
-  static isValidSearchPattern(pattern) {
-    if (!pattern || typeof pattern !== 'string') return false;
-    return pattern.trim().length > 0;
-  }
-  /**
-   * Sanitize user input to prevent injection
-   * @param {string} input - Raw user input
-   * @returns {string} Sanitized input
-   */
-  static sanitizeInput(input) {
-    if (!input || typeof input !== 'string') return '';
-    return input.trim();
-  }
+    /**
+     * Check if a search pattern is valid
+     * @param {string} pattern - Search pattern to validate
+     * @returns {boolean} True if valid
+     */
+    static isValidSearchPattern(pattern) {
+        if (!pattern || typeof pattern !== 'string') return false;
+        return pattern.trim().length > 0;
+    }
+    /**
+     * Sanitize user input to prevent injection
+     * @param {string} input - Raw user input
+     * @returns {string} Sanitized input
+     */
+    static sanitizeInput(input) {
+        if (!input || typeof input !== 'string') return '';
+        return input.trim();
+    }
 
-  /**
-   * Normalize category name for comparison (remove prefix, convert underscores to spaces)
-   * @param {string} categoryName - Category name to normalize
-   * @returns {string} Normalized category name
-   */
-  static normalizeCategoryName(categoryName) {
-    if (!categoryName || typeof categoryName !== 'string') return '';
-    return categoryName
-      .replace(/^Category:/i, '')
-      .replace(/_/g, ' ')
-      .trim();
-  }
+    /**
+     * Normalize category name for comparison (remove prefix, convert underscores to spaces)
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    static normalizeCategoryName(categoryName) {
+        if (!categoryName || typeof categoryName !== 'string') return '';
+        return categoryName
+            .replace(/^Category:/i, '')
+            .replace(/_/g, ' ')
+            .trim();
+    }
 
-  /**
-   * Check if a category is trying to add itself (circular reference)
-   * @param {string} currentCategory - The category being edited
-   * @param {string} categoryToAdd - The category to be added
-   * @returns {boolean} True if circular reference detected
-   */
-  static isCircularCategory(currentCategory, categoryToAdd) {
-    if (!currentCategory || !categoryToAdd) return false;
+    /**
+     * Check if a category is trying to add itself (circular reference)
+     * @param {string} currentCategory - The category being edited
+     * @param {string} categoryToAdd - The category to be added
+     * @returns {boolean} True if circular reference detected
+     */
+    static isCircularCategory(currentCategory, categoryToAdd) {
+        if (!currentCategory || !categoryToAdd) return false;
 
-    const normalizedCurrent = this.normalizeCategoryName(currentCategory);
-    const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
+        const normalizedCurrent = this.normalizeCategoryName(currentCategory);
+        const normalizedToAdd = this.normalizeCategoryName(categoryToAdd);
 
-    return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
-  }
+        return normalizedCurrent.toLowerCase() === normalizedToAdd.toLowerCase();
+    }
 }
 
 // === src/utils/WikitextParser.js ===
@@ -179,117 +179,117 @@ class Validator {
  * @class WikitextParser
  */
 class WikitextParser {
-  /**
-   * Extract all categories from wikitext
-   * @param {string} wikitext - The wikitext content
-   * @returns {Array<string>} Array of category names with "Category:" prefix
-   */
-  extractCategories(wikitext) {
-    const categoryRegex = /\[\[Category:([^\]|]+)(?:\|[^\]]*)?\]\]/gi;
-    const matches = [];
-    let match;
+    /**
+     * Extract all categories from wikitext
+     * @param {string} wikitext - The wikitext content
+     * @returns {Array<string>} Array of category names with "Category:" prefix
+     */
+    extractCategories(wikitext) {
+        const categoryRegex = /\[\[Category:([^\]|]+)(?:\|[^\]]*)?\]\]/gi;
+        const matches = [];
+        let match;
 
-    while ((match = categoryRegex.exec(wikitext)) !== null) {
-      matches.push(`Category:${this.normalize(match[1].trim())}`);
+        while ((match = categoryRegex.exec(wikitext)) !== null) {
+            matches.push(`Category:${this.normalize(match[1].trim())}`);
+        }
+
+        return matches;
+    }
+    /**
+     * Normalize category name by replacing underscores with spaces and trimming
+     * @param {string} categoryName - Category name to normalize
+     * @returns {string} Normalized category name
+     */
+    normalize(categoryName) {
+        return categoryName.replace(/_/g, ' ').trim();
     }
 
-    return matches;
-  }
-  /**
-   * Normalize category name by replacing underscores with spaces and trimming
-   * @param {string} categoryName - Category name to normalize
-   * @returns {string} Normalized category name
-   */
-  normalize(categoryName) {
-    return categoryName.replace(/_/g, ' ').trim();
-  }
+    /**
+     * Check if category exists in wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to check (with or without "Category:" prefix)
+     * @returns {boolean} True if category exists
+     */
+    hasCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
 
-  /**
-   * Check if category exists in wikitext
-   * @param {string} wikitext - The wikitext content
-   * @param {string} categoryName - Category name to check (with or without "Category:" prefix)
-   * @returns {boolean} True if category exists
-   */
-  hasCategory(wikitext, categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    const normalizedName = this.normalize(cleanName);
+        // Create a pattern that matches both spaces and underscores
+        const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
+        const regex = new RegExp(
+            `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]`,
+            'i'
+        );
+        return regex.test(wikitext);
+    }
+    /**
+     * Add a category to wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to add (with or without "Category:" prefix)
+     * @returns {string} Modified wikitext
+     */
+    addCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
 
-    // Create a pattern that matches both spaces and underscores
-    const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
-    const regex = new RegExp(
-      `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]`,
-      'i'
-    );
-    return regex.test(wikitext);
-  }
-  /**
-   * Add a category to wikitext
-   * @param {string} wikitext - The wikitext content
-   * @param {string} categoryName - Category name to add (with or without "Category:" prefix)
-   * @returns {string} Modified wikitext
-   */
-  addCategory(wikitext, categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    const normalizedName = this.normalize(cleanName);
+        // Check if category already exists (with normalization)
+        if (this.hasCategory(wikitext, normalizedName)) {
+            return wikitext;
+        }
 
-    // Check if category already exists (with normalization)
-    if (this.hasCategory(wikitext, normalizedName)) {
-      return wikitext;
+        const categorySyntax = `[[Category:${normalizedName}]]`;
+
+        // Find last category or end of file
+        const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
+
+        if (lastCategoryMatch) {
+            // Add after last category
+            return wikitext.replace(
+                /(\[\[Category:[^\]]+\]\])\s*$/,
+                `$1\n${categorySyntax}\n`
+            );
+        } else {
+            // Add at end
+            return wikitext.trim() + `\n${categorySyntax}\n`;
+        }
+    }
+    /**
+     * Remove a category from wikitext
+     * @param {string} wikitext - The wikitext content
+     * @param {string} categoryName - Category name to remove (with or without "Category:" prefix)
+     * @returns {string} Modified wikitext
+     */
+    removeCategory(wikitext, categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        const normalizedName = this.normalize(cleanName);
+
+        // Create a pattern that matches both spaces and underscores
+        const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
+        const regex = new RegExp(
+            `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
+            'gi'
+        );
+        return wikitext.replace(regex, '');
     }
 
-    const categorySyntax = `[[Category:${normalizedName}]]`;
-
-    // Find last category or end of file
-    const lastCategoryMatch = wikitext.match(/\[\[Category:[^\]]+\]\]\s*$/);
-
-    if (lastCategoryMatch) {
-      // Add after last category
-      return wikitext.replace(
-        /(\[\[Category:[^\]]+\]\])\s*$/,
-        `$1\n${categorySyntax}\n`
-      );
-    } else {
-      // Add at end
-      return wikitext.trim() + `\n${categorySyntax}\n`;
+    /**
+     * Escape special regex characters in a string
+     * @param {string} string - String to escape
+     * @returns {string} Escaped string
+     */
+    escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-  }
-  /**
-   * Remove a category from wikitext
-   * @param {string} wikitext - The wikitext content
-   * @param {string} categoryName - Category name to remove (with or without "Category:" prefix)
-   * @returns {string} Modified wikitext
-   */
-  removeCategory(wikitext, categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    const normalizedName = this.normalize(cleanName);
 
-    // Create a pattern that matches both spaces and underscores
-    const pattern = normalizedName.split(' ').map(part => this.escapeRegex(part)).join('[ _]+');
-    const regex = new RegExp(
-      `\\[\\[Category:${pattern}(?:\\|[^\\]]*)?\\]\\]\\s*\\n?`,
-      'gi'
-    );
-    return wikitext.replace(regex, '');
-  }
-
-  /**
-   * Escape special regex characters in a string
-   * @param {string} string - String to escape
-   * @returns {string} Escaped string
-   */
-  escapeRegex(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  /**
-   * Get the proper wikitext syntax for a category
-   * @param {string} categoryName - Category name (with or without "Category:" prefix)
-   * @returns {string} Wikitext category syntax
-   */
-  getCategorySyntax(categoryName) {
-    const cleanName = categoryName.replace(/^Category:/i, '');
-    return `[[Category:${cleanName}]]`;
-  }
+    /**
+     * Get the proper wikitext syntax for a category
+     * @param {string} categoryName - Category name (with or without "Category:" prefix)
+     * @returns {string} Wikitext category syntax
+     */
+    getCategorySyntax(categoryName) {
+        const cleanName = categoryName.replace(/^Category:/i, '');
+        return `[[Category:${cleanName}]]`;
+    }
 }
 
 // === src/utils/UsageLogger.js ===
@@ -298,45 +298,45 @@ class WikitextParser {
  * @class UsageLogger
  */
 class UsageLogger {
-  /**
-   * Log a search operation
-   * @param {string} pattern - Search pattern used
-   * @param {number} resultsCount - Number of results found
-   */
-  static logSearch(pattern, resultsCount) {
-    console.log(`[CBM] Search: "${pattern}" - ${resultsCount} results`);
-  }
+    /**
+     * Log a search operation
+     * @param {string} pattern - Search pattern used
+     * @param {number} resultsCount - Number of results found
+     */
+    static logSearch(pattern, resultsCount) {
+        console.log(`[CBM] Search: "${pattern}" - ${resultsCount} results`);
+    }
 
-  /**
-   * Log a batch operation
-   * @param {number} filesCount - Number of files processed
-   * @param {Array<string>} categoriesAdded - Categories that were added
-   * @param {Array<string>} categoriesRemoved - Categories that were removed
-   */
-  static logBatchOperation(filesCount, categoriesAdded, categoriesRemoved) {
-    console.log(
-      `[CBM] Batch: ${filesCount} files, ` +
-      `+${categoriesAdded.length} -${categoriesRemoved.length} categories`
-    );
-  }
+    /**
+     * Log a batch operation
+     * @param {number} filesCount - Number of files processed
+     * @param {Array<string>} categoriesAdded - Categories that were added
+     * @param {Array<string>} categoriesRemoved - Categories that were removed
+     */
+    static logBatchOperation(filesCount, categoriesAdded, categoriesRemoved) {
+        console.log(
+            `[CBM] Batch: ${filesCount} files, ` +
+            `+${categoriesAdded.length} -${categoriesRemoved.length} categories`
+        );
+    }
 
-  /**
-   * Log an error
-   * @param {string} context - Where the error occurred
-   * @param {Error} error - The error object
-   */
-  static logError(context, error) {
-    console.error(`[CBM] Error in ${context}:`, error);
-  }
+    /**
+     * Log an error
+     * @param {string} context - Where the error occurred
+     * @param {Error} error - The error object
+     */
+    static logError(context, error) {
+        console.error(`[CBM] Error in ${context}:`, error);
+    }
 
-  /**
-   * Log performance metrics
-   * @param {string} operation - Operation name
-   * @param {number} duration - Duration in milliseconds
-   */
-  static logPerformance(operation, duration) {
-    console.log(`[CBM] Performance: ${operation} took ${duration}ms`);
-  }
+    /**
+     * Log performance metrics
+     * @param {string} operation - Operation name
+     * @param {number} duration - Duration in milliseconds
+     */
+    static logPerformance(operation, duration) {
+        console.log(`[CBM] Performance: ${operation} took ${duration}ms`);
+    }
 }
 
 // === src/models/FileModel.js ===
@@ -407,30 +407,11 @@ class CategoryOperation {
 class APIService {
     constructor() {
         /**
-         * Native MediaWiki API helper — instantiated lazily on first use.
-         * @type {mw.Api|null}
+         * Native MediaWiki API helper
+         * @type {mw.Api}
          */
-        this.mwApi = null;
+        this.mwApi = new mw.Api();
     }
-
-    /* ------------------------------------------------------------------ */
-    /*  mw.Api helper                                                      */
-    /* ------------------------------------------------------------------ */
-
-    /**
-     * Return (and lazily create) an mw.Api instance.
-     * @returns {mw.Api}
-     * @throws {Error} If mw.Api is not available
-     */
-    _getMwApi() {
-        if (this.mwApi) return this.mwApi;
-        if (typeof mw !== 'undefined' && mw.Api) {
-            this.mwApi = new mw.Api();
-            return this.mwApi;
-        }
-        throw new Error('mw.Api is not available — are you running inside MediaWiki?');
-    }
-
     /* ------------------------------------------------------------------ */
     /*  Public helpers used by other services                              */
     /* ------------------------------------------------------------------ */
@@ -555,9 +536,8 @@ class APIService {
      * @returns {Promise<Array<string>|false>} Array of category names (without "Category:" prefix), or false if page not found
      */
     async getCategories(title) {
-        const api = this._getMwApi();
         try {
-            const categories = await api.getCategories(title);
+            const categories = await this.mwApi.getCategories(title);
             if (categories === false) {
                 return false;
             }
@@ -640,10 +620,9 @@ class APIService {
      * @returns {Promise<Object>} API response
      */
     async editPage(title, content, summary, options = {}) {
-        const api = this._getMwApi();
 
         // Use mw.Api.edit() with a transform function
-        return api.edit(title, function () {
+        return this.mwApi.edit(title, function () {
             return {
                 text: content,
                 summary: summary,
@@ -662,9 +641,8 @@ class APIService {
      * @returns {Promise<Object>} Parsed JSON response
      */
     async makeRequest(params) {
-        const api = this._getMwApi();
         try {
-            return await api.get(params);
+            return await this.mwApi.get(params);
         } catch (error) {
             if (typeof Logger !== 'undefined') {
                 Logger.error('API request failed', error);
@@ -884,7 +862,7 @@ class CategoryService {
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
     async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
-        const api = this.api._getMwApi();
+        const api = new mw.Api();
         const parser = this.parser;
 
         try {

@@ -105,7 +105,7 @@ class CategoryService {
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
     async updateCategoriesOptimized(fileTitle, toAdd, toRemove) {
-        const api = this.api._getMwApi();
+        const api = new mw.Api();
         const parser = this.parser;
 
         try {

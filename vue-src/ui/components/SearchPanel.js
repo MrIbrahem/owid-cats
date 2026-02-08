@@ -51,6 +51,6 @@ class SearchPanel {
 
 }
 
-module.exports = {
-    SearchPanel
-};
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SearchPanel;
+}

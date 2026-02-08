@@ -74,6 +74,6 @@ class FilesList {
     }
 }
 
-module.exports = {
-    FilesList
-};
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = FilesList;
+}

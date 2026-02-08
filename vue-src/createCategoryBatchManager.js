@@ -385,7 +385,6 @@ function createCategoryBatchManager(api) {
     return app;
 }
 
-
-module.exports = {
-    createCategoryBatchManager
-};
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = createCategoryBatchManager;
+}

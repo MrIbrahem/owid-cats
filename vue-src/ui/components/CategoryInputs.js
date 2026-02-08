@@ -57,7 +57,6 @@ class CategoryInputs {
     attachListeners() {
     }
 }
-
-module.exports = {
-    CategoryInputs
-};
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CategoryInputs;
+}

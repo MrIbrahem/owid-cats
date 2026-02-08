@@ -1,11 +1,10 @@
 /**
  * Creates the Vue app definition for the Category Batch Manager tool.
- * @param {mw.Api} api - An instance of the MediaWiki API for making requests.
  * @returns {Object} Vue app definition object.
  */
 /* global APIService, SearchHandler, CategoryInputs, FilesList, ProgressBar */
 
-function BatchManager(api) {
+function BatchManager() {
     const mwApi = new APIService();
     const search_handler = new SearchHandler();
     const category_inputs = new CategoryInputs(mwApi);

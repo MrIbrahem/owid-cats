@@ -31,13 +31,13 @@ describe('CategoryService', () => {
     delete global.mw;
   });
 
-  describe('addCategories', () => {
+  describe('addCategoriesToFile', () => {
     test('should add new category to page', async () => {
       mockApi.getPageContent.mockResolvedValue(
         'Some text\n[[Category:Existing]]'
       );
 
-      const result = await service.addCategories('File:Test.svg', ['Category:New']);
+      const result = await service.addCategoriesToFile('File:Test.svg', ['Category:New']);
 
       expect(result.success).toBe(true);
       expect(result.modified).toBe(true);
@@ -49,7 +49,7 @@ describe('CategoryService', () => {
         'Some text\n[[Category:Existing]]'
       );
 
-      const result = await service.addCategories('File:Test.svg', ['Category:Existing']);
+      const result = await service.addCategoriesToFile('File:Test.svg', ['Category:Existing']);
 
       expect(result.success).toBe(true);
       expect(result.modified).toBe(false);
@@ -57,13 +57,13 @@ describe('CategoryService', () => {
     });
   });
 
-  describe('removeCategories', () => {
+  describe('removeCategoriesFromFile', () => {
     test('should remove existing category', async () => {
       mockApi.getPageContent.mockResolvedValue(
         'Some text\n[[Category:ToRemove]]\n[[Category:Keep]]'
       );
 
-      const result = await service.removeCategories('File:Test.svg', ['Category:ToRemove']);
+      const result = await service.removeCategoriesFromFile('File:Test.svg', ['Category:ToRemove']);
 
       expect(result.success).toBe(true);
       expect(result.modified).toBe(true);
@@ -75,7 +75,7 @@ describe('CategoryService', () => {
         'Some text\n[[Category:Keep]]'
       );
 
-      const result = await service.removeCategories('File:Test.svg', ['Category:NonExistent']);
+      const result = await service.removeCategoriesFromFile('File:Test.svg', ['Category:NonExistent']);
 
       expect(result.success).toBe(true);
       expect(result.modified).toBe(false);

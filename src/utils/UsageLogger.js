@@ -26,6 +26,7 @@ class UsageLogger {
     }
 
     /**
+     * TODO: use it in the workflow
      * Log an error
      * @param {string} context - Where the error occurred
      * @param {Error} error - The error object
@@ -35,6 +36,7 @@ class UsageLogger {
     }
 
     /**
+     * TODO: use it in the workflow
      * Log performance metrics
      * @param {string} operation - Operation name
      * @param {number} duration - Duration in milliseconds

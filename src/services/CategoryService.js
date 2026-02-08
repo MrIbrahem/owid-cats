@@ -15,12 +15,13 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Add categories to a file
      * @param {string} fileTitle - File page title
      * @param {Array<string>} categoriesToAdd - Categories to add
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
-    async addCategories(fileTitle, categoriesToAdd) {
+    async addCategoriesToFile(fileTitle, categoriesToAdd) {
         const wikitext = await this.api.getPageContent(fileTitle);
 
         let newWikitext = wikitext;
@@ -42,12 +43,13 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Remove categories from a file
      * @param {string} fileTitle - File page title
      * @param {Array<string>} categoriesToRemove - Categories to remove
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
-    async removeCategories(fileTitle, categoriesToRemove) {
+    async removeCategoriesFromFile(fileTitle, categoriesToRemove) {
         const wikitext = await this.api.getPageContent(fileTitle);
 
         let newWikitext = wikitext;
@@ -98,6 +100,7 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Combined add and remove operation using mw.Api.edit() for better conflict handling
      * @param {string} fileTitle - File page title
      * @param {Array<string>} toAdd - Categories to add
@@ -150,6 +153,7 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow
      * Get current categories for a file using the optimized API method
      * @param {string} fileTitle - File page title
      * @returns {Promise<Array<string>>} Array of category names
@@ -163,6 +167,7 @@ class CategoryService {
     }
 
     /**
+     * TODO: use it in the workflow or move it to a utility module
      * Build an edit summary from add/remove lists
      * @param {Array<string>} toAdd - Categories added
      * @param {Array<string>} toRemove - Categories removed

@@ -1,4 +1,5 @@
 /**
+ * TODO: use it in the workflow
  * Error recovery system for failed operations
  * @class ErrorRecovery
  */
@@ -23,6 +24,7 @@ class ErrorRecovery {
     }
 
     /**
+     * TODO: use it in the workflow
      * Retry all failed operations that haven't exceeded max attempts
      * @param {Function} executeOperation - Function to retry an operation
      * @returns {Promise<Object>} Results of retry attempts
@@ -90,6 +92,7 @@ class ErrorRecovery {
     }
 
     /**
+     * TODO: use it in the workflow
      * Clear all failed operations
      */
     clearAll() {

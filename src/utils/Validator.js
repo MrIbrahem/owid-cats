@@ -4,6 +4,7 @@
  */
 class Validator {
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Check if a category name is valid
      * @param {string} name - Category name to validate
      * @returns {boolean} True if valid
@@ -19,6 +20,7 @@ class Validator {
     }
 
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Check if a search pattern is valid
      * @param {string} pattern - Search pattern to validate
      * @returns {boolean} True if valid
@@ -28,6 +30,7 @@ class Validator {
         return pattern.trim().length > 0;
     }
     /**
+     * TODO: use it in the workflow or remove if not needed
      * Sanitize user input to prevent injection
      * @param {string} input - Raw user input
      * @returns {string} Sanitized input

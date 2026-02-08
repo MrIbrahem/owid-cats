@@ -25,6 +25,7 @@ class APIService {
     /* ------------------------------------------------------------------ */
 
     /**
+     * TODO: remove it and related tests
      * Fetch files from a category with pagination support.
      * @param {string} categoryName - Full category name including "Category:" prefix
      * @param {Object} [options={}] - Query options

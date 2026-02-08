@@ -20,7 +20,7 @@ class CategoryService {
      * @param {Array<string>} categoriesToAdd - Categories to add
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
-    async addCategories(fileTitle, categoriesToAdd) {
+    async addCategoriesToFile(fileTitle, categoriesToAdd) {
         const wikitext = await this.api.getPageContent(fileTitle);
 
         let newWikitext = wikitext;
@@ -47,7 +47,7 @@ class CategoryService {
      * @param {Array<string>} categoriesToRemove - Categories to remove
      * @returns {Promise<{success: boolean, modified: boolean}>}
      */
-    async removeCategories(fileTitle, categoriesToRemove) {
+    async removeCategoriesFromFile(fileTitle, categoriesToRemove) {
         const wikitext = await this.api.getPageContent(fileTitle);
 
         let newWikitext = wikitext;

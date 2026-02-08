@@ -250,14 +250,14 @@ class ProgressSection {
 
 function createCategoryBatchManager(api) {
     const search_panel = new SearchPanel();
-    const CategoryInputs = new CategoryInputs(api);
-    const FilesList = new FilesList();
-    const ProgressSection = new ProgressSection();
+    const category_inputs = new CategoryInputs(api);
+    const files_list = new FilesList();
+    const progress_section = new ProgressSection();
 
     const Search_SectionHtml = search_panel.createElement();
-    const CategoryInputPanelHtml = CategoryInputs.createElement();
-    const FilesListHtml = FilesList.createElement();
-    const ProgressSectionHtml = ProgressSection.createElement();
+    const CategoryInputPanelHtml = category_inputs.createElement();
+    const FilesListHtml = files_list.createElement();
+    const ProgressSectionHtml = progress_section.createElement();
 
     const app = {
         data: function () {
@@ -269,7 +269,7 @@ function createCategoryBatchManager(api) {
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
                 // selectedFiles: [],
-                selectedFiles: this.FilesList.selectedFiles, // Bind to FilesList component's selectedFiles
+                selectedFiles: this.files_list.selectedFiles, // Bind to FilesList component's selectedFiles
                 showMessage: false,
                 messageType: '',
                 messageContent: '',
@@ -347,12 +347,12 @@ function createCategoryBatchManager(api) {
 
             // Select all files
             selectAll: function () {
-                return this.FilesList.selectAll();
+                return this.files_list.selectAll();
             },
 
             // Deselect all files
             deselectAll: function () {
-                return this.FilesList.deselectAll();
+                return this.files_list.deselectAll();
             },
 
             // Remove individual file from list
@@ -639,6 +639,8 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     categoryBatchManager.api = new mw.Api();
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
+
+    const { createCategoryBatchManager } = require('./createCategoryBatchManager');
 
     const app = createCategoryBatchManager(categoryBatchManager.api);
 

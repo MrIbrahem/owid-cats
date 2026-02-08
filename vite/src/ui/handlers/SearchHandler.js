@@ -52,7 +52,7 @@ class SearchHandler {
     stopSearch(self) {
         self.isSearching = false;
         self.shouldStopSearch = true;
-        // Implement logic to stop ongoing search if possible
+        // Implement logic to stop ongoing search like in `class stopOperation`
     }
 
 }

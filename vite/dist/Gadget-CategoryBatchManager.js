@@ -17,23 +17,23 @@
  * @class FileModel
  */
 class FileModel {
-  /**
-   * @param {Object} data - File data
-   * @param {string} data.title - Full file title (e.g., "File:Example,BLR.svg")
-   * @param {number} data.pageid - Unique page ID
-   * @param {boolean} [data.selected=true] - Whether file is selected for operation
-   * @param {Array<string>} [data.currentCategories=[]] - Current categories
-   * @param {string} [data.thumbnail=''] - URL to thumbnail
-   * @param {number} [data.size=0] - File size in bytes
-   */
-  constructor(data) {
-    this.title = data.title;
-    this.pageid = data.pageid;
-    this.selected = data.selected !== undefined ? data.selected : true;
-    this.currentCategories = data.currentCategories || [];
-    this.thumbnail = data.thumbnail || '';
-    this.size = data.size || 0;
-  }
+    /**
+     * @param {Object} data - File data
+     * @param {string} data.title - Full file title (e.g., "File:Example,BLR.svg")
+     * @param {number} data.pageid - Unique page ID
+     * @param {boolean} [data.selected=true] - Whether file is selected for operation
+     * @param {Array<string>} [data.currentCategories=[]] - Current categories
+     * @param {string} [data.thumbnail=''] - URL to thumbnail
+     * @param {number} [data.size=0] - File size in bytes
+     */
+    constructor(data) {
+        this.title = data.title;
+        this.pageid = data.pageid;
+        this.selected = data.selected !== undefined ? data.selected : true;
+        this.currentCategories = data.currentCategories || [];
+        this.thumbnail = data.thumbnail || '';
+        this.size = data.size || 0;
+    }
 }
 
 // === src/models/CategoryOperation.js ===
@@ -485,66 +485,6 @@ class FileService {
     }
 }
 
-// === vite/src/ui/components/SearchPanel.js ===
-/**
- * Search panel UI component using Codex CSS-only classes.
- * @see https://doc.wikimedia.org/codex/latest/
- * @class SearchPanel
- */
-class SearchPanel {
-    /**
-     */
-    constructor() {
-    }
-
-    /**
-     * Create the search panel HTML element with Codex components.
-     */
-    createElement() {
-        return `
-        <div class="cbm-search-panel">
-            <div class="cbm-input-group">
-                <cdx-label input-id="cbm-source-category" class="cbm-label">
-                    Source Category
-                </cdx-label>
-                <cdx-text-input id="cbm-source-category" v-model="sourceCategory"
-                    placeholder="Category:Our World in Data graphs of Austria" />
-            </div>
-
-            <div class="cbm-input-group">
-                <cdx-label input-id="cbm-pattern" class="cbm-label">
-                    Search Pattern
-                </cdx-label>
-                <span class="cbm-help-text">
-                    Enter a pattern to filter files (e.g., ,BLR.svg)
-                </span>
-                <div class="cbm-input-button-group">
-                    <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg" />
-                    <cdx-button v-if="!isSearching" @click="searchFiles" action="progressive" weight="primary">
-                        Search
-                    </cdx-button>
-                    <cdx-button v-if="isSearching" @click="stopSearch" action="destructive" weight="primary">
-                        Stop Process
-                    </cdx-button>
-                </div>
-            </div>
-        </div>
-        `;
-    }
-
-    searchFiles(self) {
-        self.isSearching = true;
-        self.file_service.executeFileSearch(self)
-    }
-
-    stopSearch(self) {
-        self.isSearching = false;
-        self.shouldStopSearch = true;
-        // Implement logic to stop ongoing search if possible
-    }
-
-}
-
 // === vite/src/ui/components/CategoryInputs.js ===
 /**
  * Category inputs UI component using Codex CSS-only classes.
@@ -841,6 +781,417 @@ class ProgressBar {
     }
 }
 
+// === vite/src/ui/helpers/ValidationHelper.js ===
+/**
+ * Validation Helper
+ *
+ * @description
+ * Shared validation logic for BatchManager handlers.
+ * Provides common validation functions used by PreviewHandler and ExecuteHandler.
+ *
+ * @requires Validator - For checking circular category references
+ */
+
+
+
+class ValidationHelper {
+    /**
+     * @param {BatchManager} ui - The main UI instance
+     */
+    constructor(ui) {
+        this.ui = ui;
+    }
+
+    /**
+     * Get and validate selected files
+     * @returns {Array|null} Array of selected files, or null if validation fails
+     */
+    getSelectedFiles() {
+        const selectedFiles = this.ui.getSelectedFiles();
+        console.log('[CBM-V] Selected files:', selectedFiles);
+        if (selectedFiles.length === 0) {
+            console.log('[CBM-V] No files selected');
+            this.ui.showMessage('No files selected.', 'warning');
+            return null;
+        }
+        return selectedFiles;
+    }
+
+    /**
+     * Parse and validate category inputs
+     * @returns {Object|null} Object with toAdd and toRemove arrays, or null if validation fails
+     */
+    parseCategoryInputs() {
+        const toAdd = this.ui.parseCategories(
+            document.getElementById('cbm-add-cats').value
+        );
+        const toRemove = this.ui.parseCategories(
+            document.getElementById('cbm-remove-cats').value
+        );
+        console.log('[CBM-V] Categories to add:', toAdd);
+        console.log('[CBM-V] Categories to remove:', toRemove);
+
+        if (toAdd.length === 0 && toRemove.length === 0) {
+            console.log('[CBM-V] No categories specified');
+            this.ui.showMessage('Please specify categories to add or remove.', 'warning');
+            return null;
+        }
+
+        return { toAdd, toRemove };
+    }
+
+    /**
+     * Check for circular category references and filter them out silently
+     * Only shows error if ALL categories are circular
+     * @param {Array<string>} categoriesToAdd - Categories to check for circular references
+     * @returns {Array<string>|null} Filtered categories, or null if all are circular
+     */
+    filterCircularCategories(categoriesToAdd) {
+        const sourceCategory = this.ui.state.sourceCategory;
+        const circularCategories = [];
+        const validCategories = [];
+
+        for (const category of categoriesToAdd) {
+            if (Validator.isCircularCategory(sourceCategory, category)) {
+                console.log('[CBM-V] Circular category detected (silently removed):', category);
+                circularCategories.push(category);
+            } else {
+                validCategories.push(category);
+            }
+        }
+
+        // If all categories are circular, show error
+        if (circularCategories.length > 0 && validCategories.length === 0) {
+            this.ui.showMessage(
+                `❌ Cannot add: all categorie(s) are circular references to the current page. Cannot add "${circularCategories.join(', ')}" to itself.`,
+                'error'
+            );
+            return null;
+        }
+
+        // Silently filter circular categories if there are valid ones
+        return validCategories;
+    }
+
+    /**
+     * Perform all validation steps before a batch operation
+     * @returns {Object|null} Object with selectedFiles, toAdd, toRemove, or null if validation fails
+     */
+    validateBatchOperation() {
+        const selectedFiles = this.getSelectedFiles();
+        if (!selectedFiles) return null;
+
+        const categoryInputs = this.parseCategoryInputs();
+        if (!categoryInputs) return null;
+
+        // Filter out circular categories (returns null if ALL are circular)
+        const filteredToAdd = this.filterCircularCategories(categoryInputs.toAdd);
+        if (filteredToAdd === null) return null; // All categories were circular
+
+        // Check if there are any valid operations remaining
+        if (filteredToAdd.length === 0 && categoryInputs.toRemove.length === 0) {
+            console.log('[CBM-V] No valid categories after filtering');
+            this.ui.showMessage('No valid categories to add or remove.', 'warning');
+            return null;
+        }
+
+        return {
+            selectedFiles,
+            toAdd: filteredToAdd,
+            toRemove: categoryInputs.toRemove
+        };
+    }
+}
+
+// === vite/src/ui/handlers/ExecuteHandler.js ===
+/**
+ * Search panel UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
+ * @class ExecuteHandler
+ */
+class ExecuteHandler {
+    /**
+     */
+    constructor() {
+    }
+
+    /**
+     * Create the search panel HTML element with Codex components.
+     */
+    createElement() {
+        return `
+            <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary">
+                GO
+            </cdx-button>
+            <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary">
+                Stop Process
+            </cdx-button>
+        `;
+    }
+
+    // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
+    // Execute batch operation
+    executeOperation(self) {
+        const selectedCount = self.selectedCount;
+
+        if (selectedCount === 0) {
+            self.showWarningMessage('Please select at least one file.');
+            return;
+        }
+
+        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+            self.showWarningMessage('Please specify categories to add or remove.');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to process ${selectedCount} file(s)?`)) {
+            return;
+        }
+
+        self.isProcessing = true;
+        self.shouldStopProgress = false;
+        self.showProgress = true;
+
+        // Placeholder - implement actual batch processing
+        const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
+        self.processBatch(selectedFilesToProcess, 0);
+    }
+
+    // Process files sequentially
+    processBatch(self, files, index) {
+        if (self.shouldStopProgress || index >= files.length) {
+            self.isProcessing = false;
+            self.showProgress = false;
+            if (!self.shouldStopProgress) {
+                self.showSuccessMessage('Batch operation completed successfully!');
+            } else {
+                self.showWarningMessage('Operation stopped by user.');
+            }
+            return;
+        }
+
+        self.progressPercent = ((index + 1) / files.length) * 100;
+        self.progressText = `Processing ${index + 1} of ${files.length}...`;
+
+        // Placeholder - implement actual file processing
+        setTimeout(() => {
+            console.log('Processing:', files[index].title);
+            self.processBatch(files, index + 1);
+        }, 500);
+    }
+
+    // Stop ongoing operation
+    stopOperation(self) {
+        self.shouldStopProgress = true;
+    }
+
+}
+
+// === vite/src/ui/handlers/PreviewHandler.js ===
+/**
+ * Preview Handler
+ *
+ * @description
+ * Handles all preview-related functionality for BatchManager.
+ * Manages preview generation, modal display, and validation.
+ *
+ * @requires ValidationHelper - For common validation logic
+ */
+
+
+
+class PreviewHandler {
+    /**
+     * @param {BatchManager} ui - The main UI instance
+     */
+    constructor(ui) {
+        this.ui = ui;
+        this.validator = new ValidationHelper(ui);
+    }
+    createElement() {
+        return `
+        <cdx-button @click="previewTheChanges" action="default" weight="normal"
+            :disabled="isProcessing">
+            Preview Changes
+        </cdx-button>
+    `;
+    }
+    // Preview changes before executing
+    previewTheChanges(self) {
+        const selectedCount = self.selectedCount;
+
+        if (selectedCount === 0) {
+            self.showWarningMessage('Please select at least one file.');
+            return;
+        }
+
+        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+            self.showWarningMessage('Please specify categories to add or remove.');
+            return;
+        }
+
+        // Placeholder - implement preview logic
+        let previewMessage = `Preview for ${selectedCount} file(s):\n`;
+        if (self.addCategories.length > 0) {
+            previewMessage += `\nAdding: ${self.addCategories.join(', ')}`;
+        }
+        if (self.removeCategories.length > 0) {
+            previewMessage += `\nRemoving: ${self.removeCategories.join(', ')}`;
+        }
+
+        // should be replaced by showPreviewModal
+        alert(previewMessage);
+    }
+    /**
+     * Handle preview button click
+     * Generates and displays a preview of category changes
+     */
+    async handlePreview() {
+        console.log('[CBM-P] Preview button clicked');
+
+        // Use ValidationHelper for common validation
+        const validation = this.validator.validateBatchOperation();
+        if (!validation) return;
+
+        const { selectedFiles, toAdd, toRemove } = validation;
+
+        // Generate preview without affecting file list - no loading indicator
+        try {
+            console.log('[CBM-P] Calling batchProcessor.previewChanges');
+            const preview = await this.ui.batchProcessor.previewChanges(
+                selectedFiles,
+                toAdd,
+                toRemove
+            );
+            console.log('[CBM-P] Preview result:', preview);
+            this.showPreviewModal(preview);
+
+        } catch (error) {
+            console.log('[CBM-P] Error in previewChanges:', error);
+            // Check if error is about duplicate categories
+            if (error.message.includes('already exist')) {
+                this.ui.showMessage(`⚠️ ${error.message}`, 'warning');
+            } else {
+                this.ui.showMessage(`Error generating preview: ${error.message}`, 'error');
+            }
+        }
+    }
+
+    /**
+     * Show the preview modal with changes
+     * @param {Array} preview - Array of preview items
+     */
+    showPreviewModal(preview) {
+        const modal = document.getElementById('cbm-preview-modal');
+        const content = document.getElementById('cbm-preview-content');
+        if (!modal) {
+            console.error('[CBM] Preview modal container not found');
+            return;
+        }
+        if (!content) {
+            console.error('[CBM] Preview content container not found');
+            return;
+        }
+        let html = '<table class="cbm-preview-table">';
+        html += '<tr><th>File</th><th>Current Categories</th><th>New Categories</th></tr>';
+
+        preview.forEach(item => {
+            if (item.willChange) {
+                html += `
+          <tr>
+            <td>${item.file}</td>
+            <td>${item.currentCategories.join('<br>')}</td>
+            <td>${item.newCategories.join('<br>')}</td>
+          </tr>
+        `;
+            }
+        });
+
+        html += '</table>';
+
+        const changesCount = preview.filter(p => p.willChange).length;
+
+        if (changesCount === 0) {
+            console.log('[CBM] No changes detected');
+            this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
+            return;
+        }
+
+        html = `<p>${changesCount} files will be modified</p>` + html;
+
+        content.innerHTML = html;
+        modal.classList.remove('hidden');
+    }
+
+    /**
+     * Hide the preview modal
+     */
+    hidePreviewModal() {
+        const modal = document.getElementById('cbm-preview-modal');
+        modal.classList.add('hidden');
+    }
+}
+
+// === vite/src/ui/handlers/SearchHandler.js ===
+/**
+ * Search panel UI component using Codex CSS-only classes.
+ * @see https://doc.wikimedia.org/codex/latest/
+ * @class SearchHandler
+ */
+class SearchHandler {
+    /**
+     */
+    constructor() {
+    }
+
+    /**
+     * Create the search panel HTML element with Codex components.
+     */
+    createElement() {
+        return `
+        <div class="cbm-search-panel">
+            <div class="cbm-input-group">
+                <cdx-label input-id="cbm-source-category" class="cbm-label">
+                    Source Category
+                </cdx-label>
+                <cdx-text-input id="cbm-source-category" v-model="sourceCategory"
+                    placeholder="Category:Our World in Data graphs of Austria" />
+            </div>
+
+            <div class="cbm-input-group">
+                <cdx-label input-id="cbm-pattern" class="cbm-label">
+                    Search Pattern
+                </cdx-label>
+                <span class="cbm-help-text">
+                    Enter a pattern to filter files (e.g., ,BLR.svg)
+                </span>
+                <div class="cbm-input-button-group">
+                    <cdx-text-input id="cbm-pattern" v-model="searchPattern" placeholder="e.g., ,BLR.svg" />
+                    <cdx-button v-if="!isSearching" @click="searchFiles" action="progressive" weight="primary">
+                        Search
+                    </cdx-button>
+                    <cdx-button v-if="isSearching" @click="stopSearch" action="destructive" weight="primary">
+                        Stop Process
+                    </cdx-button>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    searchFiles(self) {
+        self.isSearching = true;
+        self.file_service.executeFileSearch(self)
+    }
+
+    stopSearch(self) {
+        self.isSearching = false;
+        self.shouldStopSearch = true;
+        // Implement logic to stop ongoing search if possible
+    }
+
+}
+
 // === vite/src/BatchManager.js ===
 /**
  * Creates the Vue app definition for the Category Batch Manager tool.
@@ -851,16 +1202,20 @@ class ProgressBar {
 
 function BatchManager(api) {
     const mwApi = new APIService();
-    const search_panel = new SearchPanel();
+    const search_handler = new SearchHandler();
     const category_inputs = new CategoryInputs(mwApi);
     const files_list = new FilesList(mwApi);
     const progress_section = new ProgressBar();
     const file_service = new FileService(mwApi);
+    const execute_handler = new ExecuteHandler(mwApi);
+    const preview_handler = new PreviewHandler();
 
-    const Search_SectionHtml = search_panel.createElement();
+    const Search_SectionHtml = search_handler.createElement();
     const CategoryInputPanelHtml = category_inputs.createElement();
     const FilesListHtml = files_list.createElement();
     const ProgressSectionHtml = progress_section.createElement();
+    const ExecuteSectionHtml = execute_handler.createElement();
+    const PreviewChangesHtml = preview_handler.createElement();
 
     const template = `
         <div class="cbm-container">
@@ -896,16 +1251,8 @@ function BatchManager(api) {
                     </div>
 
                     <div class="cbm-button-group">
-                        <cdx-button @click="previewChanges" action="default" weight="normal"
-                            :disabled="isProcessing">
-                            Preview Changes
-                        </cdx-button>
-                        <cdx-button v-if="!isProcessing" @click="executeOperation" action="progressive" weight="primary">
-                            GO
-                        </cdx-button>
-                        <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary">
-                            Stop Process
-                        </cdx-button>
+                        ${PreviewChangesHtml}
+                        ${ExecuteSectionHtml}
                     </div>
                 </div>
                 <!-- Progress Section -->
@@ -931,7 +1278,7 @@ function BatchManager(api) {
     const app = {
         data: function () {
             return {
-                search_panel: search_panel,
+                search_handler: search_handler,
                 file_service: file_service,
                 mwApi: mwApi, // Reference to API service instance
                 files_list: files_list, // Reference to FilesList component instance
@@ -996,10 +1343,10 @@ function BatchManager(api) {
             */
 
             searchFiles: function () {
-                return this.search_panel.searchFiles(this);
+                return this.search_handler.searchFiles(this);
             },
             stopSearch: function () {
-                return this.search_panel.stopSearch(this);
+                return this.search_handler.stopSearch(this);
             },
 
             /* *************************
@@ -1035,29 +1382,8 @@ function BatchManager(api) {
 
             // should be moved to `class BatchProcessor` at `src/services/BatchProcessor.js`
             // Preview changes before executing
-            previewChanges: function () {
-                const selectedCount = this.selectedCount;
-
-                if (selectedCount === 0) {
-                    this.showWarningMessage('Please select at least one file.');
-                    return;
-                }
-
-                if (this.addCategories.length === 0 && this.removeCategories.length === 0) {
-                    this.showWarningMessage('Please specify categories to add or remove.');
-                    return;
-                }
-
-                // Placeholder - implement preview logic
-                let previewMessage = `Preview for ${selectedCount} file(s):\n`;
-                if (this.addCategories.length > 0) {
-                    previewMessage += `\nAdding: ${this.addCategories.join(', ')}`;
-                }
-                if (this.removeCategories.length > 0) {
-                    previewMessage += `\nRemoving: ${this.removeCategories.join(', ')}`;
-                }
-
-                alert(previewMessage);
+            previewTheChanges: function () {
+                return this.preview_handler.previewTheChanges(this);
             },
 
             /* *************************
@@ -1065,60 +1391,19 @@ function BatchManager(api) {
             ** *************************
             */
 
-            // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
             // Execute batch operation
             executeOperation: function () {
-                const selectedCount = this.selectedCount;
-
-                if (selectedCount === 0) {
-                    this.showWarningMessage('Please select at least one file.');
-                    return;
-                }
-
-                if (this.addCategories.length === 0 && this.removeCategories.length === 0) {
-                    this.showWarningMessage('Please specify categories to add or remove.');
-                    return;
-                }
-
-                if (!confirm(`Are you sure you want to process ${selectedCount} file(s)?`)) {
-                    return;
-                }
-
-                this.isProcessing = true;
-                this.shouldStopProgress = false;
-                this.showProgress = true;
-
-                // Placeholder - implement actual batch processing
-                const selectedFilesToProcess = this.selectedFiles.filter(f => f.selected);
-                this.processBatch(selectedFilesToProcess, 0);
+                return this.execute_handler.executeOperation(this);
             },
 
             // Process files sequentially
             processBatch: function (files, index) {
-                if (this.shouldStopProgress || index >= files.length) {
-                    this.isProcessing = false;
-                    this.showProgress = false;
-                    if (!this.shouldStopProgress) {
-                        this.showSuccessMessage('Batch operation completed successfully!');
-                    } else {
-                        this.showWarningMessage('Operation stopped by user.');
-                    }
-                    return;
-                }
-
-                this.progressPercent = ((index + 1) / files.length) * 100;
-                this.progressText = `Processing ${index + 1} of ${files.length}...`;
-
-                // Placeholder - implement actual file processing
-                setTimeout(() => {
-                    console.log('Processing:', files[index].title);
-                    this.processBatch(files, index + 1);
-                }, 500);
+                return this.execute_handler.processBatch(this, files, index);
             },
 
             // Stop ongoing operation
             stopOperation: function () {
-                this.shouldStopProgress = true;
+                return this.execute_handler.stopOperation(this);
             },
 
             /* *************************

@@ -83,11 +83,14 @@ function BatchManager(api) {
     const app = {
         data: function () {
             return {
+                execute_handler: execute_handler,
+                preview_handler: preview_handler,
                 search_handler: search_handler,
                 file_service: file_service,
+                category_inputs: category_inputs,
+                files_list: files_list,
+
                 mwApi: mwApi, // Reference to API service instance
-                files_list: files_list, // Reference to FilesList component instance
-                category_inputs: category_inputs, // Reference to CategoryInputs component instance
                 sourceCategory: 'Category:Our World in Data graphs of Austria',
                 searchPattern: '1990',
                 addCategories: [],

@@ -160,7 +160,7 @@ class APIService {
             });
         } else {
             return [];
-        };
+        }
     }
 
     /**

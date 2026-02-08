@@ -8,6 +8,8 @@ const path = require('path');
 
 // File order according to dependency requirements
 const SOURCE_FILES = [
+    'vue-src/services/APIService.js',
+    // 'vue-src/services/CategoryService.js',
     'vue-src/ui/components/SearchPanel.js',
     'vue-src/ui/components/CategoryInputs.js',
     'vue-src/ui/components/FilesList.js',

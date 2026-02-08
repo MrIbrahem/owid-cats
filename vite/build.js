@@ -8,14 +8,14 @@ const path = require('path');
 
 // File order according to dependency requirements
 const SOURCE_FILES = [
-    'vue-src/services/APIService.js',
-    // 'vue-src/services/CategoryService.js',
-    'vue-src/ui/components/SearchPanel.js',
-    'vue-src/ui/components/CategoryInputs.js',
-    'vue-src/ui/components/FilesList.js',
-    'vue-src/ui/components/ProgressSection.js',
-    'vue-src/createCategoryBatchManager.js',
-    'vue-src/main.js',
+    'vite/src/services/APIService.js',
+    // 'vite/src/services/CategoryService.js',
+    'vite/src/ui/components/SearchPanel.js',
+    'vite/src/ui/components/CategoryInputs.js',
+    'vite/src/ui/components/FilesList.js',
+    'vite/src/ui/components/ProgressSection.js',
+    'vite/src/createCategoryBatchManager.js',
+    'vite/src/main.js',
 ];
 
 const DIST_DIR = 'dist';
@@ -69,7 +69,7 @@ function processFile(filePath) {
     content = stripGlobalComments(content);
 
     // For main.js, we need to wrap it differently since it's the entry point
-    if (filePath === 'vue-src/main.js') {
+    if (filePath === 'vite/src/main.js') {
         // Remove the outer wrapper
         content = content.replace(/\/\/ <nowiki>\n\nif \(typeof categoryBatchManager === 'undefined'\) \{\s*var categoryBatchManager = \{\};\s*\}\n\n/m, '');
         content = content.replace(/\n\n\/\/ <\/nowiki>\n$/, '');

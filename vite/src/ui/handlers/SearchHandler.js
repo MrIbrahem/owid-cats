@@ -36,7 +36,7 @@ class SearchHandler {
                         Search
                     </cdx-button>
                     <cdx-button v-if="isSearching" @click="stopSearch" action="destructive" weight="primary">
-                        Stop Process
+                        Stop Search
                     </cdx-button>
                 </div>
             </div>
@@ -44,9 +44,28 @@ class SearchHandler {
         `;
     }
 
-    searchFiles(self) {
+    async searchFiles(self) {
         self.isSearching = true;
-        self.file_service.executeFileSearch(self)
+        self.resetMessageState();
+
+        if (self.sourceCategory.trim() === '') {
+            self.showWarningMessage('Please enter a source category.');
+            return;
+        }
+
+        const searchResults_demo = [
+            { title: 'File:GDP-per-capita,BLR.svg', selected: false },
+            { title: 'File:Life-expectancy,BLR.svg', selected: false }
+        ];
+
+        self.showProgress = true;
+        self.progressText = 'Searching for files...';
+
+        self.searchResults = await self.file_service.searchFiles(self.sourceCategory, self.searchPattern);
+        self.selectedFiles = [...self.searchResults];
+        self.showProgress = false;
+        self.showResultsMessage = true;
+        self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
 
     stopSearch(self) {

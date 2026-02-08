@@ -20,7 +20,8 @@
 ## UI/handlers
 - [ ] ExecuteHandler
 - [ ] PreviewHandler
-- [ ] SearchHandler
+- [x] SearchHandler
+- [ ] SearchHandler/stopSearch
 
 ## UI BatchManager
 - [x] Source Category

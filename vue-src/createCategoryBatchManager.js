@@ -95,7 +95,7 @@ function createCategoryBatchManager(api) {
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
-                selectedFiles: this.selectedFiles, // Bind to FilesList component's selectedFiles
+                selectedFiles: [], // Bind to FilesList component's selectedFiles
                 showMessage: false,
                 messageType: '',
                 messageContent: '',

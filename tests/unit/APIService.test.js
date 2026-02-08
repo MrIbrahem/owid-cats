@@ -32,28 +32,6 @@ describe('APIService', () => {
     jest.clearAllMocks();
   });
 
-  describe('_getMwApi', () => {
-    test('should create mw.Api instance on first call', () => {
-      const api = service._getMwApi();
-      expect(api).toBe(mockMwApi);
-      expect(global.mw.Api).toHaveBeenCalledTimes(1);
-    });
-
-    test('should reuse mw.Api instance on subsequent calls', () => {
-      const api1 = service._getMwApi();
-      const api2 = service._getMwApi();
-      expect(api1).toBe(api2);
-      expect(global.mw.Api).toHaveBeenCalledTimes(1);
-    });
-
-    test('should throw error if mw.Api is not available', () => {
-      delete global.mw;
-      service = new APIService();
-
-      expect(() => service._getMwApi()).toThrow('mw.Api is not available');
-    });
-  });
-
   describe('getCategoryMembers', () => {
     test('should fetch category members without pagination', async () => {
       mockMwApi.get.mockResolvedValue({

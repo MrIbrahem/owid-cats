@@ -1,8 +1,5 @@
-// Mock global Logger before requiring APIService
-global.Logger = {
-  error: jest.fn(),
-  log: jest.fn()
-};
+// Mock console before requiring APIService
+const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
 const APIService = require('../../src/services/APIService');
 
@@ -30,6 +27,7 @@ describe('APIService', () => {
   afterEach(() => {
     delete global.mw;
     jest.clearAllMocks();
+    mockConsoleError.mockRestore();
   });
 
   describe('getCategoryMembers', () => {
@@ -431,7 +429,7 @@ describe('APIService', () => {
       const result = await service.searchCategories('Test');
 
       expect(result).toEqual([]);
-      expect(global.Logger.error).toHaveBeenCalledWith(
+      expect(console.error).toHaveBeenCalledWith(
         'Failed to search categories',
         expect.any(Error)
       );

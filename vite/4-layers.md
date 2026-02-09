@@ -80,7 +80,7 @@ class CategoryInputs {
     async onAddCategoryInput(self, value) {
         this.hideCategoryMessage(self, 'add');
         const data = await this.apiService.fetchCategories(value);
-        self.addCategoryMenuItems = data;
+        self.addCategory.menuItems = data;
     }
 }
 

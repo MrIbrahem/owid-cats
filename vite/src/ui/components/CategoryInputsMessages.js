@@ -13,13 +13,13 @@ class CategoryInputsMessages {
     createAddElement() {
         return `
             <!-- Category Add Message -->
-            <div v-if="showAddCategoryMessage" class="margin-bottom-20">
+            <div v-if="addCategory.message.show" class="margin-bottom-20">
                 <cdx-message
                 allow-user-dismiss
-                :type="addCategoryMessageType"
+                :type="addCategory.message.type"
                 :inline="false"
                 >
-                    {{ addCategoryMessageText }}
+                    {{ addCategory.message.text }}
                 </cdx-message>
             </div>
         `;
@@ -28,12 +28,12 @@ class CategoryInputsMessages {
     createRemoveElement() {
         return `
             <!-- Category Remove Message -->
-            <div v-if="showRemoveCategoryMessage" class="margin-bottom-20">
+            <div v-if="removeCategory.message.show" class="margin-bottom-20">
                 <cdx-message
                 allow-user-dismiss
-                :type="removeCategoryMessageType"
+                :type="removeCategory.message.type"
                 :inline="false">
-                    {{ removeCategoryMessageText }}
+                    {{ removeCategory.message.text }}
                 </cdx-message>
             </div>
     `;
@@ -42,24 +42,24 @@ class CategoryInputsMessages {
     displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
         console.log(`[CBM] Displaying ${msg_type} category message: ${text} (type: ${type})`);
         if (msg_type === 'add') {
-            self.showAddCategoryMessage = true;
-            self.addCategoryMessageType = type;
-            self.addCategoryMessageText = text;
+            self.addCategory.message.show = true;
+            self.addCategory.message.type = type;
+            self.addCategory.message.text = text;
         } else if (msg_type === 'remove') {
-            self.showRemoveCategoryMessage = true;
-            self.removeCategoryMessageType = type;
-            self.removeCategoryMessageText = text;
+            self.removeCategory.message.show = true;
+            self.removeCategory.message.type = type;
+            self.removeCategory.message.text = text;
         }
     }
 
     hideCategoryMessage(self, msg_type = 'add') {
         console.log(`[CBM] Hiding ${msg_type} category message`);
         if (msg_type === 'add') {
-            self.showAddCategoryMessage = false;
-            self.addCategoryMessageText = '';
+            self.addCategory.message.show = false;
+            self.addCategory.message.text = '';
         } else if (msg_type === 'remove') {
-            self.showRemoveCategoryMessage = false;
-            self.removeCategoryMessageText = '';
+            self.removeCategory.message.show = false;
+            self.removeCategory.message.text = '';
         }
     }
 

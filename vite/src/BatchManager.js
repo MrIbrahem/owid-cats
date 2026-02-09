@@ -153,36 +153,6 @@ function BatchManager() {
                         text: "",
                     },
                 },
-                // CategoryInputsMessages state
-                showAddCategoryMessage: false,
-                addCategoryMessageType: '',
-                addCategoryMessageText: '',
-
-                showRemoveCategoryMessage: false,
-                removeCategoryMessageType: '',
-                removeCategoryMessageText: '',
-
-                // CategoryInputs state
-                addCategoryChips: [],
-                removeCategoryChips: [],
-
-                addInputValue: '',
-                removeInputValue: '',
-
-                addCategories: [],
-                removeCategories: [],
-
-                addCategoryMenuItems: [],
-                removeCategoryMenuItems: [],
-
-                addCategoryMenuConfig: {
-                    boldLabel: true,
-                    visibleItemLimit: 10
-                },
-                removeCategoryMenuConfig: {
-                    boldLabel: true,
-                    visibleItemLimit: 10
-                },
             };
             return app_data;
         },

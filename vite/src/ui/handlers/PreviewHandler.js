@@ -96,6 +96,8 @@ class PreviewHandler {
         // Filter out circular categories (returns null if ALL are circular)
         const filteredToAdd = this.validator.filterCircularCategories(self);
 
+        if (filteredToAdd === null) return null; // All categories were circular
+
         // Check if there are any valid operations remaining
         if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');

@@ -311,14 +311,15 @@ class BatchManager {
         const listContainer = document.getElementById('cbm-file-list');
         if (listContainer) {
             listContainer.innerHTML = `
-        <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar"
-             aria-label="Loading">
-          <div class="cdx-progress-bar__bar"></div>
-        </div>`;
+                <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar"
+                    aria-label="Loading">
+                <div class="cdx-progress-bar__bar"></div>
+                </div>`;
         }
     }
 
     /**
+     * TODO: use cdx-dialog for this instead of OO.ui.confirm, to avoid mixing UI frameworks and get better styling control
      * Show a confirmation dialog using MediaWiki's OO.ui.confirm
      * @param {string} message - Dialog message
      * @param {Object} options - Dialog options
@@ -328,12 +329,6 @@ class BatchManager {
         const title = options.title || 'Confirm';
 
         return new Promise((resolve) => {
-            if (typeof OO === 'undefined' || !OO.ui || !OO.ui.confirm) {
-                // Fallback to native confirm if OO.ui is not available
-                resolve(confirm(message));
-                return;
-            }
-
             OO.ui.confirm(message, {
                 title: title,
                 actions: [

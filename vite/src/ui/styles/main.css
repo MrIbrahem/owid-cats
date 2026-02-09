@@ -1,6 +1,7 @@
 .cbm-preview-dialog .cdx-dialog__surface {
     width: 90vw;
 }
+
 /* Container styles */
 .cbm-container {
     max-width: 1200px;
@@ -38,7 +39,8 @@
 
 /* Selected files info box */
 .cbm-selected-info {
-    margin-bottom: 15px;
+    margin-top: 15px;
+    border-top: 1px solid #c8ccd1;
     padding: 10px;
     background-color: #eaecf0;
     border-radius: 4px;

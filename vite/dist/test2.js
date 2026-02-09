@@ -1690,6 +1690,10 @@ class SearchHandler {
 
     async searchFiles(self) {
         self.isSearching = true;
+        // Clear all files and messages from previous search
+        self.selectedFiles = [];
+        self.previewRows = [];
+        self.searchResults = [];
         self.resetMessageState();
 
         if (self.sourceCategory.trim() === '') {
@@ -1835,9 +1839,6 @@ function BatchManager() {
                 <!-- Search Section -->
                 ${Search_SectionHtml}
 
-                <!-- Progress Section -->
-                ${ProgressSectionHtml}
-
                 <!-- Actions Section -->
                 <div>
                     ${CategoryInputPanelHtml}
@@ -1859,6 +1860,9 @@ function BatchManager() {
             <!-- Right Panel: File List -->
             <div>
                 ${FilesListHtml}
+
+                <!-- Progress Section -->
+                ${ProgressSectionHtml}
             </div>
         </div>
     </div>

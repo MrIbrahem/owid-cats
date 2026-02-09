@@ -33,9 +33,6 @@ function BatchManager() {
                 <!-- Search Section -->
                 ${Search_SectionHtml}
 
-                <!-- Progress Section -->
-                ${ProgressSectionHtml}
-
                 <!-- Actions Section -->
                 <div>
                     ${CategoryInputPanelHtml}
@@ -57,6 +54,9 @@ function BatchManager() {
             <!-- Right Panel: File List -->
             <div>
                 ${FilesListHtml}
+
+                <!-- Progress Section -->
+                ${ProgressSectionHtml}
             </div>
         </div>
     </div>

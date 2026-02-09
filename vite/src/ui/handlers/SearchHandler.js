@@ -52,6 +52,10 @@ class SearchHandler {
 
     async searchFiles(self) {
         self.isSearching = true;
+        // Clear all files and messages from previous search
+        self.selectedFiles = [];
+        self.previewRows = [];
+        self.searchResults = [];
         self.resetMessageState();
 
         if (self.sourceCategory.trim() === '') {

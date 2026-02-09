@@ -78,7 +78,7 @@ function BatchManager() {
 
     const app = {
         data: function () {
-            return {
+            const app_data = {
                 execute_handler: execute_handler,
                 preview_handler: preview_handler,
                 search_handler: search_handler,
@@ -152,6 +152,7 @@ function BatchManager() {
                 },
 
             };
+            return app_data;
         },
         computed: {
             selectedCount: function () {

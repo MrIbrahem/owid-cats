@@ -575,9 +575,9 @@ class BatchOperationService {
     <div class="cbm-container">
         <h2 class="cbm-title">Category Batch Manager</h2>
 
-        <div class="cbm-grid">
+        <div class="cbm-main-layout">
             <!-- Left Panel -->
-            <div>
+            <div class="cbm-left-panel">
                 <SearchPanel
                     v-model:source-category="store.sourceCategory"
                     v-model:search-pattern="store.searchPattern"
@@ -607,7 +607,7 @@ class BatchOperationService {
             </div>
 
             <!-- Right Panel -->
-            <div>
+            <div class="cbm-right-panel">
                 <FilesList
                     v-model="store.selectedFiles"
                 />

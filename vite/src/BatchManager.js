@@ -27,9 +27,9 @@ function BatchManager() {
                 Category Batch Manager
             </h2>
 
-            <div class="cbm-grid">
+            <div class="cbm-main-layout">
                 <!-- Left Panel: Search and Actions -->
-                <div>
+                <div class="cbm-left-panel">
                     <!-- Search Section -->
                     ${Search_SectionHtml}
 
@@ -52,7 +52,7 @@ function BatchManager() {
                 </div>
 
                 <!-- Right Panel: File List -->
-                <div>
+                <div class="cbm-right-panel">
                     ${FilesListHtml}
 
                     <!-- Progress Section -->

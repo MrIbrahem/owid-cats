@@ -38,7 +38,7 @@ class PreviewHandler {
             <p v-else>
                 No changes detected. Please adjust your categories to add/remove and preview again.
             </p>
-            <table v-if="previewRows.length > 0" class="cbm-preview-table">
+            <table class="cbm-preview-table">
                 <thead>
                     <tr>
                         <th>File</th>
@@ -49,7 +49,7 @@ class PreviewHandler {
                 </thead>
 
                 <tbody>
-                    <tr v-for="(row, index) in previewRows" :key="index">
+                    <tr v-if="previewRows.length > 0" v-for="(row, index) in previewRows" :key="index">
                         <td>{{ row.file }}</td>
 
                         <td>

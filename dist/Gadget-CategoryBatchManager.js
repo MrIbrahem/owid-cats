@@ -2317,7 +2317,7 @@ class BatchManager {
                 </div>
             </div>
             <div id="cbm-preview-modal" class="cbm-modal hidden">
-                <div class="cbm-modal-content">
+                <div class="cbm-preview-dialog">
                     <h3>Preview Changes</h3>
                     <div id="cbm-preview-content"></div>
                     <button id="cbm-preview-close"

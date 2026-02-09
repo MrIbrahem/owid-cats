@@ -1,5 +1,7 @@
-.cbm-preview-dialog .cdx-dialog__surface {
+.cbm-preview-dialog {
     width: 90vw;
+    max-width: 90%;
+    max-height: 80vh;
 }
 
 /* Container styles */
@@ -23,11 +25,30 @@
     padding-bottom: 10px;
 }
 
-/* Grid layout */
-.cbm-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+/* ── Main Layout: Two Column ── */
+.cbm-main-layout {
+    display: flex;
     gap: 20px;
+    height: 100%;
+}
+
+.cbm-left-panel {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.cbm-right-panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eaecf0;
+    border-radius: 2px;
+    background: #f8f9fa;
 }
 
 /* Label styles */

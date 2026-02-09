@@ -26,19 +26,25 @@ class PreviewHandler {
             v-model:open="openPreviewHandler"
             class="cbm-preview-dialog"
             title="Preview Changes"
-            subtitle="{{ changesCount }} files will be modified"
             :use-close-button="true"
             :primary-action="primaryAction"
             :default-action="defaultAction"
             @primary="onPrimaryAction"
             @default="openPreviewHandler = false"
         >
+            <p v-if="changesCount > 0">
+                {{ changesCount }} file(s) will be updated. Review the changes below before saving.
+            </p>
+            <p v-else>
+                No changes detected. Please adjust your categories to add/remove and preview again.
+            </p>
             <table v-if="previewRows.length > 0" class="cbm-preview-table">
                 <thead>
                     <tr>
                         <th>File</th>
                         <th>Current Categories</th>
                         <th>New Categories</th>
+                        <th>Diff</th>
                     </tr>
                 </thead>
 
@@ -56,6 +62,9 @@ class PreviewHandler {
                             <div v-for="(cat, i) in row.newCategories" :key="i">
                                 {{ cat }}
                             </div>
+                        </td>
+                        <td>
+                            {{ row.diff }}
                         </td>
                     </tr>
                 </tbody>
@@ -127,18 +136,19 @@ class PreviewHandler {
             .map(item => ({
                 file: item.file,
                 currentCategories: [...item.currentCategories],
-                newCategories: [...item.newCategories]
+                newCategories: [...item.newCategories],
+                diff: item.currentCategories.length - item.newCategories.length
             }));
-
-        self.openPreviewHandler = true;
 
         self.changesCount = preview.filter(p => p.willChange).length;
 
         if (self.changesCount === 0) {
             console.log('[CBM] No changes detected');
-            self.displayCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice', 'add');
-            return;
+            self.displayCategoryMessage('ℹ️ No changes detected.', 'notice', 'add');
+            // return;
         }
+        self.openPreviewHandler = true;
+
     }
     /**
      * Check if a category exists in a list (with normalization)

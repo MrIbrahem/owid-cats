@@ -86,6 +86,7 @@ class CategoryInputs {
     `;
     }
     displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
+        console.log(`[CBM] Displaying ${msg_type} category message: ${text} (type: ${type})`);
         if (msg_type === 'add') {
             self.showAddCategoryMessage = true;
             self.addCategoryMessageType = type;
@@ -98,6 +99,7 @@ class CategoryInputs {
     }
 
     hideCategoryMessage(self, msg_type = 'add') {
+        console.log(`[CBM] Hiding ${msg_type} category message`);
         if (msg_type === 'add') {
             self.showAddCategoryMessage = false;
             self.addCategoryMessageText = '';

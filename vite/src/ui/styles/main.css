@@ -64,7 +64,7 @@
     margin-top: 15px;
     border-top: 1px solid #c8ccd1;
     padding: 10px;
-    background-color: #eaecf0;
+    background-color: var(--background-color-neutral, #eaecf0);
     border-radius: 4px;
 }
 
@@ -125,7 +125,7 @@
 
 /* ==================== FilesList ==================== */
 .cbm-files-list {
-    background-color: #ffffff;
+    background-color: var(--background-color-base, #ffffff);
     padding: 20px;
     border-radius: 4px;
     border: 1px solid #c8ccd1;
@@ -190,7 +190,7 @@
 }
 
 .cbm-empty-state {
-    background-color: #ffffff;
+    background-color: var(--background-color-base, #ffffff);
     padding: 40px;
     border-radius: 4px;
     border: 1px solid #c8ccd1;
@@ -207,7 +207,7 @@
 .cbm-progress-section {
     margin-top: 20px;
     padding: 15px;
-    background-color: #ffffff;
+    background-color: var(--background-color-base, #ffffff);
     border: 1px solid #c8ccd1;
     border-radius: 4px;
 }
@@ -243,19 +243,7 @@
         background-color: #212529;
     }
 
-    html.skin-theme-clientpref-os .cbm-empty-state {
-        background-color: #212529;
-    }
-
-    html.skin-theme-clientpref-os .cbm-files-list {
-        background-color: #212529;
-    }
-
     html.skin-theme-clientpref-os .cbm-container {
-        background-color: #212529;
-    }
-
-    html.skin-theme-clientpref-os .cbm-selected-info {
         background-color: #212529;
     }
 }
@@ -265,19 +253,7 @@
         background-color: #212529;
     }
 
-    html.skin-theme-clientpref-night .cbm-empty-state {
-        background-color: #212529;
-    }
-
-    html.skin-theme-clientpref-night .cbm-files-list {
-        background-color: #212529;
-    }
-
     html.skin-theme-clientpref-night .cbm-container {
-        background-color: #212529;
-    }
-
-    html.skin-theme-clientpref-night .cbm-selected-info {
         background-color: #212529;
     }
 }

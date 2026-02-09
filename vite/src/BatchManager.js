@@ -123,6 +123,36 @@ function BatchManager() {
                 changesCount: '',
                 openPreviewHandler: false,
 
+                addCategory: {
+                    menuItems: [],
+                    menuConfig: {
+                        boldLabel: true,
+                        visibleItemLimit: 10
+                    },
+                    chips: [],
+                    selected: [],
+                    input: "",
+                    message: {
+                        show: false,
+                        type: "",
+                        text: "",
+                    },
+                },
+                removeCategory: {
+                    menuItems: [],
+                    menuConfig: {
+                        boldLabel: true,
+                        visibleItemLimit: 10
+                    },
+                    chips: [],
+                    selected: [],
+                    input: "",
+                    message: {
+                        show: false,
+                        type: "",
+                        text: "",
+                    },
+                },
                 // CategoryInputsMessages state
                 showAddCategoryMessage: false,
                 addCategoryMessageType: '',

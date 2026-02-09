@@ -62,13 +62,13 @@ class SearchHandler {
             { title: 'File:Life-expectancy,BLR.svg', selected: false }
         ];
 
-        self.showProgress = true;
-        self.progressText = 'Searching for files...';
+        self.showSearchProgress = true;
+        self.searchProgressText = 'Searching for files...';
 
         self.searchResults = await self.file_service.searchFiles(self.sourceCategory, self.searchPattern);
         // self.workFiles = [...self.searchResults];
         self.workFiles = self.searchResults;
-        self.showProgress = false;
+        self.showSearchProgress = false;
         self.isSearching = false;
     }
 

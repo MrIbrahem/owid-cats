@@ -15,14 +15,14 @@ class SearchProgressBar {
      */
     createElement() {
         return `
-        <div v-if="showProgress" class="cbm-progress-section">
+        <div v-if="showSearchProgress" class="cbm-progress-section">
             <div class="cbm-progress-bar-bg">
                 <div class="cbm-progress-bar-fill"
-                    :style="{ width: progressPercent + '%' }">
+                    :style="{ width: searchProgressPercent + '%' }">
                 </div>
             </div>
             <div class="cbm-progress-text">
-                {{ progressText }}
+                {{ searchProgressText }}
             </div>
         </div>
     `;

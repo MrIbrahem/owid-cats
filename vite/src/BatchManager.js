@@ -76,37 +76,51 @@ function BatchManager() {
                 file_service: file_service,
                 category_inputs: category_inputs,
                 files_list: files_list,
-
                 mwApi: mwApi, // Reference to API service instance
+
+                editSummary: 'Batch category update via Category Batch Manager',
+
+                // SearchHandler state
                 sourceCategory: 'Category:Our World in Data graphs of Austria',
                 searchPattern: '1990',
-                addCategories: [],
-                addInputValue: '',
-                removeInputValue: '',
-                removeCategories: [],
-                editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
+
+                // FilesList state
                 workFiles: [],
 
                 // MessageDisplay state
                 showMessage: false,
                 messageType: '',
                 messageContent: '',
+                // SearchProgressBar state
+                showSearchProgress: false,
+                searchProgressPercent: 0,
+                searchProgressText: '',
 
-                openConfirmDialog: false,
-                ConfirmDefaultAction: { label: 'Cancel' },
-                ConfirmPrimaryAction: { label: 'Save', actionType: 'progressive' },
-                confirmMessage: "",
-
-                showProgress: false,
-                progressPercent: 0,
-                progressText: 'Processing...',
-                isProcessing: false,
-                shouldStopProgress: false,
-
+                // SearchHandler state
                 isSearching: false,
                 shouldStopSearch: false,
 
+                // ExecuteHandler state
+                openConfirmDialog: false,
+                confirmDefaultAction: { label: 'Cancel' },
+                confirmPrimaryAction: { label: 'Save', actionType: 'progressive' },
+                confirmMessage: "",
+
+                // ExecuteHandler state
+                showExecutionProgress: false,
+                executionProgressText: 'Processing...',
+                executionProgressPercent: 0,
+
+                isProcessing: false,
+                shouldStopProgress: false,
+
+                // PreviewHandler state
+                previewRows: [],
+                changesCount: '',
+                openPreviewHandler: false,
+
+                // CategoryInputs messages state
                 showAddCategoryMessage: false,
                 addCategoryMessageType: '',
                 addCategoryMessageText: '',
@@ -115,32 +129,27 @@ function BatchManager() {
                 removeCategoryMessageType: '',
                 removeCategoryMessageText: '',
 
-                previewRows: [],
-                changesCount: '',
-                previewHtml: '',
-                openPreviewHandler: false,
-
-                // For multiselect lookup - Add Categories
+                // CategoryInputs state
                 addCategoryChips: [],
-                addCategoryMenuItems: [
-                    // { value: 'Category:Economics', label: 'Category:Economics' },
-                    // { value: 'Category:Science', label: 'Category:Science' }
-                ],
+                removeCategoryChips: [],
+
+                addInputValue: '',
+                removeInputValue: '',
+
+                addCategories: [],
+                removeCategories: [],
+
+                addCategoryMenuItems: [],
+                removeCategoryMenuItems: [],
+
                 addCategoryMenuConfig: {
                     boldLabel: true,
                     visibleItemLimit: 10
                 },
-
-                // For multiselect lookup - Remove Categories
-                removeCategoryChips: [],
-                removeCategoryMenuItems: [
-                    // { value: 'Category:Politics', label: 'Category:Politics' }
-                ],
                 removeCategoryMenuConfig: {
                     boldLabel: true,
                     visibleItemLimit: 10
                 },
-
             };
             return app_data;
         },

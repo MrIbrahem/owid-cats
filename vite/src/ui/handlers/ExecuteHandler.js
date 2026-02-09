@@ -27,8 +27,8 @@ class ExecuteHandler {
                 v-model:open="openConfirmDialog"
                 title="Confirm Batch Update"
                 :use-close-button="true"
-                :primary-action="ConfirmPrimaryAction"
-                :default-action="ConfirmDefaultAction"
+                :primary-action="confirmPrimaryAction"
+                :default-action="confirmDefaultAction"
                 @primary="ConfirmOnPrimaryAction"
                 @default="openConfirmDialog = false"
             >
@@ -40,11 +40,11 @@ class ExecuteHandler {
             <div v-if="showExecutionProgress" class="cbm-progress-section">
                 <div class="cbm-progress-bar-bg">
                     <div class="cbm-progress-bar-fill"
-                        :style="{ width: ExecutionProgressPercent + '%' }">
+                        :style="{ width: executionProgressPercent + '%' }">
                     </div>
                 </div>
                 <div class="cbm-progress-text">
-                    {{ ExecutionProgressText }}
+                    {{ executionProgressText }}
                 </div>
             </div>
         `;
@@ -151,8 +151,8 @@ class ExecuteHandler {
             return;
         }
 
-        self.ExecutionProgressPercent = ((index + 1) / files.length) * 100;
-        self.ExecutionProgressText = `Processing ${index + 1} of ${files.length}...`;
+        self.executionProgressPercent = ((index + 1) / files.length) * 100;
+        self.executionProgressText = `Processing ${index + 1} of ${files.length}...`;
 
         // Placeholder - implement actual file processing
         setTimeout(() => {

@@ -1,9 +1,9 @@
 /**
  * Progress bar UI component using Codex CSS-only classes.
  * @see https://doc.wikimedia.org/codex/latest/
- * @class ProgressBar
+ * @class SearchProgressBar
  */
-class ProgressBar {
+class SearchProgressBar {
     /**
      */
     constructor() {
@@ -11,6 +11,7 @@ class ProgressBar {
 
     /**
      * Create the HTML structure for the progress section
+     * @returns {string} HTML string for the progress section
      */
     createElement() {
         return `
@@ -35,5 +36,5 @@ class ProgressBar {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ProgressBar;
+    module.exports = SearchProgressBar;
 }

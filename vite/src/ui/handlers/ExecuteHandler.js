@@ -37,6 +37,16 @@ class ExecuteHandler {
                 <template #footer-text>
                 </template>
             </cdx-dialog>
+            <div v-if="showExecutionProgress" class="cbm-progress-section">
+                <div class="cbm-progress-bar-bg">
+                    <div class="cbm-progress-bar-fill"
+                        :style="{ width: ExecutionProgressPercent + '%' }">
+                    </div>
+                </div>
+                <div class="cbm-progress-text">
+                    {{ ExecutionProgressText }}
+                </div>
+            </div>
         `;
     }
 
@@ -72,7 +82,7 @@ class ExecuteHandler {
 
         self.isProcessing = true;
         self.shouldStopProgress = false;
-        self.showProgress = true;
+        self.showExecutionProgress = true;
 
         // Placeholder - implement actual batch processing
         const selectedFilesToProcess = self.workFiles.filter(f => f.selected);
@@ -121,7 +131,7 @@ class ExecuteHandler {
 
         self.isProcessing = true;
         self.shouldStopProgress = false;
-        self.showProgress = true;
+        self.showExecutionProgress = true;
 
         // Placeholder - implement actual batch processing
         // const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
@@ -132,7 +142,7 @@ class ExecuteHandler {
     processBatch(self, files, index) {
         if (self.shouldStopProgress || index >= files.length) {
             self.isProcessing = false;
-            self.showProgress = false;
+            self.showExecutionProgress = false;
             if (!self.shouldStopProgress) {
                 self.showSuccessMessage('Batch operation completed successfully!');
             } else {
@@ -141,8 +151,8 @@ class ExecuteHandler {
             return;
         }
 
-        self.progressPercent = ((index + 1) / files.length) * 100;
-        self.progressText = `Processing ${index + 1} of ${files.length}...`;
+        self.ExecutionProgressPercent = ((index + 1) / files.length) * 100;
+        self.ExecutionProgressText = `Processing ${index + 1} of ${files.length}...`;
 
         // Placeholder - implement actual file processing
         setTimeout(() => {

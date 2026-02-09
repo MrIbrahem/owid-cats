@@ -1049,6 +1049,7 @@ class CategoryInputs {
     `;
     }
     displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
+        console.log(`[CBM] Displaying ${msg_type} category message: ${text} (type: ${type})`);
         if (msg_type === 'add') {
             self.showAddCategoryMessage = true;
             self.addCategoryMessageType = type;
@@ -1061,6 +1062,7 @@ class CategoryInputs {
     }
 
     hideCategoryMessage(self, msg_type = 'add') {
+        console.log(`[CBM] Hiding ${msg_type} category message`);
         if (msg_type === 'add') {
             self.showAddCategoryMessage = false;
             self.addCategoryMessageText = '';
@@ -1594,15 +1596,15 @@ class PreviewHandler {
                 newCategories: [...item.newCategories]
             }));
 
-        self.openPreviewHandler = true;
-
         self.changesCount = preview.filter(p => p.willChange).length;
 
         if (self.changesCount === 0) {
             console.log('[CBM] No changes detected');
-            self.displayCategoryMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice', 'add');
-            return;
+            self.displayCategoryMessage('ℹ️ No changes detected.', 'notice', 'add');
+            // return;
         }
+        self.openPreviewHandler = true;
+
     }
     /**
      * Check if a category exists in a list (with normalization)
@@ -1716,16 +1718,6 @@ class SearchHandler {
                 </div>
             </div>
         </div>
-        <!-- Results Message -->
-        <div v-if="showResultsMessage" class="margin-bottom-20">
-            <cdx-message
-            allow-user-dismiss
-            type="success"
-            :inline="false"
-            >
-                {{ resultsMessageText }}
-            </cdx-message>
-        </div>
         `;
     }
 
@@ -1751,11 +1743,10 @@ class SearchHandler {
         self.progressText = 'Searching for files...';
 
         self.searchResults = await self.file_service.searchFiles(self.sourceCategory, self.searchPattern);
-        self.selectedFiles = [...self.searchResults];
+        // self.selectedFiles = [...self.searchResults];
+        self.selectedFiles = self.searchResults;
         self.showProgress = false;
-        self.showResultsMessage = true;
         self.isSearching = false;
-        self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
 
     stopSearch(self) {
@@ -1943,9 +1934,6 @@ function BatchManager() {
                 removeCategoryMessageType: '',
                 removeCategoryMessageText: '',
 
-                showResultsMessage: false,
-                resultsMessageText: '',
-
                 previewRows: [],
                 changesCount: '',
                 previewHtml: '',
@@ -2017,9 +2005,6 @@ function BatchManager() {
             // Remove individual file from list
             removeFile: function (index) {
                 this.selectedFiles.splice(index, 1);
-                if (this.selectedFiles.length === 0) {
-                    this.showResultsMessage = false;
-                }
             },
 
             // Preview changes before executing

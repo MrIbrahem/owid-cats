@@ -2,7 +2,7 @@
  * Creates the Vue app definition for the Category Batch Manager tool.
  * @returns {Object} Vue app definition object.
  */
-/* global APIService, SearchHandler, CategoryInputs, FilesList, ProgressBar */
+/* global APIService, SearchHandler, CategoryInputs, FilesList, ProgressBar, MessageDisplay */
 
 function BatchManager() {
     const mwApi = new APIService();
@@ -13,11 +13,13 @@ function BatchManager() {
     const file_service = new FileService(mwApi);
     const execute_handler = new ExecuteHandler(mwApi);
     const preview_handler = new PreviewHandler();
+    const message_display = new MessageDisplay();
 
     const Search_SectionHtml = search_handler.createElement();
     const CategoryInputPanelHtml = category_inputs.createElement();
     const FilesListHtml = files_list.createElement();
     const ProgressSectionHtml = progress_section.createElement();
+    const MessageDisplayHtml = message_display.createElement();
     const ExecuteSectionHtml = execute_handler.createElement();
     const PreviewChangesHtml = preview_handler.createElement();
 
@@ -60,19 +62,7 @@ function BatchManager() {
                 </div>
             </div>
             <!-- Message Display -->
-            <div v-if="showMessage" class="cbm-fixed-message">
-                <cdx-message
-                allow-user-dismiss
-                :type="messageType"
-                :fade-in="true"
-                :auto-dismiss="messageType === 'success'"
-                :display-time="3000"
-                dismiss-button-label="Close"
-                @dismissed="handleMessageDismiss"
-                >
-                    {{ messageContent }}
-                </cdx-message>
-            </div>
+            ${MessageDisplayHtml}
         </div>
     `;
 
@@ -80,6 +70,7 @@ function BatchManager() {
         data: function () {
             const app_data = {
                 execute_handler: execute_handler,
+                message_display: message_display,
                 preview_handler: preview_handler,
                 search_handler: search_handler,
                 file_service: file_service,
@@ -96,6 +87,8 @@ function BatchManager() {
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
                 selectedFiles: [],
+
+                // MessageDisplay state
                 showMessage: false,
                 messageType: '',
                 messageContent: '',
@@ -258,25 +251,23 @@ function BatchManager() {
                 this.messageContent = '';
             },
 
-            showWarningMessage: function (message) {
-                console.warn('[CBM] Warning:', message);
-                this.messageType = 'warning';
+            renderMessage: function (message, type = 'info') {
+                console.warn(`'[CBM] ${type}:`, message);
+                this.messageType = type;
                 this.messageContent = message;
                 this.showMessage = true;
+            },
+
+            showWarningMessage: function (message) {
+                this.renderMessage(message, 'warning');
             },
 
             showErrorMessage: function (message) {
-                console.error('[CBM] Error:', message);
-                this.messageType = 'error';
-                this.messageContent = message;
-                this.showMessage = true;
+                this.renderMessage(message, 'error');
             },
 
             showSuccessMessage: function (message) {
-                console.log('[CBM] Success:', message);
-                this.messageType = 'success';
-                this.messageContent = message;
-                this.showMessage = true;
+                this.renderMessage(message, 'success');
             },
 
             handleMessageDismiss: function () {

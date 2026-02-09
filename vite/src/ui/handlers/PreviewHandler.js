@@ -17,6 +17,7 @@ class PreviewHandler {
         this.validator = new ValidationHelper();
     }
     createElement() {
+        // @primary="onPrimaryAction"
         return `
         <cdx-button @click="handlePreview" action="default" weight="normal"
             :disabled="isProcessing">
@@ -29,7 +30,6 @@ class PreviewHandler {
             :use-close-button="true"
             :primary-action="primaryAction"
             :default-action="defaultAction"
-            @primary="onPrimaryAction"
             @default="openPreviewHandler = false"
         >
             <p v-if="changesCount > 0">

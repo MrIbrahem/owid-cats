@@ -82,11 +82,8 @@ class FileService {
             if (parseInt(pageId) < 0) continue; // Skip missing pages
 
             const categories = (page.categories || []).map(cat => cat.title);
-            const FileModelClass = typeof FileModel !== 'undefined' ? FileModel : function (d) {
-                return d;
-            };
 
-            fileModels.push(new FileModelClass({
+            fileModels.push(new FileModel({
                 title: page.title,
                 pageid: page.pageid,
                 selected: true,

@@ -7,15 +7,20 @@
 class CategoryInputs {
     /**
      * @param {APIService} apiService - API service for category search
+     * @param {CategoryInputsMessages} messagesComponent - Component for managing category input messages
      */
-    constructor(apiService) {
+    constructor(apiService, messagesComponent) {
         this.apiService = apiService;
+        this.messages_component = messagesComponent;
     }
 
     /**
      * Create the category inputs HTML element with Codex components.
      */
     createElement() {
+        const addElement = this.messages_component.createAddElement();
+        const removeElement = this.messages_component.createRemoveElement();
+
         return `
             <div class="cbm-category-input-group">
                 <cdx-label input-id="cbm-add-cats" class="cbm-label">
@@ -43,15 +48,7 @@ class CategoryInputs {
             </div>
 
             <!-- Category Add Message -->
-            <div v-if="showAddCategoryMessage" class="margin-bottom-20">
-                <cdx-message
-                allow-user-dismiss
-                type="{{ addCategoryMessageType }}"
-                :inline="false"
-                >
-                    {{ addCategoryMessageText }}
-                </cdx-message>
-            </div>
+            ${addElement}
 
             <div class="cbm-category-input-group">
                 <cdx-label input-id="cbm-remove-cats" class="cbm-label">
@@ -74,17 +71,12 @@ class CategoryInputs {
                     </template>
                 </cdx-multiselect-lookup>
             </div>
+
             <!-- Category Remove Message -->
-            <div v-if="showRemoveCategoryMessage" class="margin-bottom-20">
-                <cdx-message
-                allow-user-dismiss
-                type="{{ removeCategoryMessageType }}"
-                :inline="false">
-                    {{ removeCategoryMessageText }}
-                </cdx-message>
-            </div>
+            ${removeElement}
     `;
     }
+
     displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
         console.log(`[CBM] Displaying ${msg_type} category message: ${text} (type: ${type})`);
         if (msg_type === 'add') {

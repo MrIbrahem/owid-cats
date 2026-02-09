@@ -7,7 +7,8 @@
 function BatchManager() {
     const mwApi = new APIService();
     const search_handler = new SearchHandler();
-    const category_inputs = new CategoryInputs(mwApi);
+    const messages_component = new CategoryInputsMessages();
+    const category_inputs = new CategoryInputs(mwApi, messages_component);
     const files_list = new FilesList(mwApi);
     const progress_section = new SearchProgressBar();
     const file_service = new FileService(mwApi);
@@ -75,6 +76,7 @@ function BatchManager() {
                 search_handler: search_handler,
                 file_service: file_service,
                 category_inputs: category_inputs,
+                messages_component: messages_component,
                 files_list: files_list,
                 mwApi: mwApi, // Reference to API service instance
 
@@ -92,6 +94,7 @@ function BatchManager() {
                 showMessage: false,
                 messageType: '',
                 messageContent: '',
+
                 // SearchProgressBar state
                 showSearchProgress: false,
                 searchProgressPercent: 0,
@@ -120,7 +123,7 @@ function BatchManager() {
                 changesCount: '',
                 openPreviewHandler: false,
 
-                // CategoryInputs messages state
+                // CategoryInputsMessages state
                 showAddCategoryMessage: false,
                 addCategoryMessageType: '',
                 addCategoryMessageText: '',
@@ -229,15 +232,20 @@ function BatchManager() {
             },
 
             /* *************************
-            **      CategoryInputs
+            **  CategoryInputsMessages
             ** *************************
             */
             displayCategoryMessage: function (text, type, msg_type = 'add') {
-                return this.category_inputs.displayCategoryMessage(this, text, type, msg_type);
+                return this.messages_component.displayCategoryMessage(this, text, type, msg_type);
             },
             hideCategoryMessage: function (msg_type = 'add') {
-                return this.category_inputs.hideCategoryMessage(this, msg_type);
+                return this.messages_component.hideCategoryMessage(this, msg_type);
             },
+
+            /* *************************
+            **      CategoryInputs
+            ** *************************
+            */
             onAddCategoryInput: function (value) {
                 return this.category_inputs.onAddCategoryInput(this, value);
             },

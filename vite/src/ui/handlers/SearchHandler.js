@@ -41,16 +41,6 @@ class SearchHandler {
                 </div>
             </div>
         </div>
-        <!-- Results Message -->
-        <div v-if="showResultsMessage" class="margin-bottom-20">
-            <cdx-message
-            allow-user-dismiss
-            type="success"
-            :inline="false"
-            >
-                {{ resultsMessageText }}
-            </cdx-message>
-        </div>
         `;
     }
 
@@ -76,11 +66,10 @@ class SearchHandler {
         self.progressText = 'Searching for files...';
 
         self.searchResults = await self.file_service.searchFiles(self.sourceCategory, self.searchPattern);
-        self.selectedFiles = [...self.searchResults];
+        // self.selectedFiles = [...self.searchResults];
+        self.selectedFiles = self.searchResults;
         self.showProgress = false;
-        self.showResultsMessage = true;
         self.isSearching = false;
-        self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
     }
 
     stopSearch(self) {

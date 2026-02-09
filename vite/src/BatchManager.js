@@ -122,9 +122,6 @@ function BatchManager() {
                 removeCategoryMessageType: '',
                 removeCategoryMessageText: '',
 
-                showResultsMessage: false,
-                resultsMessageText: '',
-
                 previewRows: [],
                 changesCount: '',
                 previewHtml: '',
@@ -196,9 +193,6 @@ function BatchManager() {
             // Remove individual file from list
             removeFile: function (index) {
                 this.selectedFiles.splice(index, 1);
-                if (this.selectedFiles.length === 0) {
-                    this.showResultsMessage = false;
-                }
             },
 
             // Preview changes before executing

@@ -18,6 +18,8 @@ class PreviewHandler {
     }
     createElement() {
         // @primary="onPrimaryAction"
+        // :primary-action="primaryAction"
+        // :default-action="defaultAction"
         return `
         <cdx-button @click="handlePreview" action="default" weight="normal"
             :disabled="isProcessing">
@@ -28,8 +30,6 @@ class PreviewHandler {
             class="cbm-preview-dialog"
             title="Preview Changes"
             :use-close-button="true"
-            :primary-action="primaryAction"
-            :default-action="defaultAction"
             @default="openPreviewHandler = false"
         >
             <p v-if="changesCount > 0">

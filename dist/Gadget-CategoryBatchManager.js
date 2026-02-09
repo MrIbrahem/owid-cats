@@ -603,35 +603,6 @@ class FileService {
         this.api = apiService;
     }
 
-    async executeFileSearch(self) {
-        self.resetMessageState();
-
-        if (self.sourceCategory.trim() === '') {
-            self.showWarningMessage('Please enter a source category.');
-            return;
-        }
-
-        self.showProgress = true;
-        self.progressText = 'Searching for files...';
-
-        // Placeholder - implement actual search logic
-        // Mock results for demonstration
-        self.searchResults = await this.searchFiles(self.sourceCategory, self.searchPattern);
-        const searchResults_demo = [
-            { title: 'File:GDP-per-capita,BLR.svg', selected: false },
-            { title: 'File:Life-expectancy,BLR.svg', selected: false },
-            { title: 'File:Population,BLR.svg', selected: false },
-            { title: 'File:Unemployment-rate,BLR.svg', selected: false },
-            { title: 'File:Literacy-rate,BLR.svg', selected: false },
-            { title: 'File:Infant-mortality,BLR.svg', selected: false },
-            { title: 'File:CO2-emissions,BLR.svg', selected: false },
-            { title: 'File:Energy-consumption,BLR.svg', selected: false }
-        ];
-        self.selectedFiles = [...self.searchResults];
-        self.showProgress = false;
-        self.showResultsMessage = true;
-        self.resultsMessageText = `Found ${self.searchResults.length} files matching the pattern.`;
-    }
     /**
      * Search files by pattern within a category
      * Uses MediaWiki search API for efficiency instead of loading all category members
@@ -1968,8 +1939,8 @@ class PreviewHandler {
 
         if (changesCount === 0) {
             console.log('[CBM] No changes detected');
-            this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
-            return;
+            this.ui.showMessage('ℹ️ No changes detected.', 'notice');
+            // return;
         }
 
         html = `<p>${changesCount} files will be modified</p>` + html;

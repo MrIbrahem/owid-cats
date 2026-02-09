@@ -99,12 +99,19 @@ function BatchManager() {
                 showMessage: false,
                 messageType: '',
                 messageContent: '',
+
+                openConfirmDialog: false,
+                ConfirmDefaultAction: { label: 'Cancel' },
+                ConfirmPrimaryAction: { label: 'Save', actionType: 'progressive' },
+                confirmMessage: "",
+
                 showProgress: false,
                 progressPercent: 0,
                 progressText: 'Processing...',
-                isSearching: false,
                 isProcessing: false,
                 shouldStopProgress: false,
+
+                isSearching: false,
                 shouldStopSearch: false,
 
                 showAddCategoryMessage: false,
@@ -208,6 +215,9 @@ function BatchManager() {
                 return this.execute_handler.executeOperation(this);
             },
 
+            ConfirmOnPrimaryAction: function () {
+                return this.execute_handler.ConfirmOnPrimaryAction(this);
+            },
             // Process files sequentially
             processBatch: function (files, index) {
                 return this.execute_handler.processBatch(this, files, index);

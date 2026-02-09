@@ -23,12 +23,25 @@ class ExecuteHandler {
             <cdx-button v-if="isProcessing" @click="stopOperation" action="destructive" weight="primary">
                 Stop Process
             </cdx-button>
+            <cdx-dialog
+                v-model:open="openConfirmDialog"
+                title="Confirm Batch Update"
+                :use-close-button="true"
+                :primary-action="ConfirmPrimaryAction"
+                :default-action="ConfirmDefaultAction"
+                @primary="ConfirmOnPrimaryAction"
+                @default="openConfirmDialog = false"
+            >
+                    <p>{{ confirmMessage }}</p>
+
+                <template #footer-text>
+                </template>
+            </cdx-dialog>
         `;
     }
 
-    // should be moved to class ExecuteHandler` at `src/ui/handlers/ExecuteHandler.js`
     // Execute batch operation
-    executeOperation(self) {
+    executeOperationOld(self) {
         const selectedCount = self.selectedCount;
 
         if (selectedCount === 0 || !self.selectedFiles || self.selectedFiles.length === 0) {
@@ -54,6 +67,55 @@ class ExecuteHandler {
         if (!confirm(`Are you sure you want to process ${selectedCount} file(s)?`)) {
             return;
         }
+
+        self.isProcessing = true;
+        self.shouldStopProgress = false;
+        self.showProgress = true;
+
+        // Placeholder - implement actual batch processing
+        const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
+        self.processBatch(selectedFilesToProcess, 0);
+    }
+
+    // Execute batch operation
+    executeOperation(self) {
+        const selectedCount = self.selectedCount;
+
+        if (selectedCount === 0 || !self.selectedFiles || self.selectedFiles.length === 0) {
+            self.showWarningMessage('Please select at least one file.');
+            return;
+        }
+
+        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+            self.showWarningMessage('Please specify categories to add or remove.');
+            return;
+        }
+
+        // Filter out circular categories (returns null if ALL are circular)
+        const filteredToAdd = this.validator.filterCircularCategories(self);
+
+        // Check if there are any valid operations remaining
+        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
+            console.log('[CBM-V] No valid categories after filtering');
+            self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
+            return;
+        }
+
+        // Show confirmation dialog
+        self.confirmMessage =
+            `You are about to update ${self.selectedFiles.length} file(s).\n\n` +
+            `Categories to add: ${filteredToAdd.length > 0 ? filteredToAdd.join(', ') : 'none'}\n` +
+            `Categories to remove: ${self.removeCategories.length > 0 ? self.removeCategories.join(', ') : 'none'}\n\n` +
+            'Do you want to proceed?';
+
+        // trigger confirm dialog
+        self.openConfirmDialog = true;
+    }
+
+    ConfirmOnPrimaryAction(self) {
+        self.openConfirmDialog = false;
+        // eslint-disable-next-line no-console
+        console.log('[CBM-E] User confirmed operation');
 
         self.isProcessing = true;
         self.shouldStopProgress = false;

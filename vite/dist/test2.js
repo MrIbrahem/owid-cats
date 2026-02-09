@@ -1449,39 +1449,6 @@ class PreviewHandler {
         </cdx-dialog>
     `;
     }
-    // Preview changes before executing
-    previewTheChanges(self) {
-        console.log('[CBM-P] Preview button clicked');
-
-        const selectedCount = self.selectedCount;
-
-        if (selectedCount === 0) {
-            self.showWarningMessage('Please select at least one file.');
-            return;
-        }
-
-        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
-            self.showWarningMessage('Please specify categories to add or remove.');
-            return;
-        }
-
-        const validation = this.validator.validateBatchOperation(self);
-        if (!validation) return;
-
-        const { selectedFiles, toAdd, toRemove } = validation;
-
-        // Placeholder - implement preview logic
-        let previewMessage = `Preview for ${selectedFiles.length} file(s):\n`;
-        if (toAdd.length > 0) {
-            previewMessage += `\nAdding: ${toAdd.join(', ')}`;
-        }
-        if (toRemove.length > 0) {
-            previewMessage += `\nRemoving: ${toRemove.join(', ')}`;
-        }
-
-        // should be replaced by showPreviewModal
-        alert(previewMessage);
-    }
     /**
      * Handle preview button click
      * Generates and displays a preview of category changes
@@ -2054,18 +2021,21 @@ function BatchManager() {
             },
 
             showWarningMessage: function (message) {
+                console.warn('[CBM] Warning:', message);
                 this.messageType = 'warning';
                 this.messageContent = message;
                 this.showMessage = true;
             },
 
             showErrorMessage: function (message) {
+                console.error('[CBM] Error:', message);
                 this.messageType = 'error';
                 this.messageContent = message;
                 this.showMessage = true;
             },
 
             showSuccessMessage: function (message) {
+                console.log('[CBM] Success:', message);
                 this.messageType = 'success';
                 this.messageContent = message;
                 this.showMessage = true;

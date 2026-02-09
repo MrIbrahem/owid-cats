@@ -44,7 +44,11 @@ class CategoryInputs {
 
             <!-- Category Add Message -->
             <div v-if="showAddCategoryMessage" class="margin-bottom-20">
-                <cdx-message type="{{ addCategoryMessageType }}" :inline="false">
+                <cdx-message
+                allow-user-dismiss
+                type="{{ addCategoryMessageType }}"
+                :inline="false"
+                >
                     {{ addCategoryMessageText }}
                 </cdx-message>
             </div>
@@ -72,7 +76,10 @@ class CategoryInputs {
             </div>
             <!-- Category Remove Message -->
             <div v-if="showRemoveCategoryMessage" class="margin-bottom-20">
-                <cdx-message type="{{ removeCategoryMessageType }}" :inline="false">
+                <cdx-message
+                allow-user-dismiss
+                type="{{ removeCategoryMessageType }}"
+                :inline="false">
                     {{ removeCategoryMessageText }}
                 </cdx-message>
             </div>

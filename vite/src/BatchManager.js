@@ -63,8 +63,15 @@ function BatchManager() {
 
     <!-- Message Display -->
     <div v-if="showMessage" class="cbm-fixed-message">
-        <cdx-message :type="messageType" :fade-in="true" :auto-dismiss="messageType === 'success'" :display-time="3000"
-            dismiss-button-label="Close" @dismissed="handleMessageDismiss">
+        <cdx-message
+        allow-user-dismiss
+        :type="messageType"
+        :fade-in="true"
+        :auto-dismiss="messageType === 'success'"
+        :display-time="3000"
+        dismiss-button-label="Close"
+        @dismissed="handleMessageDismiss"
+        >
             {{ messageContent }}
         </cdx-message>
     </div>
@@ -248,18 +255,21 @@ function BatchManager() {
             },
 
             showWarningMessage: function (message) {
+                console.warn('[CBM] Warning:', message);
                 this.messageType = 'warning';
                 this.messageContent = message;
                 this.showMessage = true;
             },
 
             showErrorMessage: function (message) {
+                console.error('[CBM] Error:', message);
                 this.messageType = 'error';
                 this.messageContent = message;
                 this.showMessage = true;
             },
 
             showSuccessMessage: function (message) {
+                console.log('[CBM] Success:', message);
                 this.messageType = 'success';
                 this.messageContent = message;
                 this.showMessage = true;

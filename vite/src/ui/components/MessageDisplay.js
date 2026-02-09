@@ -14,11 +14,19 @@ class MessageDisplay {
      *
      */
     createElement() {
+        // :auto-dismiss="messageType === 'success'"
         return `
             <!-- Message Display -->
             <div v-if="showMessage" class="cbm-fixed-message">
-                <cdx-message allow-user-dismiss :type="messageType" :fade-in="true" :auto-dismiss="messageType === 'success'"
-                    :display-time="3000" dismiss-button-label="Close" @dismissed="handleMessageDismiss">
+                <cdx-message
+                allow-user-dismiss
+                :type="messageType"
+                :fade-in="true"
+                :auto-dismiss="true"
+                :display-time="3000"
+                dismiss-button-label="Close"
+                @dismissed="handleMessageDismiss"
+                >
                     {{ messageContent }}
                 </cdx-message>
             </div>

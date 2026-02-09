@@ -19,6 +19,7 @@ const SOURCE_FILES = [
     'vite/src/services/FileService.js',
 
     'vite/src/ui/components/CategoryInputs.js',
+    'vite/src/ui/components/CategoryInputsMessages.js',
     'vite/src/ui/components/FilesList.js',
     'vite/src/ui/components/SearchProgressBar.js',
     'vite/src/ui/components/MessageDisplay.js',

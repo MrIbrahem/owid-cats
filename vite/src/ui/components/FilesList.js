@@ -35,10 +35,10 @@ class FilesList {
             <!-- File List -->
             <div class="cbm-files-scrollable">
                 <div v-for="(file, index) in selectedFiles" :key="index" class="cbm-file-row">
-                    <cdx-checkbox v-model="file.selected" :input-id="'file-' + index" />
-                    <label :for="'file-' + index">
+                    <cdx-checkbox v-model="file.selected" :input-id="'file-' + index" aria-label="{{ file.title }}" />
+                    <cdx-label :for="'file-' + index">
                         {{ file.title }}
-                    </label>
+                    </cdx-label>
                     <button @click="removeFile(index)" class="cbm-file-remove-btn" title="Remove from list">
                         ×
                     </button>

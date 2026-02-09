@@ -90,14 +90,14 @@ class CategorySearchService {
     constructor(apiService) {
         this.apiService = apiService;
     }
-    
+
     async searchCategories(query, options = {}) {
         if (!query || query.trim().length < 2) {
             return [];
         }
         return await this.apiService.fetchCategories(query, options);
     }
-    
+
     deduplicateResults(existing, newResults) {
         const seen = new Set(existing.map(r => r.value));
         return newResults.filter(r => !seen.has(r.value));
@@ -143,20 +143,20 @@ class SearchService {
         this.fileService = fileService;
         this.validationService = validationService;
     }
-    
+
     async executeSearch(sourceCategory, searchPattern) {
         // Validate inputs
         const validation = this.validationService.validateSearchInputs(
-            sourceCategory, 
+            sourceCategory,
             searchPattern
         );
         if (!validation.isValid) {
             throw new Error(validation.message);
         }
-        
+
         // Execute search
         return await this.fileService.searchFiles(
-            sourceCategory, 
+            sourceCategory,
             searchPattern
         );
     }
@@ -203,7 +203,7 @@ const SearchPanelComponent = {
 // Before: Everything in PreviewHandler
 class PreviewHandler {
     async handlePreview(self) {
-        const validation = this.validator.validateBatchOperation(self);
+        const validation = this.validator.validateBatchOperation(self, selectedFiles, addCategories, removeCategories);
         const preview = await this.previewChanges(...);
         this.showPreviewModal(self, preview);
     }
@@ -215,7 +215,7 @@ class PreviewService {
     constructor(validationService) {
         this.validationService = validationService;
     }
-    
+
     async generatePreview(files, categoriesToAdd, categoriesToRemove) {
         return files.map(file => {
             const newCategories = this.calculateNewCategories(
@@ -223,38 +223,38 @@ class PreviewService {
                 categoriesToAdd,
                 categoriesToRemove
             );
-            
+
             return {
                 file: file.title,
                 currentCategories: file.currentCategories,
                 newCategories: newCategories,
                 willChange: this.hasChanges(
-                    file.currentCategories, 
+                    file.currentCategories,
                     newCategories
                 )
             };
         });
     }
-    
+
     calculateNewCategories(current, toAdd, toRemove) {
         let result = [...current];
-        
+
         // Remove categories
         toRemove.forEach(cat => {
             const index = this.findCategoryIndex(cat, result);
             if (index > -1) result.splice(index, 1);
         });
-        
+
         // Add categories
         toAdd.forEach(cat => {
             if (!this.categoryExists(cat, result)) {
                 result.push(cat);
             }
         });
-        
+
         return result;
     }
-    
+
     hasChanges(current, newCats) {
         return JSON.stringify(current) !== JSON.stringify(newCats);
     }
@@ -289,14 +289,14 @@ export const useBatchManagerStore = defineStore('batchManager', {
         searchPattern: '',
         searchResults: [],
         isSearching: false,
-        
+
         // File selection state
         selectedFiles: [],
-        
+
         // Category management state
         categoriesToAdd: [],
         categoriesToRemove: [],
-        
+
         // Operation state
         isProcessing: false,
         progress: {
@@ -304,27 +304,27 @@ export const useBatchManagerStore = defineStore('batchManager', {
             total: 0,
             percentage: 0
         },
-        
+
         // UI state
         messages: [],
         showPreview: false,
         previewData: null
     }),
-    
+
     getters: {
         selectedCount: (state) => {
             return state.selectedFiles.filter(f => f.selected).length;
         },
-        
+
         hasValidOperation: (state) => {
             return (
                 state.selectedFiles.length > 0 &&
-                (state.categoriesToAdd.length > 0 || 
+                (state.categoriesToAdd.length > 0 ||
                  state.categoriesToRemove.length > 0)
             );
         }
     },
-    
+
     actions: {
         async executeSearch(searchService) {
             this.isSearching = true;
@@ -344,14 +344,14 @@ export const useBatchManagerStore = defineStore('batchManager', {
                 this.isSearching = false;
             }
         },
-        
+
         async generatePreview(previewService, validationService) {
             const validation = validationService.validateBatchOperation(
                 this.selectedFiles,
                 this.categoriesToAdd,
                 this.categoriesToRemove
             );
-            
+
             if (!validation.isValid) {
                 this.addMessage({
                     type: 'warning',
@@ -359,7 +359,7 @@ export const useBatchManagerStore = defineStore('batchManager', {
                 });
                 return;
             }
-            
+
             this.previewData = await previewService.generatePreview(
                 this.selectedFiles.filter(f => f.selected),
                 this.categoriesToAdd,
@@ -367,14 +367,14 @@ export const useBatchManagerStore = defineStore('batchManager', {
             );
             this.showPreview = true;
         },
-        
+
         addMessage(message) {
             this.messages.push({
                 id: Date.now(),
                 ...message
             });
         },
-        
+
         clearMessages() {
             this.messages = [];
         }
@@ -401,17 +401,17 @@ class ValidationService {
                 message: 'Please enter a source category.'
             };
         }
-        
+
         if (!searchPattern || searchPattern.trim() === '') {
             return {
                 isValid: false,
                 message: 'Please enter a search pattern.'
             };
         }
-        
+
         return { isValid: true };
     }
-    
+
     /**
      * Validate batch operation inputs
      */
@@ -424,7 +424,7 @@ class ValidationService {
                 message: 'Please select at least one file.'
             };
         }
-        
+
         // Check if at least one operation is specified
         if (categoriesToAdd.length === 0 && categoriesToRemove.length === 0) {
             return {
@@ -432,7 +432,7 @@ class ValidationService {
                 message: 'Please specify categories to add or remove.'
             };
         }
-        
+
         return {
             isValid: true,
             selectedFiles: selected,
@@ -440,14 +440,14 @@ class ValidationService {
             categoriesToRemove
         };
     }
-    
+
     /**
      * Check for circular category references
      */
     checkCircularReferences(sourceCategory, categoriesToAdd) {
         const circular = [];
         const valid = [];
-        
+
         categoriesToAdd.forEach(cat => {
             if (Validator.isCircularCategory(sourceCategory, cat)) {
                 circular.push(cat);
@@ -455,7 +455,7 @@ class ValidationService {
                 valid.push(cat);
             }
         });
-        
+
         if (circular.length > 0 && valid.length === 0) {
             return {
                 isValid: false,
@@ -464,14 +464,14 @@ class ValidationService {
                 valid: []
             };
         }
-        
+
         return {
             isValid: true,
             circular,
             valid
         };
     }
-    
+
     /**
      * Validate category name format
      */
@@ -492,7 +492,7 @@ class BatchOperationService {
         this.categoryService = categoryService;
         this.rateLimiter = rateLimiter;
     }
-    
+
     /**
      * Execute batch operation with progress tracking
      */
@@ -505,23 +505,23 @@ class BatchOperationService {
             failed: 0,
             errors: []
         };
-        
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            
+
             try {
                 // Rate limiting
                 await this.rateLimiter.wait(2000);
-                
+
                 // Update categories
                 const result = await this.categoryService.updateCategories(
                     file.title,
                     categoriesToAdd,
                     categoriesToRemove
                 );
-                
+
                 results.processed++;
-                
+
                 if (result.success) {
                     if (result.modified) {
                         results.successful++;
@@ -529,7 +529,7 @@ class BatchOperationService {
                         results.skipped++;
                     }
                 }
-                
+
                 // Report progress
                 if (onProgress) {
                     onProgress({
@@ -539,7 +539,7 @@ class BatchOperationService {
                         results
                     });
                 }
-                
+
             } catch (error) {
                 results.processed++;
                 results.failed++;
@@ -547,7 +547,7 @@ class BatchOperationService {
                     file: file.title,
                     error: error.message
                 });
-                
+
                 if (onProgress) {
                     onProgress({
                         current: results.processed,
@@ -558,7 +558,7 @@ class BatchOperationService {
                 }
             }
         }
-        
+
         return results;
     }
 }
@@ -574,7 +574,7 @@ class BatchOperationService {
 <template>
     <div class="cbm-container">
         <h2 class="cbm-title">Category Batch Manager</h2>
-        
+
         <div class="cbm-grid">
             <!-- Left Panel -->
             <div>
@@ -585,12 +585,12 @@ class BatchOperationService {
                     @search="handleSearch"
                     @stop="handleStopSearch"
                 />
-                
+
                 <CategoryInputsPanel
                     v-model:add-categories="store.categoriesToAdd"
                     v-model:remove-categories="store.categoriesToRemove"
                 />
-                
+
                 <ActionPanel
                     :selected-count="store.selectedCount"
                     :is-processing="store.isProcessing"
@@ -599,13 +599,13 @@ class BatchOperationService {
                     @execute="handleExecute"
                     @stop="handleStop"
                 />
-                
+
                 <ProgressBar
                     v-if="store.isProcessing"
                     :progress="store.progress"
                 />
             </div>
-            
+
             <!-- Right Panel -->
             <div>
                 <FilesList
@@ -613,14 +613,14 @@ class BatchOperationService {
                 />
             </div>
         </div>
-        
+
         <!-- Preview Dialog -->
         <PreviewDialog
             v-model:open="store.showPreview"
             :preview-data="store.previewData"
             @confirm="handleConfirmPreview"
         />
-        
+
         <!-- Messages -->
         <MessageDisplay
             :messages="store.messages"
@@ -635,16 +635,16 @@ import { inject } from 'vue';
 
 export default {
     name: 'BatchManager',
-    
+
     setup() {
         const store = useBatchManagerStore();
-        
+
         // Inject services
         const searchService = inject('searchService');
         const validationService = inject('validationService');
         const previewService = inject('previewService');
         const batchOperationService = inject('batchOperationService');
-        
+
         return {
             store,
             searchService,
@@ -653,30 +653,30 @@ export default {
             batchOperationService
         };
     },
-    
+
     methods: {
         async handleSearch() {
             await this.store.executeSearch(this.searchService);
         },
-        
+
         handleStopSearch() {
             // Implement stop logic
         },
-        
+
         async handlePreview() {
             await this.store.generatePreview(
                 this.previewService,
                 this.validationService
             );
         },
-        
+
         async handleExecute() {
             const validation = this.validationService.validateBatchOperation(
                 this.store.selectedFiles,
                 this.store.categoriesToAdd,
                 this.store.categoriesToRemove
             );
-            
+
             if (!validation.isValid) {
                 this.store.addMessage({
                     type: 'warning',
@@ -684,13 +684,13 @@ export default {
                 });
                 return;
             }
-            
+
             if (!confirm(`Process ${validation.selectedFiles.length} files?`)) {
                 return;
             }
-            
+
             this.store.isProcessing = true;
-            
+
             try {
                 const results = await this.batchOperationService.execute(
                     validation.selectedFiles,
@@ -700,7 +700,7 @@ export default {
                         this.store.progress = progress;
                     }
                 );
-                
+
                 this.store.addMessage({
                     type: 'success',
                     text: `Completed: ${results.successful} successful, ${results.failed} failed`
@@ -714,16 +714,16 @@ export default {
                 this.store.isProcessing = false;
             }
         },
-        
+
         handleStop() {
             // Implement stop logic
         },
-        
+
         async handleConfirmPreview() {
             this.store.showPreview = false;
             await this.handleExecute();
         },
-        
+
         handleDismissMessage(messageId) {
             const index = this.store.messages.findIndex(m => m.id === messageId);
             if (index > -1) {
@@ -744,24 +744,24 @@ class ServiceContainer {
     constructor() {
         this.services = new Map();
     }
-    
+
     register(name, factory) {
         this.services.set(name, {
             factory,
             instance: null
         });
     }
-    
+
     get(name) {
         const service = this.services.get(name);
         if (!service) {
             throw new Error(`Service ${name} not found`);
         }
-        
+
         if (!service.instance) {
             service.instance = service.factory(this);
         }
-        
+
         return service.instance;
     }
 }
@@ -769,43 +769,43 @@ class ServiceContainer {
 // Initialize services
 function createServices() {
     const container = new ServiceContainer();
-    
+
     // Infrastructure
     container.register('apiService', () => new APIService());
     container.register('rateLimiter', () => new RateLimiter());
     container.register('wikitextParser', () => new WikitextParser());
-    
+
     // Domain Services
-    container.register('categoryService', (c) => 
+    container.register('categoryService', (c) =>
         new CategoryService(c.get('apiService'))
     );
-    container.register('fileService', (c) => 
+    container.register('fileService', (c) =>
         new FileService(c.get('apiService'))
     );
-    
+
     // Application Services
-    container.register('validationService', () => 
+    container.register('validationService', () =>
         new ValidationService()
     );
-    container.register('searchService', (c) => 
+    container.register('searchService', (c) =>
         new SearchService(
             c.get('fileService'),
             c.get('validationService')
         )
     );
-    container.register('previewService', (c) => 
+    container.register('previewService', (c) =>
         new PreviewService(c.get('validationService'))
     );
-    container.register('batchOperationService', (c) => 
+    container.register('batchOperationService', (c) =>
         new BatchOperationService(
             c.get('categoryService'),
             c.get('rateLimiter')
         )
     );
-    container.register('categorySearchService', (c) => 
+    container.register('categorySearchService', (c) =>
         new CategorySearchService(c.get('apiService'))
     );
-    
+
     return container;
 }
 ```
@@ -816,20 +816,20 @@ function createServices() {
 mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (require) {
     const target = document.getElementById('category-batch-manager2');
     if (!target) return;
-    
+
     const Vue = require('vue');
     const Codex = require('@wikimedia/codex');
     const { createPinia } = require('pinia');
-    
+
     // Create service container
     const services = createServices();
-    
+
     // Create Vue app
     const app = Vue.createMwApp(BatchManager);
-    
+
     // Add Pinia for state management
     app.use(createPinia());
-    
+
     // Provide services
     app.provide('apiService', services.get('apiService'));
     app.provide('searchService', services.get('searchService'));
@@ -837,7 +837,7 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
     app.provide('previewService', services.get('previewService'));
     app.provide('batchOperationService', services.get('batchOperationService'));
     app.provide('categorySearchService', services.get('categorySearchService'));
-    
+
     // Register Codex components
     Object.entries(Codex).forEach(([name, component]) => {
         if (name.startsWith('Cdx')) {
@@ -847,7 +847,7 @@ mw.loader.using(['@wikimedia/codex', 'mediawiki.api', 'vue']).then(function (req
             app.component(kebabName, component);
         }
     });
-    
+
     app.mount('#category-batch-manager2');
 });
 ```
@@ -957,18 +957,18 @@ src/
 // tests/services/ValidationService.test.js
 describe('ValidationService', () => {
     let validationService;
-    
+
     beforeEach(() => {
         validationService = new ValidationService();
     });
-    
+
     describe('validateSearchInputs', () => {
         it('should reject empty source category', () => {
             const result = validationService.validateSearchInputs('', 'pattern');
             expect(result.isValid).toBe(false);
             expect(result.message).toContain('source category');
         });
-        
+
         it('should accept valid inputs', () => {
             const result = validationService.validateSearchInputs(
                 'Category:Test',
@@ -990,12 +990,12 @@ import BatchManager from '@/components/BatchManager.vue';
 describe('BatchManager', () => {
     let wrapper;
     let mockSearchService;
-    
+
     beforeEach(() => {
         mockSearchService = {
             executeSearch: jest.fn()
         };
-        
+
         wrapper = mount(BatchManager, {
             global: {
                 plugins: [createPinia()],
@@ -1005,7 +1005,7 @@ describe('BatchManager', () => {
             }
         });
     });
-    
+
     it('should call search service when search button clicked', async () => {
         await wrapper.find('.search-button').trigger('click');
         expect(mockSearchService.executeSearch).toHaveBeenCalled();

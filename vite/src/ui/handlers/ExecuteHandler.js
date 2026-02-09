@@ -7,6 +7,7 @@ class ExecuteHandler {
     /**
      */
     constructor(mwApi) {
+        this.validator = new ValidationHelper();
         this.categoryService = new CategoryService(mwApi)
         this.batchProcessor = new BatchProcessor(this.categoryService)
     }
@@ -30,13 +31,23 @@ class ExecuteHandler {
     executeOperation(self) {
         const selectedCount = self.selectedCount;
 
-        if (selectedCount === 0) {
+        if (selectedCount === 0 || !self.selectedFiles || self.selectedFiles.length === 0) {
             self.showWarningMessage('Please select at least one file.');
             return;
         }
 
         if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
             self.showWarningMessage('Please specify categories to add or remove.');
+            return;
+        }
+
+        // Filter out circular categories (returns null if ALL are circular)
+        const filteredToAdd = this.validator.filterCircularCategories(self);
+
+        // Check if there are any valid operations remaining
+        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
+            console.log('[CBM-V] No valid categories after filtering');
+            self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
             return;
         }
 

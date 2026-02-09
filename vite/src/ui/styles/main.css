@@ -254,6 +254,10 @@
     html.skin-theme-clientpref-os .cbm-container {
         background-color: #212529;
     }
+
+    html.skin-theme-clientpref-os .cbm-selected-info {
+        background-color: #212529;
+    }
 }
 
 @media screen {
@@ -270,6 +274,10 @@
     }
 
     html.skin-theme-clientpref-night .cbm-container {
+        background-color: #212529;
+    }
+
+    html.skin-theme-clientpref-night .cbm-selected-info {
         background-color: #212529;
     }
 }

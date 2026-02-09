@@ -33,10 +33,10 @@ const SOURCE_FILES = [
 ];
 
 const DIST_DIR = 'vite/dist';
-const OUTPUT_JS = 'vite/dist/Gadget-CategoryBatchManager.js';
+const OUTPUT_JS = 'vite/dist/test2.js';
 
 const CSS_SOURCE = 'vite/src/ui/styles/main.css';
-const OUTPUT_CSS = 'vite/dist/Gadget-CategoryBatchManager.css';
+const OUTPUT_CSS = 'vite/dist/test2.css';
 
 /**
  * Strip module.exports blocks from JavaScript code

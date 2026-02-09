@@ -1231,6 +1231,9 @@ class FilesList {
                     </button>
                 </div>
             </div>
+            <div class="cbm-selected-info">
+                Selected: <strong>{{ selectedCount }}</strong> files
+            </div>
         </div>
 
         <!-- Empty State -->
@@ -1832,6 +1835,9 @@ function BatchManager() {
                 <!-- Search Section -->
                 ${Search_SectionHtml}
 
+                <!-- Progress Section -->
+                ${ProgressSectionHtml}
+
                 <!-- Actions Section -->
                 <div>
                     ${CategoryInputPanelHtml}
@@ -1843,17 +1849,11 @@ function BatchManager() {
                         <cdx-text-input id="cbm-summary" v-model="editSummary" />
                     </div>
 
-                    <div class="cbm-selected-info">
-                        Selected: <strong>{{ selectedCount }}</strong> files
-                    </div>
-
                     <div class="cbm-button-group">
                         ${PreviewChangesHtml}
                         ${ExecuteSectionHtml}
                     </div>
                 </div>
-                <!-- Progress Section -->
-                ${ProgressSectionHtml}
             </div>
 
             <!-- Right Panel: File List -->

@@ -44,6 +44,9 @@ class FilesList {
                     </button>
                 </div>
             </div>
+            <div class="cbm-selected-info">
+                Selected: <strong>{{ selectedCount }}</strong> files
+            </div>
         </div>
 
         <!-- Empty State -->

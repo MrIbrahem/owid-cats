@@ -1007,7 +1007,11 @@ class CategoryInputs {
 
             <!-- Category Add Message -->
             <div v-if="showAddCategoryMessage" class="margin-bottom-20">
-                <cdx-message type="{{ addCategoryMessageType }}" :inline="false">
+                <cdx-message
+                allow-user-dismiss
+                type="{{ addCategoryMessageType }}"
+                :inline="false"
+                >
                     {{ addCategoryMessageText }}
                 </cdx-message>
             </div>
@@ -1035,7 +1039,10 @@ class CategoryInputs {
             </div>
             <!-- Category Remove Message -->
             <div v-if="showRemoveCategoryMessage" class="margin-bottom-20">
-                <cdx-message type="{{ removeCategoryMessageType }}" :inline="false">
+                <cdx-message
+                allow-user-dismiss
+                type="{{ removeCategoryMessageType }}"
+                :inline="false">
                     {{ removeCategoryMessageText }}
                 </cdx-message>
             </div>
@@ -1648,7 +1655,11 @@ class SearchHandler {
         </div>
         <!-- Results Message -->
         <div v-if="showResultsMessage" class="margin-bottom-20">
-            <cdx-message type="success" :inline="false">
+            <cdx-message
+            allow-user-dismiss
+            type="success"
+            :inline="false"
+            >
                 {{ resultsMessageText }}
             </cdx-message>
         </div>
@@ -1796,51 +1807,57 @@ function BatchManager() {
 
     const template = `
         <div class="cbm-container">
-        <h2 class="cbm-title">
-            Category Batch Manager
-        </h2>
+            <h2 class="cbm-title">
+                Category Batch Manager
+            </h2>
 
-        <div class="cbm-grid">
-            <!-- Left Panel: Search and Actions -->
-            <div>
-                <!-- Search Section -->
-                ${Search_SectionHtml}
-
-                <!-- Actions Section -->
+            <div class="cbm-grid">
+                <!-- Left Panel: Search and Actions -->
                 <div>
-                    ${CategoryInputPanelHtml}
+                    <!-- Search Section -->
+                    ${Search_SectionHtml}
 
-                    <div class="margin-bottom-20">
-                        <cdx-label input-id="cbm-summary" class="cbm-label">
-                            Edit Summary
-                        </cdx-label>
-                        <cdx-text-input id="cbm-summary" v-model="editSummary" />
-                    </div>
+                    <!-- Actions Section -->
+                    <div>
+                        ${CategoryInputPanelHtml}
 
-                    <div class="cbm-button-group">
-                        ${PreviewChangesHtml}
-                        ${ExecuteSectionHtml}
+                        <div class="margin-bottom-20">
+                            <cdx-label input-id="cbm-summary" class="cbm-label">
+                                Edit Summary
+                            </cdx-label>
+                            <cdx-text-input id="cbm-summary" v-model="editSummary" />
+                        </div>
+
+                        <div class="cbm-button-group">
+                            ${PreviewChangesHtml}
+                            ${ExecuteSectionHtml}
+                        </div>
                     </div>
                 </div>
+
+                <!-- Right Panel: File List -->
+                <div>
+                    ${FilesListHtml}
+
+                    <!-- Progress Section -->
+                    ${ProgressSectionHtml}
+                </div>
             </div>
-
-            <!-- Right Panel: File List -->
-            <div>
-                ${FilesListHtml}
-
-                <!-- Progress Section -->
-                ${ProgressSectionHtml}
+            <!-- Message Display -->
+            <div v-if="showMessage" class="cbm-fixed-message">
+                <cdx-message
+                allow-user-dismiss
+                :type="messageType"
+                :fade-in="true"
+                :auto-dismiss="messageType === 'success'"
+                :display-time="3000"
+                dismiss-button-label="Close"
+                @dismissed="handleMessageDismiss"
+                >
+                    {{ messageContent }}
+                </cdx-message>
             </div>
         </div>
-    </div>
-
-    <!-- Message Display -->
-    <div v-if="showMessage" class="cbm-fixed-message">
-        <cdx-message :type="messageType" :fade-in="true" :auto-dismiss="messageType === 'success'" :display-time="3000"
-            dismiss-button-label="Close" @dismissed="handleMessageDismiss">
-            {{ messageContent }}
-        </cdx-message>
-    </div>
     `;
 
     const app = {

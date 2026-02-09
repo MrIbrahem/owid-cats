@@ -208,7 +208,7 @@ class APIService {
             const params = {
                 action: 'query',
                 list: 'search',
-                srsearch: `incategory:${searchCategoryName} ${sanitizedPattern}`,
+                srsearch: `incategory:${searchCategoryName} intitle:/${sanitizedPattern}/`,
                 srnamespace: 6, // File namespace
                 srlimit: 'max',
                 srprop: 'size|wordcount|timestamp',

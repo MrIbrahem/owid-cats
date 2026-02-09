@@ -47,7 +47,7 @@ class SearchHandler {
     async searchFiles(self) {
         self.isSearching = true;
         // Clear all files and messages from previous search
-        self.selectedFiles = [];
+        self.workFiles = [];
         self.previewRows = [];
         self.searchResults = [];
         self.resetMessageState();
@@ -66,8 +66,8 @@ class SearchHandler {
         self.progressText = 'Searching for files...';
 
         self.searchResults = await self.file_service.searchFiles(self.sourceCategory, self.searchPattern);
-        // self.selectedFiles = [...self.searchResults];
-        self.selectedFiles = self.searchResults;
+        // self.workFiles = [...self.searchResults];
+        self.workFiles = self.searchResults;
         self.showProgress = false;
         self.isSearching = false;
     }

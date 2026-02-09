@@ -131,7 +131,7 @@ class SearchHandler {
         self.isSearching = true;
         self.resetMessageState();
         self.searchResults = await self.file_service.searchFiles(...);
-        self.selectedFiles = [...self.searchResults];
+        self.workFiles = [...self.searchResults];
         self.showProgress = false;
     }
 }
@@ -203,7 +203,7 @@ const SearchPanelComponent = {
 // Before: Everything in PreviewHandler
 class PreviewHandler {
     async handlePreview(self) {
-        const validation = this.validator.validateBatchOperation(self, selectedFiles, addCategories, removeCategories);
+        const validation = this.validator.validateBatchOperation(self, workFiles, addCategories, removeCategories);
         const preview = await this.previewChanges(...);
         this.showPreviewModal(self, preview);
     }
@@ -291,7 +291,7 @@ export const useBatchManagerStore = defineStore('batchManager', {
         isSearching: false,
 
         // File selection state
-        selectedFiles: [],
+        workFiles: [],
 
         // Category management state
         categoriesToAdd: [],
@@ -313,12 +313,12 @@ export const useBatchManagerStore = defineStore('batchManager', {
 
     getters: {
         selectedCount: (state) => {
-            return state.selectedFiles.filter(f => f.selected).length;
+            return state.workFiles.filter(f => f.selected).length;
         },
 
         hasValidOperation: (state) => {
             return (
-                state.selectedFiles.length > 0 &&
+                state.workFiles.length > 0 &&
                 (state.categoriesToAdd.length > 0 ||
                  state.categoriesToRemove.length > 0)
             );
@@ -334,7 +334,7 @@ export const useBatchManagerStore = defineStore('batchManager', {
                     this.searchPattern
                 );
                 this.searchResults = results;
-                this.selectedFiles = [...results];
+                this.workFiles = [...results];
             } catch (error) {
                 this.addMessage({
                     type: 'error',
@@ -347,7 +347,7 @@ export const useBatchManagerStore = defineStore('batchManager', {
 
         async generatePreview(previewService, validationService) {
             const validation = validationService.validateBatchOperation(
-                this.selectedFiles,
+                this.workFiles,
                 this.categoriesToAdd,
                 this.categoriesToRemove
             );
@@ -361,7 +361,7 @@ export const useBatchManagerStore = defineStore('batchManager', {
             }
 
             this.previewData = await previewService.generatePreview(
-                this.selectedFiles.filter(f => f.selected),
+                this.workFiles.filter(f => f.selected),
                 this.categoriesToAdd,
                 this.categoriesToRemove
             );
@@ -415,9 +415,9 @@ class ValidationService {
     /**
      * Validate batch operation inputs
      */
-    validateBatchOperation(selectedFiles, categoriesToAdd, categoriesToRemove) {
+    validateBatchOperation(workFiles, categoriesToAdd, categoriesToRemove) {
         // Check if files are selected
-        const selected = selectedFiles.filter(f => f.selected);
+        const selected = workFiles.filter(f => f.selected);
         if (selected.length === 0) {
             return {
                 isValid: false,
@@ -435,7 +435,7 @@ class ValidationService {
 
         return {
             isValid: true,
-            selectedFiles: selected,
+            workFiles: selected,
             categoriesToAdd,
             categoriesToRemove
         };
@@ -609,7 +609,7 @@ class BatchOperationService {
             <!-- Right Panel -->
             <div class="cbm-right-panel">
                 <FilesList
-                    v-model="store.selectedFiles"
+                    v-model="store.workFiles"
                 />
             </div>
         </div>
@@ -672,7 +672,7 @@ export default {
 
         async handleExecute() {
             const validation = this.validationService.validateBatchOperation(
-                this.store.selectedFiles,
+                this.store.workFiles,
                 this.store.categoriesToAdd,
                 this.store.categoriesToRemove
             );
@@ -685,7 +685,7 @@ export default {
                 return;
             }
 
-            if (!confirm(`Process ${validation.selectedFiles.length} files?`)) {
+            if (!confirm(`Process ${validation.workFiles.length} files?`)) {
                 return;
             }
 
@@ -693,7 +693,7 @@ export default {
 
             try {
                 const results = await this.batchOperationService.execute(
-                    validation.selectedFiles,
+                    validation.workFiles,
                     validation.categoriesToAdd,
                     validation.categoriesToRemove,
                     (progress) => {

@@ -75,7 +75,7 @@ class ExecuteHandler {
         self.showProgress = true;
 
         // Placeholder - implement actual batch processing
-        const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
+        const selectedFilesToProcess = self.workFiles.filter(f => f.selected);
         self.processBatch(selectedFilesToProcess, 0);
     }
 
@@ -124,8 +124,8 @@ class ExecuteHandler {
         self.showProgress = true;
 
         // Placeholder - implement actual batch processing
-        const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
-        self.processBatch(selectedFilesToProcess, 0);
+        // const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
+        self.processBatch(self.selectedFiles, 0);
     }
 
     // Process files sequentially

@@ -86,7 +86,7 @@ function BatchManager() {
                 removeCategories: [],
                 editSummary: 'Batch category update via Category Batch Manager',
                 searchResults: [],
-                selectedFiles: [],
+                workFiles: [],
 
                 // MessageDisplay state
                 showMessage: false,
@@ -146,10 +146,13 @@ function BatchManager() {
         },
         computed: {
             selectedCount: function () {
-                return this.selectedFiles.filter(f => f.selected).length;
+                return this.workFiles.filter(f => f.selected).length;
+            },
+            selectedFiles: function () {
+                return this.workFiles.filter(f => f.selected);
             },
             totalFilesCount: function () {
-                return this.selectedFiles.length;
+                return this.workFiles.length;
             }
         },
         methods: {
@@ -173,19 +176,19 @@ function BatchManager() {
             // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Select all files
             selectAll: function () {
-                return this.files_list.selectAll(this.selectedFiles);
+                return this.files_list.selectAll(this.workFiles);
             },
 
             // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Deselect all files
             deselectAll: function () {
-                return this.files_list.deselectAll(this.selectedFiles);
+                return this.files_list.deselectAll(this.workFiles);
             },
 
             // should be moved to `class FilesList` at `ui/components/FilesList.js`
             // Remove individual file from list
             removeFile: function (index) {
-                this.selectedFiles.splice(index, 1);
+                this.workFiles.splice(index, 1);
             },
 
             // Preview changes before executing

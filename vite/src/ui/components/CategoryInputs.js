@@ -86,7 +86,7 @@ class CategoryInputs {
      * @param {string} value - The input value to search for
      */
     async onAddCategoryInput(self, value) {
-        self.hideCategoryMessage(self, 'add');
+        self.hideCategoryMessage('add');
 
         // Clear menu items if the input was cleared.
         if (!value) {
@@ -126,7 +126,7 @@ class CategoryInputs {
      * @param {string} value - The input value to search for
      */
     async onRemoveCategoryInput(self, value) {
-        self.hideCategoryMessage(self, 'remove');
+        self.hideCategoryMessage('remove');
         // Clear menu items if the input was cleared.
         if (!value) {
             console.warn('Remove category input cleared, clearing menu items.');

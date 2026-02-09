@@ -78,7 +78,7 @@ This document outlines a comprehensive plan to refactor the Category Batch Manag
 // Before: CategoryInputs.js handles everything
 class CategoryInputs {
     async onAddCategoryInput(self, value) {
-        this.hideCategoryMessage(self, 'add');
+        this.hideCategoryMessage('add');
         const data = await this.apiService.fetchCategories(value);
         self.addCategory.menuItems = data;
     }

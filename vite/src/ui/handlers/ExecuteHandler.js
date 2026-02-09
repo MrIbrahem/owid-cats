@@ -59,7 +59,7 @@ class ExecuteHandler {
             return;
         }
 
-        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+        if (self.addCategory.selected.length === 0 && self.removeCategory.selected.length === 0) {
             self.showWarningMessage('Please specify categories to add or remove.');
             return;
         }
@@ -70,7 +70,7 @@ class ExecuteHandler {
         if (filteredToAdd === null) return null; // All categories were circular
 
         // Check if there are any valid operations remaining
-        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
+        if (filteredToAdd.length === 0 && self.removeCategory.selected.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
             self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
             return;
@@ -98,7 +98,7 @@ class ExecuteHandler {
             return;
         }
 
-        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+        if (self.addCategory.selected.length === 0 && self.removeCategory.selected.length === 0) {
             self.showWarningMessage('Please specify categories to add or remove.');
             return;
         }
@@ -107,7 +107,7 @@ class ExecuteHandler {
         const filteredToAdd = this.validator.filterCircularCategories(self);
 
         // Check if there are any valid operations remaining
-        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
+        if (filteredToAdd.length === 0 && self.removeCategory.selected.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
             self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
             return;
@@ -117,7 +117,7 @@ class ExecuteHandler {
         self.confirmMessage =
             `You are about to update ${self.selectedFiles.length} file(s).\n\n` +
             `Categories to add: ${filteredToAdd.length > 0 ? filteredToAdd.join(', ') : 'none'}\n` +
-            `Categories to remove: ${self.removeCategories.length > 0 ? self.removeCategories.join(', ') : 'none'}\n\n` +
+            `Categories to remove: ${self.removeCategory.selected.length > 0 ? self.removeCategory.selected.join(', ') : 'none'}\n\n` +
             'Do you want to proceed?';
 
         // trigger confirm dialog
@@ -152,7 +152,7 @@ class ExecuteHandler {
             const results = await this.batchProcessor.processBatch(
                 files,
                 filteredToAdd,
-                self.removeCategories,
+                self.removeCategory.selected,
                 {
                     onProgress: (percent, results) => {
                         self.executionProgressPercent = percent;

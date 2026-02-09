@@ -88,7 +88,7 @@ class PreviewHandler {
             return;
         }
 
-        if (self.addCategories.length === 0 && self.removeCategories.length === 0) {
+        if (self.addCategory.selected.length === 0 && self.removeCategory.selected.length === 0) {
             self.showWarningMessage('Please specify categories to add or remove.');
             return;
         }
@@ -99,7 +99,7 @@ class PreviewHandler {
         if (filteredToAdd === null) return null; // All categories were circular
 
         // Check if there are any valid operations remaining
-        if (filteredToAdd.length === 0 && self.removeCategories.length === 0) {
+        if (filteredToAdd.length === 0 && self.removeCategory.selected.length === 0) {
             console.log('[CBM-V] No valid categories after filtering');
             self.displayCategoryMessage('No valid categories to add or remove.', 'warning', 'add');
             return;
@@ -111,7 +111,7 @@ class PreviewHandler {
             const preview = await this.previewChanges(
                 self.selectedFiles,
                 filteredToAdd,
-                self.removeCategories
+                self.removeCategory.selected
             );
             console.log('[CBM-P] Preview result:', preview);
             this.showPreviewModal(self, preview);

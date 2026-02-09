@@ -25,7 +25,7 @@ class ValidationHelper {
     filterCircularCategories(self) {
         const circularCategories = [];
         const validCategories = [];
-        for (const category of self.addCategories) {
+        for (const category of self.addCategory.selected) {
             if (Validator.isCircularCategory(self.sourceCategory, category)) {
                 console.log('[CBM-V] Circular category detected (silently removed):', category);
                 circularCategories.push(category);

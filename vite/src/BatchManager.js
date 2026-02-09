@@ -123,9 +123,6 @@ function BatchManager() {
                 changesCount: '',
                 openPreviewHandler: false,
 
-                addCategories: [],
-                removeCategories: [],
-
                 addCategory: {
                     menuItems: [],
                     menuConfig: {

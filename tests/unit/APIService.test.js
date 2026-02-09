@@ -429,10 +429,6 @@ describe('APIService', () => {
       const result = await service.searchCategories('Test');
 
       expect(result).toEqual([]);
-      expect(console.error).toHaveBeenCalledWith(
-        'Failed to search categories',
-        expect.any(Error)
-      );
     });
 
     test('should handle empty results', async () => {

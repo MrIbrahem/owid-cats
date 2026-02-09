@@ -1,6 +1,6 @@
 /**
- * Category inputs UI component using Codex CSS-only classes.
- * Manages the add categories, remove categories inputs with autocomplete.
+ * Category inputs message HTML element creator using Codex CSS-only classes.
+ * Creates the HTML elements for displaying add/remove category messages.
  * @see https://doc.wikimedia.org/codex/latest/
  * @class CategoryInputsMessages
  */
@@ -39,29 +39,6 @@ class CategoryInputsMessages {
     `;
     }
 
-    displayCategoryMessage(self, text, type = 'error', msg_type = 'add') {
-        console.log(`[CBM] Displaying ${msg_type} category message: ${text} (type: ${type})`);
-        if (msg_type === 'add') {
-            self.addCategory.message.show = true;
-            self.addCategory.message.type = type;
-            self.addCategory.message.text = text;
-        } else if (msg_type === 'remove') {
-            self.removeCategory.message.show = true;
-            self.removeCategory.message.type = type;
-            self.removeCategory.message.text = text;
-        }
-    }
-
-    hideCategoryMessage(self, msg_type = 'add') {
-        console.log(`[CBM] Hiding ${msg_type} category message`);
-        if (msg_type === 'add') {
-            self.addCategory.message.show = false;
-            self.addCategory.message.text = '';
-        } else if (msg_type === 'remove') {
-            self.removeCategory.message.show = false;
-            self.removeCategory.message.text = '';
-        }
-    }
 
 }
 if (typeof module !== 'undefined' && module.exports) {

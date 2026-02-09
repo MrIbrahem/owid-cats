@@ -133,37 +133,66 @@ class ExecuteHandler {
         self.shouldStopProgress = false;
         self.showExecutionProgress = true;
 
-        // Placeholder - implement actual batch processing
-        // const selectedFilesToProcess = self.selectedFiles.filter(f => f.selected);
-        self.processBatch(self.selectedFiles, 0);
-    }
+        // Filter out circular categories again (in case state changed)
+        const filteredToAdd = this.validator.filterCircularCategories(self);
 
-    // Process files sequentially
-    processBatch(self, files, index) {
-        if (self.shouldStopProgress || index >= files.length) {
+        if (filteredToAdd === null) {
             self.isProcessing = false;
             self.showExecutionProgress = false;
-            if (!self.shouldStopProgress) {
-                self.showSuccessMessage('Batch operation completed successfully!');
-            } else {
-                self.showWarningMessage('Operation stopped by user.');
-            }
             return;
         }
 
-        self.executionProgressPercent = ((index + 1) / files.length) * 100;
-        self.executionProgressText = `Processing ${index + 1} of ${files.length}...`;
+        // Process the batch using real BatchProcessor
+        this.processBatch(self, self.selectedFiles, filteredToAdd);
+    }
 
-        // Placeholder - implement actual file processing
-        setTimeout(() => {
-            console.log('Processing:', files[index].title);
-            self.processBatch(files, index + 1);
-        }, 500);
+    // Process files using BatchProcessor
+    async processBatch(self, files, filteredToAdd) {
+        try {
+            const results = await this.batchProcessor.processBatch(
+                files,
+                filteredToAdd,
+                self.removeCategories,
+                {
+                    onProgress: (percent, results) => {
+                        self.executionProgressPercent = percent;
+                        self.executionProgressText = `Processing ${results.processed} of ${results.total}... (${results.successful} successful, ${results.failed} failed)`;
+                    },
+                    onFileComplete: (file, success) => {
+                        console.log(`[CBM-E] ${success ? '✓' : '⊘'} ${file.title}`);
+                    },
+                    onError: (file, error) => {
+                        console.error(`[CBM-E] ✗ ${file.title}:`, error.message);
+                    }
+                }
+            );
+
+            self.isProcessing = false;
+            self.showExecutionProgress = false;
+
+            if (this.batchProcessor.shouldStop) {
+                self.showWarningMessage(`Operation stopped by user. Processed ${results.processed} of ${results.total} files (${results.successful} successful, ${results.failed} failed).`);
+            } else {
+                const message = `Batch operation completed! Processed ${results.total} files: ${results.successful} successful, ${results.skipped} skipped, ${results.failed} failed.`;
+                if (results.failed > 0) {
+                    self.showWarningMessage(message);
+                } else {
+                    self.showSuccessMessage(message);
+                }
+            }
+
+        } catch (error) {
+            console.error('[CBM-E] Batch processing error:', error);
+            self.isProcessing = false;
+            self.showExecutionProgress = false;
+            self.showErrorMessage(`Batch processing failed: ${error.message}`);
+        }
     }
 
     // Stop ongoing operation
     stopOperation(self) {
         self.shouldStopProgress = true;
+        this.batchProcessor.stop();
     }
 
 }

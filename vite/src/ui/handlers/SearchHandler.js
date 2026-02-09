@@ -75,7 +75,14 @@ class SearchHandler {
     stopSearch(self) {
         self.isSearching = false;
         self.shouldStopSearch = true;
-        // Implement logic to stop ongoing search like in `class stopOperation`
+        self.showSearchProgress = false;
+
+        // Tell the file service to stop the ongoing search
+        if (self.file_service) {
+            self.file_service.stopSearch();
+        }
+
+        self.showWarningMessage('Search stopped by user.');
     }
 
 }

@@ -90,8 +90,8 @@ class PreviewHandler {
 
         if (changesCount === 0) {
             console.log('[CBM] No changes detected');
-            this.ui.showMessage('ℹ️ No changes detected. The categories you are trying to add/remove result in the same category list.', 'notice');
-            return;
+            this.ui.showMessage('ℹ️ No changes detected.', 'notice');
+            // return;
         }
 
         html = `<p>${changesCount} files will be modified</p>` + html;

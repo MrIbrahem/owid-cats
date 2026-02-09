@@ -1,6 +1,7 @@
 node_modules/
-dist/css.css
-dist/js.js
 /coverage
 plans/cdx.md
 /.claude
+/dist
+/vite/dist
+/vite/.claude

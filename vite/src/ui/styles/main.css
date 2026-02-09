@@ -6,12 +6,13 @@
 
 /* Container styles */
 .cbm-container {
-    max-width: 1200px;
+    width: 80vw;
+    max-width: 1400px;
+    max-height: 95vh;
     margin: 30px auto;
     padding: 30px;
     border: 1px solid #a2a9b1;
     border-radius: 4px;
-    background-color: #f8f9fa;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -20,7 +21,6 @@
     margin-top: 0;
     margin-bottom: 25px;
     font-size: 1.5em;
-    color: #202122;
     border-bottom: 2px solid #0645ad;
     padding-bottom: 10px;
 }
@@ -100,7 +100,6 @@
 
 .cbm-help-text {
     display: block;
-    color: #54595d;
     font-size: 0.875em;
     margin-bottom: 5px;
 }
@@ -125,7 +124,6 @@
 
 /* ==================== FilesList ==================== */
 .cbm-files-list {
-    background-color: #ffffff;
     padding: 20px;
     border-radius: 4px;
     border: 1px solid #c8ccd1;
@@ -190,7 +188,6 @@
 }
 
 .cbm-empty-state {
-    background-color: #ffffff;
     padding: 40px;
     border-radius: 4px;
     border: 1px solid #c8ccd1;
@@ -207,7 +204,6 @@
 .cbm-progress-section {
     margin-top: 20px;
     padding: 15px;
-    background-color: #ffffff;
     border: 1px solid #c8ccd1;
     border-radius: 4px;
 }
@@ -229,7 +225,6 @@
 
 .cbm-progress-text {
     text-align: center;
-    color: #202122;
     font-weight: 500;
 }
 

@@ -163,7 +163,7 @@ class SearchHandler {
                     <div class="cdx-progress-bar cdx-progress-bar--inline" role="progressbar" aria-label="Searching">
                         <div class="cdx-progress-bar__bar"></div>
                     </div>
-                    <span style="color: #54595d;">Searching for files...</span>
+                    <span>Searching for files...</span>
                 </div>
             `;
         }

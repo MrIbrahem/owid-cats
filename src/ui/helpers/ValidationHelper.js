@@ -33,15 +33,25 @@ class ValidationHelper {
         return selectedFiles;
     }
 
+    parseCategories(input) {
+        if (!input || typeof input !== 'string') {
+            return [];
+        }
+        return input
+            .split(',')
+            .map(cat => cat.trim())
+            .filter(cat => cat.length > 0)
+            .map(cat => cat.startsWith('Category:') ? cat : `Category:${cat}`);
+    }
     /**
      * Parse and validate category inputs
      * @returns {Object|null} Object with toAdd and toRemove arrays, or null if validation fails
      */
     parseCategoryInputs() {
-        const toAdd = this.ui.parseCategories(
+        const toAdd = this.parseCategories(
             document.getElementById('cbm-add-cats').value
         );
-        const toRemove = this.ui.parseCategories(
+        const toRemove = this.parseCategories(
             document.getElementById('cbm-remove-cats').value
         );
         console.log('[CBM-V] Categories to add:', toAdd);

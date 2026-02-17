@@ -1,4 +1,8 @@
 const FileService = require('../../src/services/FileService');
+const FileModel = require('../../src/models/FileModel');
+
+// Mock global FileModel for FileService
+global.FileModel = FileModel;
 
 describe('FileService', () => {
   let service;
